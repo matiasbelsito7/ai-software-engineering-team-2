@@ -1,0 +1,112 @@
+```yaml
+# ==============================================================================
+# Pre-Commit Configuration
+#
+# AI Software Engineering Team
+#
+# Documentation:
+# https://pre-commit.com/
+# ==============================================================================
+
+minimum_pre_commit_version: "3.7.0"
+
+default_install_hook_types:
+  - pre-commit
+
+default_stages:
+  - pre-commit
+
+repos:
+
+  # ============================================================================
+  # General file sanity checks
+  # ============================================================================
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+
+    hooks:
+
+      - id: check-yaml
+
+      - id: check-toml
+
+      - id: check-json
+
+      - id: check-merge-conflict
+
+      - id: check-added-large-files
+        args:
+          - --maxkb=1024
+
+      - id: end-of-file-fixer
+
+      - id: trailing-whitespace
+
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+
+  # ============================================================================
+  # Black
+  # ============================================================================
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+
+    hooks:
+
+      - id: black
+        language_version: python3.12
+
+  # ============================================================================
+  # Ruff
+  # ============================================================================
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+
+    hooks:
+
+      - id: ruff
+        args:
+          - --fix
+
+        types_or:
+          - python
+
+  # ============================================================================
+  # MyPy
+  # ============================================================================
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+
+    hooks:
+
+      - id: mypy
+
+        additional_dependencies: []
+
+        pass_filenames: false
+
+  # ============================================================================
+  # Local hooks
+  # ============================================================================
+
+  - repo: local
+
+    hooks:
+
+      - id: architecture-validation
+        name: Validate project architecture
+
+        entry: uv run python scripts/validate_architecture.py
+
+        language: system
+
+        pass_filenames: false
+
+        stages:
+          - pre-commit
+```

@@ -1,0 +1,97 @@
+```yaml #id="8v1qmf"
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  release:
+
+    name: Create GitHub Release
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+
+      ##########################################################################
+      # Checkout
+      ##########################################################################
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      ##########################################################################
+      # Install uv
+      ##########################################################################
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      ##########################################################################
+      # Python
+      ##########################################################################
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      ##########################################################################
+      # Restore uv cache
+      ##########################################################################
+
+      - name: Restore uv cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-
+
+      ##########################################################################
+      # Install dependencies
+      ##########################################################################
+
+      - name: Install dependencies
+        run: uv sync --frozen --all-extras
+
+      ##########################################################################
+      # Build package
+      ##########################################################################
+
+      - name: Build package
+        run: uv build
+
+      ##########################################################################
+      # Upload build artifacts
+      ##########################################################################
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+      ##########################################################################
+      # Create GitHub Release
+      ##########################################################################
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*
+```

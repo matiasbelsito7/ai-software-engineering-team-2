@@ -1,0 +1,63 @@
+```yaml #id="3vkqhm"
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  ##########################################################################
+  # Lint
+  ##########################################################################
+
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml
+
+  ##########################################################################
+  # Tests
+  ##########################################################################
+
+  tests:
+    name: Tests
+    needs: lint
+    uses: ./.github/workflows/test.yml
+
+  ##########################################################################
+  # CI Summary
+  ##########################################################################
+
+  ci-success:
+    name: CI Summary
+
+    needs:
+      - lint
+      - tests
+
+    runs-on: ubuntu-latest
+
+    if: success()
+
+    steps:
+
+      - name: CI completed
+        run: |
+          echo "All quality checks passed."
+          echo "Continuous Integration completed successfully."
+```

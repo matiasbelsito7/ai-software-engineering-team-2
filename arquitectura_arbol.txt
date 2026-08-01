@@ -1,0 +1,226 @@
+ai-software-engineering-team/
+│
+├── src/
+│
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── routers/
+│   │   │   ├── controllers/
+│   │   │   ├── schemas/
+│   │   │   ├── dependencies/
+│   │   │   ├── middleware/
+│   │   │   └── exceptions/
+│   │   │
+│   │   ├── lifespan.py
+│   │   ├── dependencies.py
+│   │   └── main.py
+│   │
+│   │
+│   ├── agents/
+│   │
+│   │   ├── base.py                  # BaseAgent / protocolo común
+│   │
+│   │   ├── planner/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   │   ├── system.md
+│   │   │   │   ├── planning.md
+│   │   │   │   └── refinement.md
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── architect/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── backend/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── frontend/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── database/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── reviewer/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── qa/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── documentation/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   ├── devops/
+│   │   │   ├── agent.py
+│   │   │   ├── prompts/
+│   │   │   └── tools.py
+│   │   │
+│   │   └── git/
+│   │       ├── agent.py
+│   │       ├── prompts/
+│   │       └── tools.py
+│   │
+│   │
+│   ├── graph/
+│   │   ├── workflow.py          # StateGraph principal
+│   │   ├── state.py             # Estado global
+│   │   ├── edges.py             # Routing condicional
+│   │   ├── checkpoints.py
+│   │   ├── supervisor.py
+│   │   └── human_loop.py
+│   │
+│   │
+│   ├── tools/
+│   │   ├── base.py
+│   │   ├── registry.py
+│   │   ├── sandbox.py
+│   │   ├── code_tools.py
+│   │   ├── search_tools.py
+│   │   ├── browser_tools.py
+│   │   └── api_tools.py
+│   │
+│   │
+│   ├── rag/
+│   │   ├── loaders/
+│   │   │   ├── pdf.py
+│   │   │   ├── markdown.py
+│   │   │   ├── github.py
+│   │   │   └── web.py
+│   │   │
+│   │   ├── processing/
+│   │   │   ├── chunking.py
+│   │   │   ├── cleaning.py
+│   │   │   └── metadata.py
+│   │   │
+│   │   ├── embeddings.py
+│   │   ├── retriever.py
+│   │   ├── vector_store.py
+│   │   ├── pipeline.py
+│   │   └── templates/
+│   │
+│   │
+│   ├── memory/
+│   │   ├── short_term.py
+│   │   ├── project.py
+│   │   ├── manager.py
+│   │   └── providers.py
+│   │
+│   │
+│   ├── context/
+│   │   ├── builder.py
+│   │   ├── selector.py
+│   │   ├── compressor.py
+│   │   ├── serializer.py
+│   │   └── manager.py
+│   │
+│   │
+│   ├── evals/
+│   │   ├── datasets/
+│   │   ├── benchmarks/
+│   │   ├── judges/
+│   │   ├── metrics.py
+│   │   ├── reports/
+│   │   └── runner.py
+│   │
+│   │
+│   ├── observability/
+│   │   ├── logging.py
+│   │   ├── tracing.py
+│   │   ├── metrics.py
+│   │   ├── token_usage.py
+│   │   ├── costs.py
+│   │   └── telemetry.py
+│   │
+│   │
+│   ├── infrastructure/
+│   │   ├── config/
+│   │   │   ├── settings.py
+│   │   │   └── constants.py
+│   │   │
+│   │   ├── llm/
+│   │   │   ├── providers/
+│   │   │   │   ├── openai.py
+│   │   │   │   ├── anthropic.py
+│   │   │   │   ├── ollama.py
+│   │   │   │   └── openrouter.py
+│   │   │   ├── client.py
+│   │   │   └── factory.py
+│   │   │
+│   │   ├── database/
+│   │   │   ├── models/
+│   │   │   ├── repositories/
+│   │   │   ├── session.py
+│   │   │   └── migrations/
+│   │   │
+│   │   ├── cache.py
+│   │   ├── vector_db.py
+│   │   └── auth.py
+│   │
+│   │
+│   └── shared/
+│       ├── constants.py
+│       ├── enums.py
+│       ├── exceptions.py
+│       ├── types.py
+│       ├── helpers.py
+│       └── utils.py
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── e2e/
+│   ├── fixtures/
+│   └── datasets/
+│
+├── docs/
+│   ├── architecture/
+│   ├── adr/
+│   ├── diagrams/
+│   ├── guides/
+│   ├── examples/
+│   └── api/
+│
+├── scripts/
+│   ├── setup/
+│   ├── ingestion/
+│   ├── maintenance/
+│   └── deployment/
+│
+├── docker/
+│   ├── postgres/
+│   ├── redis/
+│   ├── qdrant/
+│   └── ollama/
+│
+├── config/
+│   ├── development.yaml
+│   ├── testing.yaml
+│   ├── production.yaml
+│   └── logging.yaml
+│
+├── assets/
+│   ├── diagrams/
+│   ├── images/
+│   └── demo/
+│
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── pyproject.toml
+├── README.md
+└── LICENSE
