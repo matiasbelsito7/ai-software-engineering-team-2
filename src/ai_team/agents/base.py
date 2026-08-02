@@ -5,7 +5,7 @@ Base class for all AI agents.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from ai_team.agents.dependencies import AgentDependencies
 from ai_team.agents.models import (
@@ -13,6 +13,7 @@ from ai_team.agents.models import (
     AgentInfo,
     AgentResult,
 )
+from ai_team.agents.parsers.base import BaseParser
 from ai_team.infrastructure.llm import BaseLLM
 from ai_team.infrastructure.llm.responses import LLMResponse
 from ai_team.shared.enums import AgentCapability
@@ -22,12 +23,12 @@ class BaseAgent(ABC):
     """
     Base class for every AI agent.
 
-    Implements the Template Method pattern:
-    execute() defines the execution lifecycle while run()
-    contains the agent-specific implementation.
+    Implements the Template Method pattern.
     """
 
     INFO: ClassVar[AgentInfo]
+
+    PARSER: ClassVar[type[BaseParser[Any]] | None] = None
 
     def __init__(
         self,
@@ -41,16 +42,10 @@ class BaseAgent(ABC):
 
     @property
     def info(self) -> AgentInfo:
-        """
-        Static metadata describing this agent.
-        """
         return self.INFO
 
     @property
     def capability(self) -> AgentCapability:
-        """
-        Capability implemented by this agent.
-        """
         return self.INFO.capability
 
     # ------------------------------------------------------------------
@@ -59,9 +54,6 @@ class BaseAgent(ABC):
 
     @property
     def dependencies(self) -> AgentDependencies:
-        """
-        Shared services available to this agent.
-        """
         return self._dependencies
 
     @property
@@ -91,7 +83,7 @@ class BaseAgent(ABC):
         model: str | None = None,
     ) -> BaseLLM:
         """
-        Create or retrieve an LLM instance.
+        Create an LLM instance.
         """
 
         return self.dependencies.llm_factory.create(
@@ -107,10 +99,7 @@ class BaseAgent(ABC):
         model: str | None = None,
     ) -> LLMResponse:
         """
-        Generate a response using an LLM.
-
-        This method centralizes every interaction with the
-        language model.
+        Generate a raw response from the LLM.
         """
 
         llm = self.get_llm(
@@ -123,11 +112,37 @@ class BaseAgent(ABC):
         )
 
         execution.llm_response = response
+
         execution.conversation.add_assistant(
             response.content,
         )
 
         return response
+
+    async def generate_and_parse(
+        self,
+        execution: AgentExecution,
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+    ) -> Any:
+        """
+        Generate a response and parse it using the configured parser.
+        """
+
+        if self.PARSER is None:
+            raise RuntimeError(
+                f"{self.__class__.__name__} "
+                "does not define a PARSER."
+            )
+
+        response = await self.generate(
+            execution,
+            provider=provider,
+            model=model,
+        )
+
+        return self.PARSER.parse(response)
 
     # ------------------------------------------------------------------
     # Public API
@@ -138,7 +153,7 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> AgentExecution:
         """
-        Execute the complete lifecycle of an agent.
+        Execute the agent lifecycle.
         """
 
         self.validate(execution)
@@ -162,10 +177,9 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> None:
         """
-        Validate the execution before running.
-
-        Subclasses may override this method.
+        Validate the execution.
         """
+
         return None
 
     async def prepare(
@@ -173,16 +187,9 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> None:
         """
-        Prepare the execution before running.
-
-        Typical responsibilities:
-
-        - Build the conversation
-        - Load memory
-        - Retrieve RAG context
-        - Initialize telemetry
-        - Configure tools
+        Prepare the execution.
         """
+
         return None
 
     async def finalize(
@@ -191,14 +198,8 @@ class BaseAgent(ABC):
     ) -> None:
         """
         Finalize the execution.
-
-        Typical responsibilities:
-
-        - Persist memory
-        - Emit telemetry
-        - Store evaluation data
-        - Cleanup temporary resources
         """
+
         return None
 
     # ------------------------------------------------------------------
@@ -212,7 +213,5 @@ class BaseAgent(ABC):
     ) -> AgentResult:
         """
         Execute the agent-specific logic.
-
-        Every concrete agent must implement this method.
         """
         ...

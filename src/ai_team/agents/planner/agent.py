@@ -11,7 +11,6 @@ from ai_team.agents.models import (
     AgentResult,
 )
 from ai_team.agents.parsers import PlannerParser
-from ai_team.agents.planner.models import ExecutionPlan
 from ai_team.agents.planner.prompt_builder import (
     PlannerPromptBuilder,
 )
@@ -31,6 +30,8 @@ class PlannerAgent(BaseAgent):
             "for the multi-agent system."
         ),
     )
+
+    PARSER = PlannerParser
 
     async def prepare(
         self,
@@ -54,14 +55,8 @@ class PlannerAgent(BaseAgent):
         Generate an execution plan.
         """
 
-        response = await self.generate(
+        plan = await self.generate_and_parse(
             execution,
-        )
-
-        plan: ExecutionPlan = (
-            PlannerParser.parse(
-                response,
-            )
         )
 
         return AgentResult(
