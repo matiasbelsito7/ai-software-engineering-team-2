@@ -19,6 +19,8 @@ from ai_team.agents.models import (
     AgentExecution,
     AgentInfo,
     AgentResult,
+    PatchOperation,
+    CodePatch,
 )
 from ai_team.agents.registry import AgentRegistry
 
@@ -35,6 +37,8 @@ __all__ = [
     "AgentInfo",
     "AgentExecution",
     "AgentResult",
+    "PatchOperation",
+    "CodePatch",
 
     # Exceptions
     "AgentError",

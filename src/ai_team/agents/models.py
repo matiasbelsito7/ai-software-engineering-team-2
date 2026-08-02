@@ -222,3 +222,34 @@ class AgentInfo(BaseModel):
     capability: AgentCapability
     description: str
     version: str = "1.0.0"
+
+
+class PatchOperation(StrEnum):
+    """
+    Supported file operations.
+    """
+
+    CREATE = "create"
+
+    MODIFY = "modify"
+
+    DELETE = "delete"
+
+
+class CodePatch(BaseModel):
+    """
+    Represents a source code modification.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
+
+    path: str
+
+    operation: PatchOperation
+
+    content: str | None = None
+
+    reason: str
