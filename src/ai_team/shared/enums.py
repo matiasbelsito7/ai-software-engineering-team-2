@@ -162,3 +162,25 @@ class ExecutionStatus(Enum):
     FAILURE = auto()
     RETRY = auto()
 ```
+
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+
+class AgentCapability(StrEnum):
+    """
+    Capabilities supported by the agent system.
+    """
+
+    PLANNING = "planning"
+    ARCHITECTURE = "architecture"
+    BACKEND = "backend"
+    FRONTEND = "frontend"
+    DATABASE = "database"
+    REVIEW = "review"
+    QA = "qa"
+    DOCUMENTATION = "documentation"
+    DEVOPS = "devops"
+    GIT = "git"

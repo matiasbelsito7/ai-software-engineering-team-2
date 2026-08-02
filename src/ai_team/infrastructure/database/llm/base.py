@@ -9,7 +9,6 @@ from collections.abc import AsyncIterator
 from typing import TypeVar
 
 from ai_team.infrastructure.llm.config import GenerationConfig
-from ai_team.infrastructure.llm.messages import Conversation
 from ai_team.infrastructure.llm.responses import (
     LLMResponse,
     LLMStreamChunk,
@@ -54,27 +53,29 @@ class BaseLLM(ABC):
         ...
 
     # ------------------------------------------------------------------
-    # Generation
+    # Text Generation
     # ------------------------------------------------------------------
 
     @abstractmethod
     async def generate(
         self,
-        conversation: Conversation,
+        prompt: str,
         *,
+        system_prompt: str | None = None,
         config: GenerationConfig | None = None,
     ) -> LLMResponse:
         """
-        Generate a response from a conversation.
+        Generate a text response.
         """
         ...
 
     @abstractmethod
     async def generate_structured(
         self,
-        conversation: Conversation,
+        prompt: str,
         schema: type[SchemaT],
         *,
+        system_prompt: str | None = None,
         config: GenerationConfig | None = None,
     ) -> StructuredLLMResponse[SchemaT]:
         """
@@ -88,12 +89,13 @@ class BaseLLM(ABC):
     @abstractmethod
     async def stream(
         self,
-        conversation: Conversation,
+        prompt: str,
         *,
+        system_prompt: str | None = None,
         config: GenerationConfig | None = None,
     ) -> AsyncIterator[LLMStreamChunk]:
         """
-        Stream the model response.
+        Stream the model output.
         """
         ...
 

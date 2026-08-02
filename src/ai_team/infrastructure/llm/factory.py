@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from ai_team.infrastructure.config.settings import settings
 from ai_team.infrastructure.llm.base import BaseLLM
-from ai_team.infrastructure.llm.providers.ollama import OllamaLLM
+from ai_team.infrastructure.llm.exceptions import UnsupportedProviderError
 from ai_team.infrastructure.llm.providers.openrouter import OpenRouterLLM
 
 
@@ -33,26 +33,29 @@ class LLMFactory:
     """
 
     @staticmethod
-    def create() -> BaseLLM:
+    def create(
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+    ) -> BaseLLM:
         """
-        Create the configured LLM provider.
+        Create an LLM provider instance.
+
+        If provider or model are omitted, the application defaults
+        defined in the settings are used.
         """
 
-        provider = settings.llm.provider.lower()
+        provider = provider or settings.llm.default_provider
+        model = model or settings.llm.default_model
 
-        match provider:
+        match provider.lower():
+
             case "openrouter":
                 return OpenRouterLLM(
-                    model=settings.llm.model,
-                )
-
-            case "ollama":
-                return OllamaLLM(
-                    model=settings.llm.model,
+                    model=model,
                 )
 
             case _:
-                raise ValueError(
-                    f"Unsupported LLM provider: '{provider}'."
+                raise UnsupportedProviderError(
+                    f"Unsupported LLM provider: {provider}"
                 )
-```

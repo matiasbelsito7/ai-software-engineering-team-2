@@ -1,11 +1,5 @@
 """
-Shared implementation for all LLM providers.
-
-This class contains the infrastructure common to every provider:
-- HTTP communication
-- Error translation
-- Response construction
-- Latency measurement
+Shared infrastructure for all LLM providers.
 """
 
 from __future__ import annotations
@@ -13,17 +7,17 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import AsyncIterator
 from time import perf_counter
-from typing import Any
+from typing import Any, TypeVar
 
 import httpx
 
 from ai_team.infrastructure.http.client import HTTPClient
 from ai_team.infrastructure.llm.base import BaseLLM
+from ai_team.infrastructure.llm.config import GenerationConfig
 from ai_team.infrastructure.llm.exceptions import (
     AuthenticationError,
     AuthorizationError,
     InvalidRequestError,
-    InvalidResponseError,
     ModelNotFoundError,
     ProviderUnavailableError,
     RateLimitError,
@@ -31,17 +25,29 @@ from ai_team.infrastructure.llm.exceptions import (
     ServiceUnavailableError,
     TimeoutError,
 )
+from ai_team.infrastructure.llm.messages import Conversation
 from ai_team.infrastructure.llm.responses import (
     GenerationMetadata,
     LLMResponse,
     LLMStreamChunk,
+    StructuredLLMResponse,
     TokenUsage,
 )
+
+SchemaT = TypeVar("SchemaT")
 
 
 class ProviderBase(BaseLLM):
     """
     Base implementation shared by every LLM provider.
+
+    This class centralizes:
+
+    - HTTP communication
+    - Error translation
+    - Latency measurement
+    - Response construction
+    - Structured generation
     """
 
     def __init__(
@@ -67,7 +73,7 @@ class ProviderBase(BaseLLM):
         return self._model
 
     @property
-    def client(self):
+    def client(self) -> httpx.AsyncClient:
         return self._client
 
     # ------------------------------------------------------------------
@@ -75,6 +81,9 @@ class ProviderBase(BaseLLM):
     # ------------------------------------------------------------------
 
     async def close(self) -> None:
+        """
+        Release HTTP resources.
+        """
         await self.client.aclose()
 
     # ------------------------------------------------------------------
@@ -86,17 +95,18 @@ class ProviderBase(BaseLLM):
         *,
         endpoint: str,
         payload: dict[str, Any],
-        headers: dict[str, str] | None = None,
     ) -> tuple[dict[str, Any], float]:
+        """
+        Execute a POST request and return both the JSON response
+        and the request latency in milliseconds.
+        """
 
         start = perf_counter()
 
         try:
-
             response = await self.client.post(
                 endpoint,
                 json=payload,
-                headers=headers,
             )
 
             latency_ms = (perf_counter() - start) * 1000
@@ -116,7 +126,6 @@ class ProviderBase(BaseLLM):
             return data, latency_ms
 
         except httpx.TimeoutException as exc:
-
             raise TimeoutError(
                 "LLM request timed out.",
                 provider=self.provider_name,
@@ -124,7 +133,6 @@ class ProviderBase(BaseLLM):
             ) from exc
 
         except httpx.HTTPError as exc:
-
             raise ProviderUnavailableError(
                 str(exc),
                 provider=self.provider_name,
@@ -135,6 +143,9 @@ class ProviderBase(BaseLLM):
         self,
         response: httpx.Response,
     ) -> None:
+        """
+        Translate HTTP status codes into domain exceptions.
+        """
 
         status = response.status_code
 
@@ -142,7 +153,6 @@ class ProviderBase(BaseLLM):
             return
 
         match status:
-
             case 400:
                 raise InvalidRequestError(
                     "Invalid request.",
@@ -166,7 +176,7 @@ class ProviderBase(BaseLLM):
 
             case 404:
                 raise ModelNotFoundError(
-                    "Requested model not found.",
+                    "Model not found.",
                     provider=self.provider_name,
                     model=self.model_name,
                 )
@@ -192,8 +202,54 @@ class ProviderBase(BaseLLM):
                     model=self.model_name,
                 )
 
+from pydantic import TypeAdapter
+
+
     # ------------------------------------------------------------------
-    # Response helpers
+    # Conversation
+    # ------------------------------------------------------------------
+
+    def _conversation_to_messages(
+        self,
+        conversation: Conversation,
+    ) -> list[dict[str, Any]]:
+        """
+        Convert an internal Conversation into the provider
+        message format.
+        """
+
+        return [
+            {
+                "role": message.role.value,
+                "content": message.content,
+            }
+            for message in conversation.messages
+        ]
+
+    # ------------------------------------------------------------------
+    # Generation Config
+    # ------------------------------------------------------------------
+
+    def _apply_generation_config(
+        self,
+        payload: dict[str, Any],
+        config: GenerationConfig | None,
+    ) -> dict[str, Any]:
+        """
+        Apply generation parameters to a provider payload.
+        """
+
+        if config is None:
+            return payload
+
+        payload.update(
+            config.to_provider_dict(),
+        )
+
+        return payload
+
+    # ------------------------------------------------------------------
+    # Response
     # ------------------------------------------------------------------
 
     def _build_response(
@@ -205,6 +261,9 @@ class ProviderBase(BaseLLM):
         latency_ms: float | None = None,
         raw_response: dict[str, Any] | None = None,
     ) -> LLMResponse:
+        """
+        Build a normalized LLM response.
+        """
 
         return LLMResponse(
             content=content,
@@ -217,42 +276,91 @@ class ProviderBase(BaseLLM):
         )
 
     # ------------------------------------------------------------------
+    # Structured Generation
+    # ------------------------------------------------------------------
+
+    async def generate_structured(
+        self,
+        conversation: Conversation,
+        schema: type[SchemaT],
+        *,
+        config: GenerationConfig | None = None,
+    ) -> StructuredLLMResponse[SchemaT]:
+        """
+        Generate and validate structured output.
+
+        Every provider automatically inherits this behavior.
+        """
+
+        response = await self.generate(
+            conversation=conversation,
+            config=config,
+        )
+
+        adapter = TypeAdapter(schema)
+
+        parsed = adapter.validate_json(
+            response.content,
+        )
+
+        return StructuredLLMResponse(
+            data=parsed,
+            response=response,
+        )
+
+    # ------------------------------------------------------------------
+    # Message Conversion
+    # ------------------------------------------------------------------
+
+    def _message_to_provider_format(
+        self,
+        message: ChatMessage,
+    ) -> dict[str, Any]:
+        """
+        Convert a ChatMessage into the provider-specific format.
+
+        Providers with custom message formats (for example,
+        Anthropic or Gemini) may override this method without
+        reimplementing the entire conversation conversion.
+        """
+
+        payload: dict[str, Any] = {
+            "role": message.role.value,
+            "content": message.content,
+        }
+
+        if message.name:
+            payload["name"] = message.name
+
+        if message.tool_call_id:
+            payload["tool_call_id"] = message.tool_call_id
+
+        return payload
+
+    # ------------------------------------------------------------------
     # Abstract API
     # ------------------------------------------------------------------
 
     @abstractmethod
     async def generate(
         self,
-        prompt: str,
+        conversation: Conversation,
         *,
-        system_prompt: str | None = None,
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-        **kwargs: Any,
+        config: GenerationConfig | None = None,
     ) -> LLMResponse:
-        ...
-
-    @abstractmethod
-    async def generate_structured(
-        self,
-        prompt: str,
-        schema: type[Any],
-        *,
-        system_prompt: str | None = None,
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-        **kwargs: Any,
-    ) -> Any:
+        """
+        Generate a response from a conversation.
+        """
         ...
 
     @abstractmethod
     async def stream(
         self,
-        prompt: str,
+        conversation: Conversation,
         *,
-        system_prompt: str | None = None,
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-        **kwargs: Any,
+        config: GenerationConfig | None = None,
     ) -> AsyncIterator[LLMStreamChunk]:
+        """
+        Stream a response from the provider.
+        """
         ...
