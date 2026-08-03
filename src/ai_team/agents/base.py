@@ -4,7 +4,6 @@ Base class for all AI agents.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
 from ai_team.agents.dependencies import AgentDependencies
@@ -14,12 +13,13 @@ from ai_team.agents.models import (
     AgentResult,
 )
 from ai_team.agents.parsers.base import BaseParser
+from ai_team.agents.prompt_builder import BasePromptBuilder
 from ai_team.infrastructure.llm import BaseLLM
 from ai_team.infrastructure.llm.responses import LLMResponse
 from ai_team.shared.enums import AgentCapability
 
 
-class BaseAgent(ABC):
+class BaseAgent:
     """
     Base class for every AI agent.
 
@@ -28,13 +28,42 @@ class BaseAgent(ABC):
 
     INFO: ClassVar[AgentInfo]
 
-    PARSER: ClassVar[type[BaseParser[Any]] | None] = None
+    PARSER: ClassVar[type[BaseParser[Any]]]
+
+    PROMPT_BUILDER: ClassVar[type[BasePromptBuilder]]
 
     def __init__(
         self,
         dependencies: AgentDependencies,
     ) -> None:
+        self._validate_configuration()
+
         self._dependencies = dependencies
+
+    # ------------------------------------------------------------------
+    # Configuration
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def _validate_configuration(cls) -> None:
+        """
+        Validate that the agent declares all required class attributes.
+        """
+
+        if getattr(cls, "INFO", None) is None:
+            raise RuntimeError(
+                f"{cls.__name__} does not define INFO."
+            )
+
+        if getattr(cls, "PARSER", None) is None:
+            raise RuntimeError(
+                f"{cls.__name__} does not define PARSER."
+            )
+
+        if getattr(cls, "PROMPT_BUILDER", None) is None:
+            raise RuntimeError(
+                f"{cls.__name__} does not define PROMPT_BUILDER."
+            )
 
     # ------------------------------------------------------------------
     # Agent Information
@@ -57,16 +86,8 @@ class BaseAgent(ABC):
         return self._dependencies
 
     @property
-    def memory(self):
-        return self.dependencies.memory
-
-    @property
-    def rag(self):
-        return self.dependencies.rag
-
-    @property
-    def telemetry(self):
-        return self.dependencies.telemetry
+    def llm(self) -> BaseLLM:
+        return self.dependencies.llm
 
     @property
     def tools(self):
@@ -76,38 +97,15 @@ class BaseAgent(ABC):
     # LLM
     # ------------------------------------------------------------------
 
-    def get_llm(
-        self,
-        *,
-        provider: str | None = None,
-        model: str | None = None,
-    ) -> BaseLLM:
-        """
-        Create an LLM instance.
-        """
-
-        return self.dependencies.llm_factory.create(
-            provider=provider,
-            model=model,
-        )
-
     async def generate(
         self,
         execution: AgentExecution,
-        *,
-        provider: str | None = None,
-        model: str | None = None,
     ) -> LLMResponse:
         """
         Generate a raw response from the LLM.
         """
 
-        llm = self.get_llm(
-            provider=provider,
-            model=model,
-        )
-
-        response = await llm.generate(
+        response = await self.llm.generate(
             execution.conversation,
         )
 
@@ -122,25 +120,12 @@ class BaseAgent(ABC):
     async def generate_and_parse(
         self,
         execution: AgentExecution,
-        *,
-        provider: str | None = None,
-        model: str | None = None,
     ) -> Any:
         """
-        Generate a response and parse it using the configured parser.
+        Generate a response and parse it.
         """
 
-        if self.PARSER is None:
-            raise RuntimeError(
-                f"{self.__class__.__name__} "
-                "does not define a PARSER."
-            )
-
-        response = await self.generate(
-            execution,
-            provider=provider,
-            model=model,
-        )
+        response = await self.generate(execution)
 
         return self.PARSER.parse(response)
 
@@ -153,7 +138,7 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> AgentExecution:
         """
-        Execute the agent lifecycle.
+        Execute the complete lifecycle.
         """
 
         self.validate(execution)
@@ -169,7 +154,7 @@ class BaseAgent(ABC):
         return execution
 
     # ------------------------------------------------------------------
-    # Lifecycle Hooks
+    # Lifecycle
     # ------------------------------------------------------------------
 
     def validate(
@@ -187,10 +172,31 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> None:
         """
-        Prepare the execution.
+        Build the conversation.
         """
 
-        return None
+        execution.conversation = (
+            self.PROMPT_BUILDER.build(
+                execution,
+            )
+        )
+
+    async def run(
+        self,
+        execution: AgentExecution,
+    ) -> AgentResult:
+        """
+        Execute the agent.
+        """
+
+        output = await self.generate_and_parse(
+            execution,
+        )
+
+        return AgentResult(
+            success=True,
+            output=output,
+        )
 
     async def finalize(
         self,
@@ -201,17 +207,3 @@ class BaseAgent(ABC):
         """
 
         return None
-
-    # ------------------------------------------------------------------
-    # Agent Logic
-    # ------------------------------------------------------------------
-
-    @abstractmethod
-    async def run(
-        self,
-        execution: AgentExecution,
-    ) -> AgentResult:
-        """
-        Execute the agent-specific logic.
-        """
-        ...
