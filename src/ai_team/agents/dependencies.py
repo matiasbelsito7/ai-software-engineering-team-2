@@ -4,46 +4,39 @@ Shared dependencies for AI agents.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict
-
-from ai_team.infrastructure.llm.factory import LLMFactory
-
-if TYPE_CHECKING:
-    from ai_team.memory.base import BaseMemory
-    from ai_team.rag.base import BaseRAG
-    from ai_team.observability.telemetry import TelemetryService
-    from ai_team.tools.registry import ToolRegistry
+from ai_team.agents.tools import AgentTools
+from ai_team.infrastructure.llm.base import BaseLLM
 
 
-class AgentDependencies(BaseModel):
+@dataclass(slots=True)
+class AgentDependencies:
     """
-    Shared services available to every agent.
-
-    New services can be added here without changing
-    the constructor of every agent.
+    Shared dependencies injected into every agent.
     """
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        frozen=True,
-    )
+    # =========================================================================
+    # Core Infrastructure
+    # =========================================================================
 
-    # ------------------------------------------------------------------
-    # LLM
-    # ------------------------------------------------------------------
+    llm: BaseLLM
 
-    llm_factory: LLMFactory
+    logger: Any | None = None
 
-    # ------------------------------------------------------------------
+    settings: Any | None = None
+
+    # =========================================================================
+    # Agent Tools
+    # =========================================================================
+
+    tools: AgentTools
+
+    # =========================================================================
     # Optional Services
-    # ------------------------------------------------------------------
+    # =========================================================================
 
-    memory: "BaseMemory | None" = None
+    event_bus: Any | None = None
 
-    rag: "BaseRAG | None" = None
-
-    telemetry: "TelemetryService | None" = None
-
-    tools: "ToolRegistry | None" = None
+    telemetry: Any | None = None

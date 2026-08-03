@@ -223,6 +223,10 @@ class AgentInfo(BaseModel):
     description: str
     version: str = "1.0.0"
 
+# ============================================================================
+# Code Changes
+# ============================================================================
+
 
 class PatchOperation(StrEnum):
     """
@@ -230,9 +234,7 @@ class PatchOperation(StrEnum):
     """
 
     CREATE = "create"
-
     MODIFY = "modify"
-
     DELETE = "delete"
 
 
@@ -253,3 +255,64 @@ class CodePatch(BaseModel):
     content: str | None = None
 
     reason: str
+
+
+class DependencyChange(BaseModel):
+    """
+    Represents a dependency added or updated.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
+
+    package: str
+
+    version: str | None = None
+
+    reason: str
+
+
+# ============================================================================
+# Review Models
+# ============================================================================
+
+
+class ReviewSeverity(StrEnum):
+    """
+    Severity of a review issue.
+    """
+
+    INFO = "info"
+
+    LOW = "low"
+
+    MEDIUM = "medium"
+
+    HIGH = "high"
+
+    CRITICAL = "critical"
+
+
+class ReviewIssue(BaseModel):
+    """
+    Represents an issue detected during code review.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
+
+    title: str
+
+    description: str
+
+    severity: ReviewSeverity
+
+    file: str | None = None
+
+    line: int | None = None
+
+    suggestion: str | None = None
