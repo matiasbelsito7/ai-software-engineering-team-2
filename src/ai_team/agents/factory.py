@@ -7,7 +7,7 @@ from __future__ import annotations
 from ai_team.agents.base import BaseAgent
 from ai_team.agents.dependencies import AgentDependencies
 from ai_team.agents.registry import AgentRegistry
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentFactory:

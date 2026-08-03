@@ -10,7 +10,7 @@ from ai_team.agents.backend.prompt_builder import (
 from ai_team.agents.base import BaseAgent
 from ai_team.agents.models import AgentInfo
 from ai_team.agents.parsers import BackendParser
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class BackendAgent(BaseAgent):
@@ -19,11 +19,11 @@ class BackendAgent(BaseAgent):
     """
 
     INFO = AgentInfo(
-        name="backend",
-        capability=AgentCapability.BACKEND,
-        description=(
-            "Implements backend functionality following the approved architecture."
-        ),
+    name="backend",
+    capability=AgentCapability.BACKEND,
+    description=(
+        "Implements backend functionality following the approved architecture."
+    ),
     )
 
     PARSER = BackendParser

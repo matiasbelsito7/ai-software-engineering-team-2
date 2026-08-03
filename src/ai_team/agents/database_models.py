@@ -5,7 +5,7 @@ Shared database models used across AI agents.
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
-
+from ai_team.shared.enums import RelationshipType
 
 # ============================================================================
 # Column
@@ -100,7 +100,7 @@ class DatabaseRelationship(BaseModel):
 
     target: str
 
-    relationship: str
+    relationship: RelationshipType
 
     foreign_key: str
 

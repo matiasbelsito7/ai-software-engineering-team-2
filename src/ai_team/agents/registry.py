@@ -10,7 +10,7 @@ from ai_team.agents.exceptions import (
     AgentRegistrationError,
 )
 from ai_team.agents.models import AgentInfo
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentRegistry:

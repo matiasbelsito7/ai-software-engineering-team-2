@@ -8,7 +8,7 @@ from ai_team.agents.base import BaseAgent
 from ai_team.agents.models import AgentInfo
 from ai_team.agents.parsers import PlannerParser
 from ai_team.agents.planner.prompt_builder import PlannerPromptBuilder
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class PlannerAgent(BaseAgent):
@@ -17,11 +17,11 @@ class PlannerAgent(BaseAgent):
     """
 
     INFO = AgentInfo(
-        name="planner",
-        capability=AgentCapability.PLANNER,
-        description=(
-            "Creates implementation plans for software projects."
-        ),
+    name="planner",
+    capability=AgentCapability.PLANNER,
+    description=(
+        "Creates implementation plans for software projects."
+    ),
     )
 
     PARSER = PlannerParser

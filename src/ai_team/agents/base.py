@@ -16,7 +16,7 @@ from ai_team.agents.parsers.base import BaseParser
 from ai_team.agents.prompt_builder import BasePromptBuilder
 from ai_team.infrastructure.llm import BaseLLM
 from ai_team.infrastructure.llm.responses import LLMResponse
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class BaseAgent:

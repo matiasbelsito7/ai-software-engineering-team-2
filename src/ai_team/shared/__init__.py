@@ -14,7 +14,6 @@ Only stable, reusable definitions should be re-exported here.
 """
 
 from ai_team.shared.constants import *
-from ai_team.shared.enums import *
 from ai_team.shared.protocols import *
 from ai_team.shared.types import *
 

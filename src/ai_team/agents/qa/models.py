@@ -7,7 +7,7 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 from ai_team.agents.models import CodePatch
-
+from ai_team.shared.enums.qa import Severity
 
 # ============================================================================
 # QA Issue
@@ -28,7 +28,7 @@ class QAIssue(BaseModel):
 
     description: str
 
-    severity: str
+    severity: Severity
 
     location: str | None = None
 
@@ -68,7 +68,7 @@ class TestCase(BaseModel):
 
 class QASummary(BaseModel):
     """
-    High-level QA summary.
+    High-level quality assessment.
     """
 
     model_config = ConfigDict(
@@ -76,11 +76,11 @@ class QASummary(BaseModel):
         extra="forbid",
     )
 
-    passed: bool
+    status: ReviewStatus
 
     score: float = Field(
         ge=0.0,
-        le=100.0,
+        le=10.0,
     )
 
     overview: str

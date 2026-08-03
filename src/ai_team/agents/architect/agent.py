@@ -10,7 +10,7 @@ from ai_team.agents.architect.prompt_builder import (
     ArchitectPromptBuilder,
 )
 from ai_team.agents.parsers import ArchitectParser
-from ai_team.shared.enums import AgentCapability
+from ai_team.shared.enums.agents import AgentCapability
 
 
 class ArchitectAgent(BaseAgent):
@@ -19,11 +19,11 @@ class ArchitectAgent(BaseAgent):
     """
 
     INFO = AgentInfo(
-        name="architect",
-        capability=AgentCapability.ARCHITECT,
-        description=(
-            "Designs software architecture based on the execution plan."
-        ),
+    name="architect",
+    capability=AgentCapability.ARCHITECT,
+    description=(
+        "Designs software architecture based on the execution plan."
+    ),
     )
 
     PARSER = ArchitectParser
