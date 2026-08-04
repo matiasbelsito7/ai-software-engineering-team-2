@@ -8,12 +8,13 @@ from ai_team.agents.parsers.base import BaseParser
 from ai_team.agents.parsers.planner import PlannerParser
 from ai_team.agents.parsers.qa import QAParser
 from ai_team.agents.parsers.reviewer import ReviewerParser
-
+from ai_team.agents.parsers.documentation import DocumentationParser
 __all__ = [
     "BaseParser",
     "PlannerParser",
     "ArchitectParser",
     "BackendParser",
     "ReviewerParser",
-    "QAParser"
+    "QAParser",
+    "DocumentationParser"
 ]

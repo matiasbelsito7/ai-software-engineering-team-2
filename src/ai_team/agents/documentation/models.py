@@ -1,27 +1,20 @@
 """
-Models used by the Reviewer agent.
+Models used by the Documentation agent.
 """
 
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.models import CodePatch
-from ai_team.shared.enums.qa import Severity
-from ai_team.shared.enums.review import (
-    ReviewCategory,
-    ReviewStatus,
-)
-
 
 # ============================================================================
-# Review Finding
+# Documentation Section
 # ============================================================================
 
 
-class ReviewFinding(BaseModel):
+class DocumentationSection(BaseModel):
     """
-    A single finding produced during the review.
+    A section of a generated document.
     """
 
     model_config = ConfigDict(
@@ -31,25 +24,17 @@ class ReviewFinding(BaseModel):
 
     title: str
 
-    description: str
-
-    severity: Severity
-
-    category: ReviewCategory
-
-    recommendation: str
-
-    location: str | None = None
+    content: str
 
 
 # ============================================================================
-# Review Summary
+# Documentation File
 # ============================================================================
 
 
-class ReviewSummary(BaseModel):
+class DocumentationFile(BaseModel):
     """
-    High-level review summary.
+    Represents a generated documentation file.
     """
 
     model_config = ConfigDict(
@@ -57,40 +42,31 @@ class ReviewSummary(BaseModel):
         extra="forbid",
     )
 
-    status: ReviewStatus
+    path: str
 
-    approved: bool
+    description: str
 
-    score: float = Field(
-        ge=0.0,
-        le=10.0,
+    content: str
+
+
+# ============================================================================
+# Documentation Result
+# ============================================================================
+
+
+class DocumentationResult(BaseModel):
+    """
+    Result produced by the Documentation agent.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
     )
 
     summary: str
 
-
-# ============================================================================
-# Reviewer Result
-# ============================================================================
-
-
-class ReviewerResult(BaseModel):
-    """
-    Result produced by the Reviewer agent.
-    """
-
-    model_config = ConfigDict(
-        frozen=True,
-        extra="forbid",
-    )
-
-    review: ReviewSummary
-
-    findings: list[ReviewFinding] = Field(
-        default_factory=list,
-    )
-
-    reviewed_patches: list[CodePatch] = Field(
+    files: list[DocumentationFile] = Field(
         default_factory=list,
     )
 

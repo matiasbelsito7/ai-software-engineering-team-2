@@ -20,6 +20,7 @@ from .system import (
     LogLevel,
     TaskStatus,
 )
+from .documentation import DocumentationType
 
 __all__ = [
     # Agents
@@ -45,4 +46,7 @@ __all__ = [
     "MessageRole",
     "LLMProvider",
     "EmbeddingProvider",
+
+    # Documentation
+    "DocumentationType",
 ]
