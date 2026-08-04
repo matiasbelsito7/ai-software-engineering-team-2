@@ -30,6 +30,11 @@ from .git import (
     GitChangeType,
     GitOperation,
 )
+from .frontend import (
+    UIComponentType,
+    InteractionType,
+    ResponsiveBreakpoint
+)
 
 __all__ = [
     # Agents
@@ -67,4 +72,8 @@ __all__ = [
     # Git
     "GitOperation",
     "GitChangeType",
+    # Frontend
+    "UIComponentType",
+    "InteractionType",
+    "ResponsiveBreakpoint"
 ]
