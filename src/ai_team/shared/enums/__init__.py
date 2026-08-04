@@ -35,6 +35,7 @@ from .frontend import (
     InteractionType,
     ResponsiveBreakpoint
 )
+from .rag import SourceType
 
 __all__ = [
     # Agents
@@ -76,4 +77,6 @@ __all__ = [
     "UIComponentType",
     "InteractionType",
     "ResponsiveBreakpoint"
+     # RAG
+    "SourceType",
 ]

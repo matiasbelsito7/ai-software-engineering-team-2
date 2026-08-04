@@ -1,5 +1,5 @@
 """
-PDF document loader.
+Python source loader.
 """
 
 from __future__ import annotations
@@ -14,13 +14,16 @@ from ai_team.rag.models import (
 )
 
 
-class PDFLoader(BaseDocumentLoader):
+class PythonLoader(BaseDocumentLoader):
     """
-    Loads PDF documents.
+    Loads Python source files.
 
-    Future implementation:
-        pypdf
-        pymupdf
+    Future implementations may also extract:
+
+        - classes
+        - functions
+        - docstrings
+        - imports
     """
 
     async def load(
@@ -30,15 +33,13 @@ class PDFLoader(BaseDocumentLoader):
 
         path = Path(source.uri)
 
-        #
-        # TODO:
-        # Extract PDF text.
-        #
-
-        content = ""
+        content = path.read_text(
+            encoding="utf-8",
+        )
 
         metadata = DocumentMetadata(
             title=source.title or path.stem,
+            language="python",
         )
 
         return Document(

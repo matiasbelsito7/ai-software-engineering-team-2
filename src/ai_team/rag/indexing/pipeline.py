@@ -7,20 +7,8 @@ from __future__ import annotations
 from ai_team.rag.embedding.base import (
     BaseEmbeddingProvider,
 )
-from ai_team.rag.indexing.builder import (
-    DocumentChunkBuilder,
-)
-from ai_team.rag.indexing.chunker import (
-    DocumentChunker,
-)
-from ai_team.rag.indexing.cleaner import (
-    DocumentCleaner,
-)
-from ai_team.rag.indexing.metadata import (
-    MetadataExtractor,
-)
-from ai_team.rag.indexing.splitter import (
-    DocumentSplitter,
+from ai_team.rag.indexing.chunking import (
+    ChunkingPipeline,
 )
 from ai_team.rag.models import (
     Document,
@@ -30,24 +18,16 @@ from ai_team.rag.models import (
 
 class IndexingPipeline:
     """
-    Complete document indexing pipeline.
+    Produces embedded document chunks.
     """
 
     def __init__(
         self,
         *,
-        cleaner: DocumentCleaner,
-        splitter: DocumentSplitter,
-        chunker: DocumentChunker,
-        metadata: MetadataExtractor,
-        builder: DocumentChunkBuilder,
+        chunking: ChunkingPipeline,
         embedding: BaseEmbeddingProvider,
     ) -> None:
-        self._cleaner = cleaner
-        self._splitter = splitter
-        self._chunker = chunker
-        self._metadata = metadata
-        self._builder = builder
+        self._chunking = chunking
         self._embedding = embedding
 
     async def process(
@@ -55,33 +35,18 @@ class IndexingPipeline:
         document: Document,
     ) -> list[DocumentChunk]:
         """
-        Process a document into embedded chunks.
+        Convert a document into embedded chunks.
         """
 
-        cleaned = self._cleaner.clean(
-            document.content,
-        )
-
-        sections = self._splitter.split(
-            cleaned,
-        )
-
-        chunks = self._chunker.chunk(
-            sections,
-        )
-
-        metadata = self._metadata.extract(
+        chunks = self._chunking.process(
             document,
         )
 
-        documents = self._builder.build(
-            document=document,
-            chunks=chunks,
-            metadata=metadata,
-        )
-
         embeddings = await self._embedding.embed_batch(
-            [chunk.content for chunk in documents]
+            [
+                chunk.content
+                for chunk in chunks
+            ]
         )
 
         return [
@@ -91,7 +56,7 @@ class IndexingPipeline:
                 }
             )
             for chunk, embedding in zip(
-                documents,
+                chunks,
                 embeddings,
                 strict=True,
             )

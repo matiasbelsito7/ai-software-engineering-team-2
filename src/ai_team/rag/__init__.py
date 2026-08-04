@@ -11,6 +11,7 @@ from ai_team.rag.models import (
     RAGContext,
     RetrievalQuery,
     RetrievalResult,
+    RetrievedChunk,
 )
 
 from ai_team.rag.exceptions import (
@@ -34,6 +35,7 @@ __all__ = [
     "RetrievalQuery",
     "RetrievalResult",
     "RAGContext",
+    "RetrievedChunk",
 
     # Exceptions
     "RAGError",

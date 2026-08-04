@@ -9,6 +9,30 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ai_team.shared.enums.rag import SourceType
+
+
+# ============================================================================
+# Document Source
+# ============================================================================
+
+
+class DocumentSource(BaseModel):
+    """
+    Origin of a document.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
+
+    uri: str
+
+    type: SourceType
+
+    title: str | None = None
+
 
 # ============================================================================
 # Document Metadata
@@ -17,15 +41,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class DocumentMetadata(BaseModel):
     """
-    Metadata associated with an indexed document.
+    Additional metadata associated with a document.
     """
 
     model_config = ConfigDict(
         frozen=True,
         extra="forbid",
     )
-
-    source: str
 
     title: str | None = None
 
@@ -55,6 +77,8 @@ class Document(BaseModel):
         default_factory=uuid4,
     )
 
+    source: DocumentSource
+
     content: str
 
     metadata: DocumentMetadata
@@ -71,7 +95,7 @@ class Document(BaseModel):
 
 class DocumentChunk(BaseModel):
     """
-    Indexed document chunk.
+    Indexed chunk of a document.
     """
 
     model_config = ConfigDict(
@@ -123,13 +147,33 @@ class RetrievalQuery(BaseModel):
 
 
 # ============================================================================
+# Retrieved Chunk
+# ============================================================================
+
+
+class RetrievedChunk(BaseModel):
+    """
+    Retrieved chunk together with its relevance score.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
+
+    chunk: DocumentChunk
+
+    score: float
+
+
+# ============================================================================
 # Retrieval Result
 # ============================================================================
 
 
 class RetrievalResult(BaseModel):
     """
-    Result returned by the retriever.
+    Result returned by a retriever.
     """
 
     model_config = ConfigDict(
@@ -139,7 +183,7 @@ class RetrievalResult(BaseModel):
 
     query: RetrievalQuery
 
-    chunks: list[DocumentChunk] = Field(
+    chunks: list[RetrievedChunk] = Field(
         default_factory=list,
     )
 
