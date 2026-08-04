@@ -8,7 +8,7 @@ from ai_team.agents.base import BaseAgent
 from ai_team.agents.frontend.models import (
     FrontendResult,
 )
-from ai_team.agents.frontend.parser import (
+from ai_team.agents.parsers.frontend import (
     FrontendParser,
 )
 from ai_team.agents.frontend.prompt_builder import (

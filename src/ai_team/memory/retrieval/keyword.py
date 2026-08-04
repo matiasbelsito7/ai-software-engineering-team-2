@@ -4,7 +4,7 @@ Keyword retrieval strategy.
 
 from __future__ import annotations
 
-from ai_team.memory.base import BaseMemoryStore
+from ai_team.memory.stores.base import BaseMemoryStore
 from ai_team.memory.models import (
     MemoryContext,
     MemoryQuery,
