@@ -1,5 +1,5 @@
 """
-Abstract memory interface.
+Base interface for memory store strategies.
 """
 
 from __future__ import annotations
@@ -12,7 +12,6 @@ from ai_team.memory.models import (
     MemoryQuery,
     MemorySearchResult,
 )
-
 
 class BaseMemoryStore(ABC):
     """
