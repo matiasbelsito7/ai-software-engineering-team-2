@@ -26,6 +26,11 @@ from .devops import (
     DeploymentTarget,
     InfrastructureType,
 )
+from .git import (
+    GitChangeType,
+    GitOperation,
+)
+
 __all__ = [
     # Agents
     "AgentCapability",
@@ -58,4 +63,8 @@ __all__ = [
     "DeploymentTarget",
     "DeploymentEnvironment",
     "InfrastructureType",
+
+    # Git
+    "GitOperation",
+    "GitChangeType",
 ]
