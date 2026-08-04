@@ -21,7 +21,11 @@ from .system import (
     TaskStatus,
 )
 from .documentation import DocumentationType
-
+from .devops import (
+    DeploymentEnvironment,
+    DeploymentTarget,
+    InfrastructureType,
+)
 __all__ = [
     # Agents
     "AgentCapability",
@@ -49,4 +53,9 @@ __all__ = [
 
     # Documentation
     "DocumentationType",
+
+    # DevOps
+    "DeploymentTarget",
+    "DeploymentEnvironment",
+    "InfrastructureType",
 ]
