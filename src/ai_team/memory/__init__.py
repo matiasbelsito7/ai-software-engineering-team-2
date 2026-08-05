@@ -19,6 +19,7 @@ from ai_team.memory.exceptions import (
     MemorySerializationError,
     MemoryStoreError,
 )
+from ai_team.memory.factory import build_memory
 
 __all__ = [
     # Manager
@@ -38,4 +39,7 @@ __all__ = [
     "MemoryRetrievalError",
     "MemorySerializationError",
     "MemoryConfigurationError",
+
+    # Memory factory
+    "build_memory",
 ]

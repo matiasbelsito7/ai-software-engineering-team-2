@@ -1,4 +1,8 @@
+"""
+Enumerations used by the RAG subsystem.
+"""
 
+from __future__ import annotations
 from enum import StrEnum
 
 class SourceType(StrEnum):
@@ -16,3 +20,12 @@ class SourceType(StrEnum):
     HTTP = "http"
 
     REPOSITORY = "repository"
+
+class EmbeddingProviderType(StrEnum):
+    """
+    Supported embedding providers.
+    """
+
+    OLLAMA = "ollama"
+
+    OPENROUTER = "openrouter"

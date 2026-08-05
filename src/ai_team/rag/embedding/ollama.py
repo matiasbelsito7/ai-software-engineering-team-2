@@ -6,12 +6,13 @@ from __future__ import annotations
 
 import httpx
 
-from ai_team.rag.embedding.base import (
-    BaseEmbeddingProvider,
-)
+from ai_team.rag.embedding.base import BaseEmbeddingProvider
 from ai_team.rag.embedding.models import (
     EMBEDDING_MODELS,
-    EmbeddingModel
+    EmbeddingModel,
+)
+from ai_team.shared.enums.rag import (
+    EmbeddingProviderType,
 )
 
 
@@ -27,12 +28,20 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
         base_url: str = "http://localhost:11434",
         timeout: float = 120.0,
     ) -> None:
+
         if model not in EMBEDDING_MODELS:
             raise ValueError(
                 f"Unsupported embedding model: {model}"
             )
 
-        self._model = model
+        embedding_model = EMBEDDING_MODELS[model]
+
+        if embedding_model.provider != EmbeddingProviderType.OLLAMA:
+            raise ValueError(
+                f"{model} is not an Ollama embedding model."
+            )
+
+        self._model: EmbeddingModel = embedding_model
 
         self._client = httpx.AsyncClient(
             base_url=base_url,
@@ -47,13 +56,13 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
     def model(
         self,
     ) -> str:
-        return self._model
+        return self._model.name
 
     @property
     def dimensions(
         self,
     ) -> int:
-        return EMBEDDING_MODELS[self._model]
+        return self._model.dimensions
 
     # ------------------------------------------------------------------
     # Embeddings
@@ -63,23 +72,18 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
         self,
         text: str,
     ) -> list[float]:
-        """
-        Generate an embedding for a single text.
-        """
 
         response = await self._client.post(
             "/api/embed",
             json={
-                "model": self._model,
+                "model": self.model,
                 "input": text,
             },
         )
 
         response.raise_for_status()
 
-        payload = response.json()
-
-        embedding = payload["embeddings"][0]
+        embedding = response.json()["embeddings"][0]
 
         if len(embedding) != self.dimensions:
             raise RuntimeError(
@@ -92,9 +96,6 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
         self,
         texts: list[str],
     ) -> list[list[float]]:
-        """
-        Generate embeddings for multiple texts.
-        """
 
         if not texts:
             return []
@@ -102,16 +103,14 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
         response = await self._client.post(
             "/api/embed",
             json={
-                "model": self._model,
+                "model": self.model,
                 "input": texts,
             },
         )
 
         response.raise_for_status()
 
-        payload = response.json()
-
-        embeddings = payload["embeddings"]
+        embeddings = response.json()["embeddings"]
 
         for embedding in embeddings:
             if len(embedding) != self.dimensions:
@@ -128,9 +127,6 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
     async def health(
         self,
     ) -> bool:
-        """
-        Check whether Ollama is available.
-        """
 
         try:
             response = await self._client.get(
@@ -145,8 +141,5 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
     async def close(
         self,
     ) -> None:
-        """
-        Close the underlying HTTP client.
-        """
 
         await self._client.aclose()

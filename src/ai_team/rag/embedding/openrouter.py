@@ -6,12 +6,13 @@ from __future__ import annotations
 
 import httpx
 
-from ai_team.rag.embedding.base import (
-    BaseEmbeddingProvider,
-)
+from ai_team.rag.embedding.base import BaseEmbeddingProvider
 from ai_team.rag.embedding.models import (
     EMBEDDING_MODELS,
-    EmbeddingModel
+    EmbeddingModel,
+)
+from ai_team.shared.enums.rag import (
+    EmbeddingProviderType,
 )
 
 
@@ -34,14 +35,14 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
                 f"Unsupported embedding model: {model}"
             )
 
-        model_info = EMBEDDING_MODELS[model]
+        embedding_model = EMBEDDING_MODELS[model]
 
-        if model_info.provider != "openrouter":
+        if embedding_model.provider != EmbeddingProviderType.OPENROUTER:
             raise ValueError(
-                f"{model} is not an OpenRouter model."
+                f"{model} is not an OpenRouter embedding model."
             )
 
-        self._model = model
+        self._model: EmbeddingModel = embedding_model
 
         self._client = httpx.AsyncClient(
             base_url=base_url,
@@ -60,15 +61,13 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
     def model(
         self,
     ) -> str:
-        return self._model
+        return self._model.name
 
     @property
     def dimensions(
         self,
     ) -> int:
-        return EMBEDDING_MODELS[
-            self._model
-        ].dimensions
+        return self._model.dimensions
 
     # ------------------------------------------------------------------
     # Embeddings
@@ -82,16 +81,14 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
         response = await self._client.post(
             "/embeddings",
             json={
-                "model": self._model,
+                "model": self.model,
                 "input": text,
             },
         )
 
         response.raise_for_status()
 
-        payload = response.json()
-
-        embedding = payload["data"][0]["embedding"]
+        embedding = response.json()["data"][0]["embedding"]
 
         if len(embedding) != self.dimensions:
             raise RuntimeError(
@@ -111,18 +108,16 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
         response = await self._client.post(
             "/embeddings",
             json={
-                "model": self._model,
+                "model": self.model,
                 "input": texts,
             },
         )
 
         response.raise_for_status()
 
-        payload = response.json()
-
         embeddings = [
             item["embedding"]
-            for item in payload["data"]
+            for item in response.json()["data"]
         ]
 
         for embedding in embeddings:

@@ -35,8 +35,12 @@ from .frontend import (
     InteractionType,
     ResponsiveBreakpoint
 )
-from .rag import SourceType
-
+from .rag import EmbeddingProviderType, SourceType
+from .observability import (
+    ToolType,
+    LLMProvider,
+    ExecutionStatus
+)
 __all__ = [
     # Agents
     "AgentCapability",
@@ -79,4 +83,9 @@ __all__ = [
     "ResponsiveBreakpoint"
      # RAG
     "SourceType",
+    "EmbeddingProviderType"
+    #observability
+    "ToolType", 
+    "LLMProvider",
+    "ExecutionStatus"
 ]

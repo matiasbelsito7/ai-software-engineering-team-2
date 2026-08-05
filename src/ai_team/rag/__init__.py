@@ -24,6 +24,8 @@ from ai_team.rag.exceptions import (
     VectorStoreError,
 )
 
+from ai_team.rag.factory import build_rag
+
 __all__ = [
     # Manager
     "RAGManager",
@@ -45,4 +47,7 @@ __all__ = [
     "EmbeddingGenerationError",
     "VectorStoreError",
     "RAGConfigurationError",
+
+    # Factories
+    "build_rag",
 ]
