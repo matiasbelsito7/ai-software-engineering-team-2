@@ -1,4 +1,3 @@
-```yaml
 name: Lint
 
 on:
@@ -102,5 +101,5 @@ jobs:
 
       - name: Validate architecture
         run: make architecture
-```
+
 

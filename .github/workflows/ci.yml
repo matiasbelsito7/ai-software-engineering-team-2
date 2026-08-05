@@ -1,5 +1,4 @@
-```yaml #id="3vkqhm"
-name: Continuous Integration
+name: CI
 
 on:
   push:
@@ -60,4 +59,3 @@ jobs:
         run: |
           echo "All quality checks passed."
           echo "Continuous Integration completed successfully."
-```
