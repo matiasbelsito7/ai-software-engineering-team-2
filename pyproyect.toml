@@ -202,13 +202,13 @@ dev = [
 
 [project.urls]
 
-Homepage = "https://github.com/matiasbelsito7/ai-software-engineering-team"
+Homepage = "https://github.com/matiasbelsito7/ai-software-engineering-team2"
 
-Repository = "https://github.com/matiasbelsito7/ai-software-engineering-team"
+Repository = "https://github.com/matiasbelsito7/ai-software-engineering-team2"
 
-Issues = "https://github.com/matiasbelsito7/ai-software-engineering-team/issues"
+Issues = "https://github.com/matiasbelsito7/ai-software-engineering-team2/issues"
 
-Documentation = "https://github.com/matiasbelsito7/ai-software-engineering-team"
+Documentation = "https://github.com/matiasbelsito7/ai-software-engineering-team2"
 
 ###############################################################################
 # Ruff

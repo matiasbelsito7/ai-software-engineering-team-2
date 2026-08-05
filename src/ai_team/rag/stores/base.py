@@ -7,31 +7,44 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from ai_team.rag.models import (
-    Document,
     DocumentChunk,
-    RetrievalQuery,
-    RetrievalResult,
+    RetrievedChunk,
 )
 
 
 class BaseVectorStore(ABC):
     """
-    Base interface implemented by every vector store.
+    Base interface implemented by every vector database.
     """
 
     # ------------------------------------------------------------------
-    # Indexing
+    # Lifecycle
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def index(
+    async def initialize(
         self,
-        document: Document,
     ) -> None:
         """
-        Index a document.
+        Initialize the vector store.
+
+        This may include creating collections,
+        indexes or validating the schema.
         """
         ...
+
+    @abstractmethod
+    async def health(
+        self,
+    ) -> bool:
+        """
+        Check whether the vector store is available.
+        """
+        ...
+
+    # ------------------------------------------------------------------
+    # CRUD
+    # ------------------------------------------------------------------
 
     @abstractmethod
     async def upsert(
@@ -43,6 +56,25 @@ class BaseVectorStore(ABC):
         """
         ...
 
+    @abstractmethod
+    async def delete(
+        self,
+        document_id: str,
+    ) -> None:
+        """
+        Delete every chunk belonging to a document.
+        """
+        ...
+
+    @abstractmethod
+    async def clear(
+        self,
+    ) -> None:
+        """
+        Remove every stored chunk.
+        """
+        ...
+
     # ------------------------------------------------------------------
     # Retrieval
     # ------------------------------------------------------------------
@@ -50,54 +82,11 @@ class BaseVectorStore(ABC):
     @abstractmethod
     async def search(
         self,
-        query: RetrievalQuery,
-    ) -> RetrievalResult:
+        *,
+        embedding: list[float],
+        limit: int,
+    ) -> list[RetrievedChunk]:
         """
-        Perform semantic similarity search.
-        """
-        ...
-
-    # ------------------------------------------------------------------
-    # CRUD
-    # ------------------------------------------------------------------
-
-    @abstractmethod
-    async def get(
-        self,
-        document_id: str,
-    ) -> Document | None:
-        """
-        Retrieve a document by its identifier.
-        """
-        ...
-
-    @abstractmethod
-    async def delete(
-        self,
-        document_id: str,
-    ) -> None:
-        """
-        Delete a document.
-        """
-        ...
-
-    @abstractmethod
-    async def clear(self) -> None:
-        """
-        Remove every indexed document.
-        """
-        ...
-
-    # ------------------------------------------------------------------
-    # Utilities
-    # ------------------------------------------------------------------
-
-    @abstractmethod
-    async def exists(
-        self,
-        document_id: str,
-    ) -> bool:
-        """
-        Check whether a document exists.
+        Search the nearest document chunks for an embedding.
         """
         ...

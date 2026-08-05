@@ -30,6 +30,8 @@ class DocumentChunkBuilder:
         return [
             DocumentChunk(
                 document_id=document.id,
+                uri=document.source.uri,
+                source_type=document.source.type,
                 content=chunk,
                 metadata=metadata,
                 chunk_index=index,

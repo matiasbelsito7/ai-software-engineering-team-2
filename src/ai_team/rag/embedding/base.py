@@ -13,40 +13,12 @@ class BaseEmbeddingProvider(ABC):
     """
 
     # ------------------------------------------------------------------
-    # Single Embedding
-    # ------------------------------------------------------------------
-
-    @abstractmethod
-    async def embed(
-        self,
-        text: str,
-    ) -> list[float]:
-        """
-        Generate an embedding for a single text.
-        """
-        ...
-
-    # ------------------------------------------------------------------
-    # Batch Embedding
-    # ------------------------------------------------------------------
-
-    @abstractmethod
-    async def embed_batch(
-        self,
-        texts: list[str],
-    ) -> list[list[float]]:
-        """
-        Generate embeddings for multiple texts.
-        """
-        ...
-
-    # ------------------------------------------------------------------
-    # Information
+    # Properties
     # ------------------------------------------------------------------
 
     @property
     @abstractmethod
-    def model_name(
+    def model(
         self,
     ) -> str:
         """
@@ -60,6 +32,52 @@ class BaseEmbeddingProvider(ABC):
         self,
     ) -> int:
         """
-        Embedding dimensionality.
+        Dimension of the embedding vectors produced by the model.
+        """
+        ...
+
+    # ------------------------------------------------------------------
+    # Embeddings
+    # ------------------------------------------------------------------
+
+    @abstractmethod
+    async def embed(
+        self,
+        text: str,
+    ) -> list[float]:
+        """
+        Generate an embedding for a single text.
+        """
+        ...
+
+    @abstractmethod
+    async def embed_batch(
+        self,
+        texts: list[str],
+    ) -> list[list[float]]:
+        """
+        Generate embeddings for multiple texts.
+        """
+        ...
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    @abstractmethod
+    async def health(
+        self,
+    ) -> bool:
+        """
+        Check whether the provider is available.
+        """
+        ...
+
+    @abstractmethod
+    async def close(
+        self,
+    ) -> None:
+        """
+        Release any underlying resources.
         """
         ...

@@ -111,6 +111,10 @@ class DocumentChunk(BaseModel):
 
     content: str
 
+    uri: str
+
+    source_type: SourceType
+
     embedding: list[float] | None = None
 
     metadata: DocumentMetadata
