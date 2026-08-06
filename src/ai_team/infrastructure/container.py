@@ -4,14 +4,34 @@ Application dependency container.
 
 from __future__ import annotations
 
+# ------------------------------------------------------------------
+# Factories
+# ------------------------------------------------------------------
+
 from ai_team.memory.factory import build_memory
 from ai_team.observability.factory import build_observability
 from ai_team.rag.factory import build_rag
 
+# ------------------------------------------------------------------
+# Agents
+# ------------------------------------------------------------------
+
+from ai_team.agents.architect.agent import ArchitectAgent
+from ai_team.agents.backend.agent import BackendAgent
+from ai_team.agents.devops.agent import DevOpsAgent
+from ai_team.agents.documentation.agent import DocumentationAgent
+from ai_team.agents.frontend.agent import FrontendAgent
+from ai_team.agents.git.agent import GitAgent
+from ai_team.agents.planner.agent import PlannerAgent
+from ai_team.agents.qa.agent import QAAgent
+from ai_team.agents.reviewer.agent import ReviewerAgent
+
 
 class Container:
     """
-    Composition root of the application.
+    Application composition root.
+
+    Creates every singleton service and agent.
     """
 
     def __init__(self) -> None:
@@ -28,7 +48,7 @@ class Container:
         self.llm_provider = None
 
         # ---------------------------------------------------------
-        # Application modules
+        # Shared services
         # ---------------------------------------------------------
 
         self.observation = build_observability()
@@ -42,10 +62,65 @@ class Container:
             embedding_provider=self.embedding_provider,
         )
 
+        # ---------------------------------------------------------
+        # Agents
+        # ---------------------------------------------------------
+
+        self.planner = PlannerAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.architect = ArchitectAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.backend = BackendAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.frontend = FrontendAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.reviewer = ReviewerAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.qa = QAAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.documentation = DocumentationAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.devops = DevOpsAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
+        self.git = GitAgent(
+            memory=self.memory,
+            rag=self.rag,
+            observation=self.observation,
+        )
+
     async def initialize(self) -> None:
-        """
-        Initialize managed services.
-        """
 
         for service in (
             self.observation,
@@ -58,9 +133,6 @@ class Container:
                 await initialize()
 
     async def shutdown(self) -> None:
-        """
-        Shutdown managed services.
-        """
 
         for service in (
             self.rag,
