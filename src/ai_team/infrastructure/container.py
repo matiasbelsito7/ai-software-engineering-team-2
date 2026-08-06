@@ -28,6 +28,15 @@ from ai_team.agents.planner.agent import PlannerAgent
 from ai_team.agents.qa.agent import QAAgent
 from ai_team.agents.reviewer.agent import ReviewerAgent
 
+# ------------------------------------------------------------------
+# Docker
+# ------------------------------------------------------------------
+
+import docker
+
+from ai_team.tools.docker.factory import (
+    build_docker_tool,
+)
 
 class Container:
     """
@@ -126,6 +135,32 @@ class Container:
             memory=self.memory,
             rag=self.rag,
             observation=self.observation,
+        )
+
+        # ---------------------------------------------------------
+        # Docker
+        # ---------------------------------------------------------
+
+        self.docker_client = docker.from_env()
+
+        self.docker_manager = DockerManager(
+            client=self.docker_client,
+        )
+
+        self.docker_tool = build_docker_tool(
+            manager=self.docker_manager,
+        )
+
+        # ---------------------------------------------------------
+        # Tools
+        # ---------------------------------------------------------
+
+        self.tools = build_tools(
+            workspace=self.workspace,
+            terminal=self.terminal_tool,
+            git=self.git_tool,
+            python=self.python_tool,
+            docker=self.docker_tool,
         )
 
     async def initialize(self) -> None:

@@ -202,7 +202,7 @@ class ProviderBase(BaseLLM):
                     model=self.model_name,
                 )
 
-from pydantic import TypeAdapter
+    from pydantic import TypeAdapter
 
 
     # ------------------------------------------------------------------
@@ -363,4 +363,3 @@ from pydantic import TypeAdapter
         """
         Stream a response from the provider.
         """
-        ...

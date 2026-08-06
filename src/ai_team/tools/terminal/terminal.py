@@ -15,27 +15,37 @@ from ai_team.tools.models import (
     ToolResult,
 )
 
+from ai_team.tools.terminal.policy import (
+    CommandPolicy,
+)
+
 
 class TerminalTool(BaseTool):
     """
-    Execute shell commands inside the workspace.
+    Execute terminal commands inside the workspace.
     """
 
     def __init__(
         self,
         *,
         workspace: Workspace,
+        policy: CommandPolicy | None = None,
     ) -> None:
 
         super().__init__(
             ToolDefinition(
                 name="terminal",
-                description="Execute terminal commands.",
+                description="Execute shell commands.",
                 category="execution",
             ),
         )
 
         self._workspace = workspace
+
+        self._policy = (
+            policy
+            or CommandPolicy()
+        )
 
     async def run(
         self,
@@ -59,11 +69,18 @@ class TerminalTool(BaseTool):
 
         try:
 
-            process = await asyncio.create_subprocess_shell(
+            self._policy.validate(
                 command,
                 cwd=self._workspace.cwd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+            )
+
+            process = (
+                await asyncio.create_subprocess_shell(
+                    command,
+                    cwd=self._workspace.cwd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
             )
 
             stdout, stderr = await asyncio.wait_for(

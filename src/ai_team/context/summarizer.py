@@ -7,7 +7,7 @@ from __future__ import annotations
 from ai_team.context.models import (
     ContextSummary,
 )
-from ai_team.llm.base import BaseLLMProvider
+from ai_team.infrastructure.llm.base import BaseLLMProvider
 
 
 class ContextSummarizer:

@@ -1,0 +1,64 @@
+"""
+Terminal command execution policy.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+
+class CommandPolicy:
+    """
+    Validates whether a command can be executed.
+    """
+
+    DEFAULT_BLOCKED_COMMANDS = {
+        "rm",
+        "rmdir",
+        "del",
+        "format",
+        "mkfs",
+        "shutdown",
+        "reboot",
+        "poweroff",
+        "sudo",
+        "su",
+        "passwd",
+        "chmod",
+        "chown",
+    }
+
+    def __init__(
+        self,
+        *,
+        blocked_commands: set[str] | None = None,
+    ) -> None:
+
+        self._blocked_commands = (
+            blocked_commands
+            or self.DEFAULT_BLOCKED_COMMANDS
+        )
+
+    def validate(
+        self,
+        command: str,
+        *,
+        cwd: Path,
+    ) -> None:
+        """
+        Raises PermissionError if the command is not allowed.
+        """
+
+        stripped = command.strip()
+
+        if not stripped:
+            raise PermissionError(
+                "Empty command."
+            )
+
+        executable = stripped.split()[0].lower()
+
+        if executable in self._blocked_commands:
+            raise PermissionError(
+                f"Command '{executable}' is blocked."
+            )
