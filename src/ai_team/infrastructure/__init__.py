@@ -1,5 +1,7 @@
 from .container import Container
+from .workspace import Workspace
 
-all = [
-    "Container",   
+__all__ = [
+    "Container",
+    "Workspace"
 ]

@@ -11,6 +11,8 @@ from __future__ import annotations
 from ai_team.memory.factory import build_memory
 from ai_team.observability.factory import build_observability
 from ai_team.rag.factory import build_rag
+from ai_team.infrastructure.workspace import Workspace
+from ai_team.tools.factory import build_tools
 
 # ------------------------------------------------------------------
 # Agents
@@ -46,6 +48,12 @@ class Container:
         self.database = None
         self.event_bus = None
         self.llm_provider = None
+        self.workspace = Workspace(
+            root="./workspace"
+        )
+        self.tools = build_tools(
+          workspace=self.workspace,
+        )
 
         # ---------------------------------------------------------
         # Shared services
