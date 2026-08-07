@@ -8,16 +8,14 @@ from ai_team.agents.base import BaseAgent
 from ai_team.agents.devops.models import (
     DevOpsResult,
 )
-from ai_team.agents.devops.parser import (
+from ai_team.agents.parsers.devops import (
     DevOpsParser,
 )
 from ai_team.agents.devops.prompt_builder import (
     DevOpsPromptBuilder,
 )
-from ai_team.agents.models import (
-    AgentExecution,
-    AgentInfo,
-)
+from ai_team.agents.execution import AgentExecution
+from ai_team.agents.info import AgentInfo
 from ai_team.shared.enums import AgentCapability
 
 

@@ -8,7 +8,7 @@ from ai_team.agents.backend.prompt_builder import (
     BackendPromptBuilder,
 )
 from ai_team.agents.base import BaseAgent
-from ai_team.agents.models import AgentInfo
+from ai_team.agents.info import AgentInfo
 from ai_team.agents.parsers import BackendParser
 from ai_team.shared.enums.agents import AgentCapability
 

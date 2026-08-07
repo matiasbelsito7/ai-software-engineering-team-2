@@ -5,73 +5,155 @@ Tool manager.
 from __future__ import annotations
 
 from ai_team.tools.base import BaseTool
-from ai_team.tools.exceptions import ToolNotFoundError
 
 
 class ToolManager:
     """
-    Registry and executor for application tools.
+    Registry of every available tool.
     """
 
-    def __init__(
-        self,
-        *,
-        tools: list[BaseTool],
-    ) -> None:
+    def __init__(self) -> None:
 
-        self._tools: dict[str, BaseTool] = {
-            tool.name: tool
-            for tool in tools
-        }
+        self._tools: dict[
+            str,
+            BaseTool,
+        ] = {}
+
+    # ---------------------------------------------------------
+    # Registry
+    # ---------------------------------------------------------
 
     def register(
         self,
         tool: BaseTool,
     ) -> None:
         """
-        Register a new tool.
+        Register a tool.
         """
 
-        self._tools[tool.name] = tool
+        name = tool.definition.name
+
+        if name in self._tools:
+
+            raise ValueError(
+                f"Tool '{name}' is already registered."
+            )
+
+        self._tools[name] = tool
+
+    def unregister(
+        self,
+        name: str,
+    ) -> None:
+        """
+        Remove a tool from the registry.
+        """
+
+        self._tools.pop(
+            name,
+            None,
+        )
+
+    # ---------------------------------------------------------
+    # Queries
+    # ---------------------------------------------------------
 
     def get(
         self,
         name: str,
     ) -> BaseTool:
         """
-        Retrieve a tool by name.
+        Return a tool.
         """
 
-        tool = self._tools.get(name)
+        try:
 
-        if tool is None:
-            raise ToolNotFoundError(
-                f"Tool '{name}' not found."
-            )
+            return self._tools[name]
 
-        return tool
+        except KeyError as exc:
 
-    def list(
+            raise ValueError(
+                f"Unknown tool '{name}'."
+            ) from exc
+
+    def has(
         self,
-    ) -> list[BaseTool]:
+        name: str,
+    ) -> bool:
+        """
+        Return whether a tool exists.
+        """
+
+        return name in self._tools
+
+    def names(
+        self,
+    ) -> tuple[str, ...]:
+        """
+        Return registered tool names.
+        """
+
+        return tuple(
+            self._tools.keys()
+        )
+
+    def definitions(
+        self,
+    ):
+        """
+        Return every tool definition.
+        """
+
+        return tuple(
+            tool.definition
+            for tool in self._tools.values()
+        )
+
+    def all(
+        self,
+    ) -> tuple[BaseTool, ...]:
         """
         Return every registered tool.
         """
 
-        return list(
+        return tuple(
             self._tools.values()
         )
 
-    async def execute(
+    # ---------------------------------------------------------
+
+    def clear(
         self,
-        *,
-        tool_name: str,
-        request,
+    ) -> None:
+        """
+        Remove every registered tool.
+        """
+
+        self._tools.clear()
+
+    # ---------------------------------------------------------
+
+    def __contains__(
+        self,
+        name: str,
+    ) -> bool:
+
+        return self.has(
+            name,
+        )
+
+    def __len__(
+        self,
+    ) -> int:
+
+        return len(
+            self._tools,
+        )
+
+    def __iter__(
+        self,
     ):
-        """
-        Execute a registered tool.
-        """
 
-        tool = self.get(tool_name)
-
-        return await tool.run(request)
+        return iter(
+            self._tools.values(),
+        )

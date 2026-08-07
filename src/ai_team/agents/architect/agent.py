@@ -5,7 +5,7 @@ Architect agent implementation.
 from __future__ import annotations
 
 from ai_team.agents.base import BaseAgent
-from ai_team.agents.models import AgentInfo
+from ai_team.agents.info import AgentInfo
 from ai_team.agents.architect.prompt_builder import (
     ArchitectPromptBuilder,
 )

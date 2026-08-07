@@ -4,26 +4,38 @@ Base class for all AI agents.
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
 from ai_team.agents.dependencies import AgentDependencies
-from ai_team.agents.models import (
+from ai_team.agents.execution import (
     AgentExecution,
-    AgentInfo,
     AgentResult,
 )
+from ai_team.agents.info import AgentInfo
 from ai_team.agents.parsers.base import BaseParser
 from ai_team.agents.prompt_builder import BasePromptBuilder
+from ai_team.context.models import ContextSelection
 from ai_team.infrastructure.llm import BaseLLM
 from ai_team.infrastructure.llm.responses import LLMResponse
+from ai_team.observability.manager import ObservationManager
+from ai_team.rag.models import RetrievedContext
 from ai_team.shared.enums.agents import AgentCapability
+from ai_team.tools.executor import ToolExecutor
 
 
-class BaseAgent:
+class BaseAgent(ABC):
     """
     Base class for every AI agent.
 
-    Implements the Template Method pattern.
+    Provides:
+    - LLM access
+    - Context management
+    - Memory access
+    - RAG retrieval
+    - Tool execution
+    - Observability hooks
+    - Standard execution lifecycle
     """
 
     INFO: ClassVar[AgentInfo]
@@ -36,9 +48,14 @@ class BaseAgent:
         self,
         dependencies: AgentDependencies,
     ) -> None:
+
         self._validate_configuration()
 
         self._dependencies = dependencies
+
+        self._tool_executor = ToolExecutor(
+            dependencies.tools,
+        )
 
     # ------------------------------------------------------------------
     # Configuration
@@ -46,9 +63,6 @@ class BaseAgent:
 
     @classmethod
     def _validate_configuration(cls) -> None:
-        """
-        Validate that the agent declares all required class attributes.
-        """
 
         if getattr(cls, "INFO", None) is None:
             raise RuntimeError(
@@ -90,8 +104,57 @@ class BaseAgent:
         return self.dependencies.llm
 
     @property
-    def tools(self):
-        return self.dependencies.tools
+    def memory(self):
+        return self.dependencies.memory
+
+    @property
+    def rag(self):
+        return self.dependencies.rag
+
+    @property
+    def context(self):
+        return self.dependencies.context
+
+    @property
+    def observations(self) -> ObservationManager:
+        return self.dependencies.observability
+
+    @property
+    def tool_executor(self) -> ToolExecutor:
+        return self._tool_executor
+
+    # ------------------------------------------------------------------
+    # Context
+    # ------------------------------------------------------------------
+
+    async def build_context(
+        self,
+        execution: AgentExecution,
+    ) -> ContextSelection:
+        """
+        Build the agent context.
+        """
+
+        return await self.context.build(
+            conversation=execution.conversation.messages,
+            memories=[],
+            documents=[],
+        )
+
+    async def retrieve_context(
+        self,
+        execution: AgentExecution,
+    ) -> RetrievedContext | None:
+        """
+        Retrieve additional context from RAG.
+        """
+
+        if not execution.query:
+            return None
+
+        return await self.rag.retrieve(
+            execution.query,
+        )
 
     # ------------------------------------------------------------------
     # LLM
@@ -101,9 +164,6 @@ class BaseAgent:
         self,
         execution: AgentExecution,
     ) -> LLMResponse:
-        """
-        Generate a raw response from the LLM.
-        """
 
         response = await self.llm.generate(
             execution.conversation,
@@ -121,13 +181,31 @@ class BaseAgent:
         self,
         execution: AgentExecution,
     ) -> Any:
-        """
-        Generate a response and parse it.
-        """
 
-        response = await self.generate(execution)
+        response = await self.generate(
+            execution,
+        )
 
         return self.PARSER.parse(response)
+
+    # ------------------------------------------------------------------
+    # Tools
+    # ------------------------------------------------------------------
+
+    async def use_tool(
+        self,
+        *,
+        tool_name: str,
+        parameters: dict[str, Any],
+    ):
+        """
+        Execute a tool through the ToolExecutor.
+        """
+
+        return await self.tool_executor.execute(
+            tool_name=tool_name,
+            parameters=parameters,
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -143,37 +221,46 @@ class BaseAgent:
 
         self.validate(execution)
 
+        await self.before_execution(execution)
+
         await self.prepare(execution)
 
         result = await self.run(execution)
 
         execution.result = result
 
-        await self.finalize(execution)
+        await self.after_execution(execution)
 
         return execution
 
     # ------------------------------------------------------------------
-    # Lifecycle
+    # Lifecycle Hooks
     # ------------------------------------------------------------------
+
+    async def before_execution(
+        self,
+        execution: AgentExecution,
+    ) -> None:
+        return None
 
     def validate(
         self,
         execution: AgentExecution,
     ) -> None:
-        """
-        Validate the execution.
-        """
-
         return None
 
     async def prepare(
         self,
         execution: AgentExecution,
     ) -> None:
-        """
-        Build the conversation.
-        """
+
+        execution.context = await self.build_context(
+            execution,
+        )
+
+        execution.retrieved_context = (
+            await self.retrieve_context(execution)
+        )
 
         execution.conversation = (
             self.PROMPT_BUILDER.build(
@@ -181,29 +268,17 @@ class BaseAgent:
             )
         )
 
+    @abstractmethod
     async def run(
         self,
         execution: AgentExecution,
     ) -> AgentResult:
         """
-        Execute the agent.
+        Execute the agent-specific logic.
         """
 
-        output = await self.generate_and_parse(
-            execution,
-        )
-
-        return AgentResult(
-            success=True,
-            output=output,
-        )
-
-    async def finalize(
+    async def after_execution(
         self,
         execution: AgentExecution,
     ) -> None:
-        """
-        Finalize the execution.
-        """
-
         return None

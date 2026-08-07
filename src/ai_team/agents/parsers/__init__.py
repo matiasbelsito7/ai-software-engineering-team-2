@@ -10,6 +10,7 @@ from ai_team.agents.parsers.qa import QAParser
 from ai_team.agents.parsers.reviewer import ReviewerParser
 from ai_team.agents.parsers.documentation import DocumentationParser
 from ai_team.agents.parsers.git import GitParser
+from ai_team.agents.parsers.database import BackendParser
 __all__ = [
     "BaseParser",
     "PlannerParser",
@@ -18,5 +19,6 @@ __all__ = [
     "ReviewerParser",
     "QAParser",
     "DocumentationParser",
-    "GitParser"    
+    "GitParser" 
+    "BackendParser",   
 ]

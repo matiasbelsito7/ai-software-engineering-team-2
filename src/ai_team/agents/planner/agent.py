@@ -5,7 +5,7 @@ Planner agent implementation.
 from __future__ import annotations
 
 from ai_team.agents.base import BaseAgent
-from ai_team.agents.models import AgentInfo
+from ai_team.agents.info import AgentInfo
 from ai_team.agents.parsers import PlannerParser
 from ai_team.agents.planner.prompt_builder import PlannerPromptBuilder
 from ai_team.shared.enums.agents import AgentCapability

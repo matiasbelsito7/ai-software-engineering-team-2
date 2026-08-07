@@ -7,7 +7,7 @@ from __future__ import annotations
 from abc import ABC
 from importlib.resources import files
 
-from ai_team.agents.models import AgentExecution
+from ai_team.agents.execution import AgentExecution
 from ai_team.infrastructure.llm.messages import Conversation
 
 

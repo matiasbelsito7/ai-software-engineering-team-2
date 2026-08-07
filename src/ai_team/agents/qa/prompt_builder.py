@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ai_team.agents.models import AgentExecution
+from ai_team.agents.execution import AgentExecution
 from ai_team.agents.prompt_builder import BasePromptBuilder
 
 

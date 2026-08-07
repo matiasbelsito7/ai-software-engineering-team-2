@@ -14,10 +14,8 @@ from ai_team.agents.parsers.frontend import (
 from ai_team.agents.frontend.prompt_builder import (
     FrontendPromptBuilder,
 )
-from ai_team.agents.models import (
-    AgentExecution,
-    AgentInfo,
-)
+from ai_team.agents.execution import AgentExecution
+from ai_team.agents.info import AgentInfo
 from ai_team.shared.enums import AgentCapability
 
 

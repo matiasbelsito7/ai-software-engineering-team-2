@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.shared.models import (
+from ai_team.agents.patches import (
     CodePatch,
     PatchOperation,
 )

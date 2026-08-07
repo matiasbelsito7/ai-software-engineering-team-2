@@ -9,7 +9,7 @@ from ai_team.agents.exceptions import (
     AgentNotFoundError,
     AgentRegistrationError,
 )
-from ai_team.agents.models import AgentInfo
+from ai_team.agents.info import AgentInfo
 from ai_team.shared.enums.agents import AgentCapability
 
 

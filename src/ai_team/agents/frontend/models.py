@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.models import CodePatch
+from ai_team.agents.patches import CodePatch
 from ai_team.shared.enums.frontend import (
     InteractionType,
     ResponsiveBreakpoint,

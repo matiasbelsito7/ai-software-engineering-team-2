@@ -8,8 +8,8 @@ from ai_team.agents.base import BaseAgent
 from ai_team.agents.database.prompt_builder import (
     DatabasePromptBuilder,
 )
-from ai_team.agents.models import AgentInfo
-from ai_team.agents.parsers import DatabaseParser
+from ai_team.agents.info import AgentInfo
+from ai_team.agents.parsers.database import DatabaseParser
 from ai_team.shared.enums import AgentCapability
 
 

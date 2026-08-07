@@ -8,16 +8,14 @@ from ai_team.agents.base import BaseAgent
 from ai_team.agents.documentation.models import (
     DocumentationResult,
 )
-from ai_team.agents.documentation.parser import (
+from ai_team.agents.parsers.documentation import (
     DocumentationParser,
 )
 from ai_team.agents.documentation.prompt_builder import (
     DocumentationPromptBuilder,
 )
-from ai_team.agents.models import (
-    AgentExecution,
-    AgentInfo,
-)
+from ai_team.agents.execution import AgentExecution
+from ai_team.agents.info import AgentInfo
 from ai_team.shared.enums import AgentCapability
 
 
