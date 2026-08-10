@@ -4,13 +4,13 @@ Backend agent response parser.
 
 from __future__ import annotations
 
-from ai_team.agents.outputs.backend import BackendOutput
+from ai_team.agents.backend.models import BackendResult
 from ai_team.agents.parsers.base import BaseParser
 
 
-class BackendParser(BaseParser[BackendOutput]):
+class BackendParser(BaseParser[BackendResult]):
     """
     Parse Backend Agent responses.
     """
 
-    model = BackendOutput
+    model = BackendResult

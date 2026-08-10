@@ -1,16 +1,17 @@
 """
-QA agent response parser.
+Parser for the QA agent.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.outputs.qa import QAOutput
 from ai_team.agents.parsers.base import BaseParser
+from ai_team.agents.qa.models import QAResult
 
 
-class QAParser(BaseParser[QAOutput]):
+class QAParser(BaseParser[QAResult]):
     """
-    Parse QA Agent responses.
+    Parser responsible for converting LLM responses
+    into QAResult objects.
     """
 
-    model = QAOutput
+    MODEL = QAResult

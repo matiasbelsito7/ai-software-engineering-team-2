@@ -1,16 +1,16 @@
 """
-Reviewer agent response parser.
+Parser for Reviewer agent outputs.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.outputs.reviewer import ReviewerOutput
 from ai_team.agents.parsers.base import BaseParser
+from ai_team.agents.reviewer.models import ReviewerResult
 
 
-class ReviewerParser(BaseParser[ReviewerOutput]):
+class ReviewerParser(BaseParser[ReviewerResult]):
     """
-    Parse Reviewer Agent responses.
+    Parser for Reviewer agent responses.
     """
 
-    model = ReviewerOutput
+    model = ReviewerResult

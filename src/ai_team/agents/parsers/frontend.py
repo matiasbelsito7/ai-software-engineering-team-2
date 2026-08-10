@@ -1,18 +1,17 @@
 """
-Frontend agent response parser.
+Parser for the Frontend agent.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.outputs.frontend import FrontendOutput
+from ai_team.agents.frontend.models import FrontendResult
 from ai_team.agents.parsers.base import BaseParser
 
 
-class FrontendParser(
-    BaseParser[FrontendOutput],
-):
+class FrontendParser(BaseParser[FrontendResult]):
     """
-    Parse Frontend Agent responses.
+    Parser responsible for converting LLM responses
+    into FrontendResult objects.
     """
 
-    model = FrontendOutput
+    MODEL = FrontendResult

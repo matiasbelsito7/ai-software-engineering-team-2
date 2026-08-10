@@ -1,18 +1,19 @@
 """
-Documentation agent response parser.
+Parser for the Documentation agent.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.outputs.documentation import DocumentationOutput
+from ai_team.agents.documentation.models import (
+    DocumentationResult,
+)
 from ai_team.agents.parsers.base import BaseParser
 
 
-class DocumentationParser(
-    BaseParser[DocumentationOutput],
-):
+class DocumentationParser(BaseParser[DocumentationResult]):
     """
-    Parse Documentation Agent responses.
+    Parser responsible for converting LLM responses
+    into DocumentationResult objects.
     """
 
-    model = DocumentationOutput
+    MODEL = DocumentationResult
