@@ -4,25 +4,38 @@ Base parser for AI agent outputs.
 
 from __future__ import annotations
 
-import json
 from abc import ABC
-from typing import Generic, TypeVar
+from typing import ClassVar
+from typing import Generic
+from typing import TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
+from pydantic import ValidationError
 
 from ai_team.agents.exceptions import AgentExecutionError
 from ai_team.infrastructure.llm.responses import LLMResponse
 
-T = TypeVar("T", bound=BaseModel)
+
+T = TypeVar(
+    "T",
+    bound=BaseModel,
+)
 
 
-class BaseParser(ABC, Generic[T]):
+class BaseParser(
+    ABC,
+    Generic[T],
+):
     """
-    Generic parser for converting LLM responses into
-    validated Pydantic models.
+    Generic parser for converting LLM responses
+    into validated Pydantic models.
     """
 
-    model: type[T]
+    model: ClassVar[type[T]]
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
     @classmethod
     def parse(
@@ -30,9 +43,16 @@ class BaseParser(ABC, Generic[T]):
         response: LLMResponse,
     ) -> T:
         """
-        Parse an LLM response.
+        Parse and validate an LLM response.
         """
-        return cls.parse_json(response.content)
+
+        return cls.parse_json(
+            response.content,
+        )
+
+    # ------------------------------------------------------------------
+    # JSON parsing
+    # ------------------------------------------------------------------
 
     @classmethod
     def parse_json(
@@ -40,33 +60,21 @@ class BaseParser(ABC, Generic[T]):
         content: str,
     ) -> T:
         """
-        Parse a JSON string into the target model.
+        Parse and validate a JSON response.
         """
 
         try:
-            payload = json.loads(content)
-
-        except json.JSONDecodeError as exc:
-            raise AgentExecutionError(
-                f"{cls.__name__} received invalid JSON."
-            ) from exc
-
-        return cls.validate(payload)
-
-    @classmethod
-    def validate(
-        cls,
-        payload: dict,
-    ) -> T:
-        """
-        Validate a parsed JSON payload.
-        """
-
-        try:
-            return cls.model.model_validate(payload)
+            return cls.model.model_validate_json(
+                content,
+            )
 
         except ValidationError as exc:
             raise AgentExecutionError(
-                f"{cls.__name__} returned an invalid "
-                f"{cls.model.__name__}."
+                f"{cls.__name__} returned invalid "
+                f"{cls.model.__name__} output."
+            ) from exc
+
+        except ValueError as exc:
+            raise AgentExecutionError(
+                f"{cls.__name__} received invalid JSON."
             ) from exc

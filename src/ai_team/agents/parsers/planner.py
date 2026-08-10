@@ -1,16 +1,16 @@
 """
-Parser for Planner agent outputs.
+Planner agent response parser.
 """
 
 from __future__ import annotations
 
+from ai_team.agents.outputs.planner import PlannerOutput
 from ai_team.agents.parsers.base import BaseParser
-from ai_team.agents.planner.models import ExecutionPlan
 
 
-class PlannerParser(BaseParser[ExecutionPlan]):
+class PlannerParser(BaseParser[PlannerOutput]):
     """
-    Parser for Planner agent responses.
+    Parse Planner Agent responses.
     """
 
-    model = ExecutionPlan
+    model = PlannerOutput

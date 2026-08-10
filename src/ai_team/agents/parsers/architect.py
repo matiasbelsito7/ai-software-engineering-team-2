@@ -1,16 +1,16 @@
 """
-Parser for Architect agent outputs.
+Architect agent response parser.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.architect.models import ArchitectureDesign
+from ai_team.agents.outputs.architect import ArchitectOutput
 from ai_team.agents.parsers.base import BaseParser
 
 
-class ArchitectParser(BaseParser[ArchitectureDesign]):
+class ArchitectParser(BaseParser[ArchitectOutput]):
     """
-    Parser for Architect agent responses.
+    Parse Architect Agent responses.
     """
 
-    model = ArchitectureDesign
+    model = ArchitectOutput

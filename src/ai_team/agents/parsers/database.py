@@ -1,17 +1,18 @@
 """
-Parser for the Database agent.
+Database agent response parser.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.database.models import DatabaseResult
+from ai_team.agents.outputs.database import DatabaseOutput
 from ai_team.agents.parsers.base import BaseParser
 
 
-class DatabaseParser(BaseParser[DatabaseResult]):
+class DatabaseParser(
+    BaseParser[DatabaseOutput],
+):
     """
-    Parser responsible for converting LLM responses into
-    DatabaseResult objects.
+    Parse Database Agent responses.
     """
 
-    MODEL = DatabaseResult
+    model = DatabaseOutput

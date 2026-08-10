@@ -1,17 +1,16 @@
 """
-Parser for the DevOps agent.
+DevOps agent response parser.
 """
 
 from __future__ import annotations
 
-from ai_team.agents.devops.models import DevOpsResult
+from ai_team.agents.outputs.devops import DevOpsOutput
 from ai_team.agents.parsers.base import BaseParser
 
 
-class DevOpsParser(BaseParser[DevOpsResult]):
+class DevOpsParser(BaseParser[DevOpsOutput]):
     """
-    Parser responsible for converting LLM responses
-    into DevOpsResult objects.
+    Parse DevOps Agent responses.
     """
 
-    MODEL = DevOpsResult
+    model = DevOpsOutput
