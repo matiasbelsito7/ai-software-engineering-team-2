@@ -4,10 +4,13 @@ Factory for creating AI agent instances.
 
 from __future__ import annotations
 
-from ai_team.agents.base import BaseAgent
-from ai_team.agents.dependencies import AgentDependencies
-from ai_team.agents.registry import AgentRegistry
-from ai_team.shared.enums.agents import AgentCapability
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ai_team.agents.base import BaseAgent
+    from ai_team.agents.dependencies import AgentDependencies
+    from ai_team.agents.registry import AgentRegistry
+    from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentFactory:
@@ -42,7 +45,7 @@ class AgentFactory:
     def create(
         self,
         capability: AgentCapability,
-    ) -> BaseAgent:
+    ) -> BaseAgent[Any]:
         """
         Create an agent for the requested capability.
         """

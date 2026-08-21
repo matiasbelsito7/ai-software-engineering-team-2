@@ -11,9 +11,9 @@ from ai_team.rag.retrieval.semantic import SemanticRetriever
 
 __all__ = [
     "BaseRetriever",
-    "SemanticRetriever",
-    "KeywordRetriever",
-    "HybridRetriever",
-    "RerankerRetriever",
     "ContextualRetriever",
+    "HybridRetriever",
+    "KeywordRetriever",
+    "RerankerRetriever",
+    "SemanticRetriever",
 ]

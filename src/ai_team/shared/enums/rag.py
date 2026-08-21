@@ -3,7 +3,9 @@ Enumerations used by the RAG subsystem.
 """
 
 from __future__ import annotations
+
 from enum import StrEnum
+
 
 class SourceType(StrEnum):
 

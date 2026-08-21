@@ -1,4 +1,3 @@
-```python
 """
 Shared type aliases used across the AI Software Engineering Team project.
 
@@ -17,99 +16,98 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from os import PathLike
-from typing import Any, TypeAlias
+from typing import Any
 from uuid import UUID
 
 ###############################################################################
 # JSON
 ###############################################################################
 
-JSONPrimitive: TypeAlias = str | int | float | bool | None
+type JSONPrimitive = str | int | float | bool | None
 
-JSONValue: TypeAlias = (
+type JSONValue = (
     JSONPrimitive
     | list["JSONValue"]
     | dict[str, "JSONValue"]
 )
 
-JSONObject: TypeAlias = dict[str, JSONValue]
-JSONArray: TypeAlias = list[JSONValue]
+type JSONObject = dict[str, JSONValue]
+type JSONArray = list[JSONValue]
 
 ###############################################################################
 # Generic metadata
 ###############################################################################
 
-Metadata: TypeAlias = dict[str, Any]
-Headers: TypeAlias = Mapping[str, str]
+type Metadata = dict[str, Any]
+type Headers = Mapping[str, str]
 
 ###############################################################################
 # Identifiers
 ###############################################################################
 
-AgentId: TypeAlias = str
-TaskId: TypeAlias = UUID
-SessionId: TypeAlias = UUID
-ConversationId: TypeAlias = UUID
-MessageId: TypeAlias = UUID
-WorkflowId: TypeAlias = UUID
-CheckpointId: TypeAlias = UUID
-DocumentId: TypeAlias = UUID
+type AgentId = str
+type TaskId = UUID
+type SessionId = UUID
+type ConversationId = UUID
+type MessageId = UUID
+type WorkflowId = UUID
+type CheckpointId = UUID
+type DocumentId = UUID
 
 ###############################################################################
 # Files
 ###############################################################################
 
-FilePath: TypeAlias = str | PathLike[str]
-DirectoryPath: TypeAlias = str | PathLike[str]
+type FilePath = str | PathLike[str]
+type DirectoryPath = str | PathLike[str]
 
 ###############################################################################
 # LLM
 ###############################################################################
 
-Prompt: TypeAlias = str
-Completion: TypeAlias = str
-SystemPrompt: TypeAlias = str
+type Prompt = str
+type Completion = str
+type SystemPrompt = str
 
-TokenCount: TypeAlias = int
-Embedding: TypeAlias = list[float]
-EmbeddingVector: TypeAlias = list[float]
+type TokenCount = int
+type Embedding = list[float]
+type EmbeddingVector = list[float]
 
 ###############################################################################
 # Time
 ###############################################################################
 
-Timestamp: TypeAlias = float
-DurationSeconds: TypeAlias = float
+type Timestamp = float
+type DurationSeconds = float
 
 ###############################################################################
 # Costs
 ###############################################################################
 
-USD: TypeAlias = float
+type USD = float
 
 ###############################################################################
 # Tool execution
 ###############################################################################
 
-ToolArguments: TypeAlias = dict[str, Any]
-ToolResult: TypeAlias = Any
+type ToolArguments = dict[str, Any]
+type ToolResult = Any
 
 ###############################################################################
 # Configuration
 ###############################################################################
 
-SettingsDict: TypeAlias = dict[str, Any]
+type SettingsDict = dict[str, Any]
 
 ###############################################################################
 # State
 ###############################################################################
 
-StateDict: TypeAlias = dict[str, Any]
+type StateDict = dict[str, Any]
 
 ###############################################################################
 # Miscellaneous
 ###############################################################################
 
-Tags: TypeAlias = list[str]
-Labels: TypeAlias = dict[str, str]
-```
+type Tags = list[str]
+type Labels = dict[str, str]

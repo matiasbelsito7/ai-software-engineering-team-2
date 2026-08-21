@@ -4,15 +4,17 @@ Models used by the Reviewer agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.patches import CodePatch
-from ai_team.shared.enums.qa import Severity
-from ai_team.shared.enums.review import (
-    ReviewCategory,
-    ReviewStatus,
-)
-
+if TYPE_CHECKING:
+    from ai_team.agents.patches import CodePatch
+    from ai_team.shared.enums.qa import Severity
+    from ai_team.shared.enums.review import (
+        ReviewCategory,
+        ReviewStatus,
+    )
 
 # ============================================================================
 # Review Finding

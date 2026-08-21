@@ -5,9 +5,12 @@ Prompt builder for the Database agent.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from ai_team.agents.models import AgentExecution
 from ai_team.agents.prompt_builder import BasePromptBuilder
+
+if TYPE_CHECKING:
+    from ai_team.agents.execution import AgentExecution
 
 
 class DatabasePromptBuilder(BasePromptBuilder):
@@ -24,6 +27,16 @@ class DatabasePromptBuilder(BasePromptBuilder):
     TASK_PROMPT = "schema.md"
 
     REFINEMENT_PROMPT = "refinement.md"
+
+    @classmethod
+    def render_context(
+        cls,
+        execution: AgentExecution,
+    ) -> str:
+        conversation = cls.build(execution)
+        return "\n\n".join(
+            msg.content for msg in conversation.messages
+        )
 
     @classmethod
     def build_user_prompt(

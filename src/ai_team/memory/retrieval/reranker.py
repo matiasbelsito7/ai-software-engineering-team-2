@@ -4,10 +4,13 @@ Memory reranker.
 
 from __future__ import annotations
 
-from ai_team.memory.models import (
-    MemoryEntry,
-    MemoryQuery,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ai_team.memory.models import (
+        MemoryEntry,
+        MemoryQuery,
+    )
 
 
 class MemoryReranker:

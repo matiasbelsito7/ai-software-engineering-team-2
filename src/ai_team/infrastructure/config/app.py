@@ -1,4 +1,3 @@
-```python
 """
 Application configuration.
 
@@ -134,4 +133,3 @@ class AppSettings(BaseSettings):
         default=True,
         description="Allow credentials in CORS.",
     )
-```

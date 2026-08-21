@@ -1,4 +1,3 @@
-```python
 """
 SQLAlchemy async session management.
 
@@ -19,8 +18,8 @@ This module intentionally does NOT contain:
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -29,6 +28,8 @@ from sqlalchemy.ext.asyncio import (
 
 from ai_team.infrastructure.database.engine import engine
 
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 # ---------------------------------------------------------------------------
 # Session Factory
@@ -82,4 +83,3 @@ async def session_scope() -> AsyncGenerator[AsyncSession, None]:
 
         finally:
             await session.close()
-```

@@ -4,6 +4,8 @@ Database agent implementation.
 
 from __future__ import annotations
 
+from typing import Any
+
 from ai_team.agents.base import BaseAgent
 from ai_team.agents.database.prompt_builder import (
     DatabasePromptBuilder,
@@ -13,7 +15,7 @@ from ai_team.agents.parsers.database import DatabaseParser
 from ai_team.shared.enums import AgentCapability
 
 
-class DatabaseAgent(BaseAgent):
+class DatabaseAgent(BaseAgent[Any]):
     """
     AI agent responsible for designing the persistence layer.
     """

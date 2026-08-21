@@ -5,12 +5,14 @@ Base tool abstraction.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from ai_team.tools.models import (
-    ToolDefinition,
-    ToolRequest,
-    ToolResult,
-)
+if TYPE_CHECKING:
+    from ai_team.tools.models import (
+        ToolDefinition,
+        ToolRequest,
+        ToolResult,
+    )
 
 
 class BaseTool(ABC):

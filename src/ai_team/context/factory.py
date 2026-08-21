@@ -4,6 +4,8 @@ Context factory.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.context.compressor import (
     ContextCompressor,
 )
@@ -16,14 +18,16 @@ from ai_team.context.selector import (
 from ai_team.context.summarizer import (
     ContextSummarizer,
 )
-from ai_team.llm.base import (
-    BaseLLMProvider,
-)
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.llm.base import (
+        BaseLLM,
+    )
 
 
 def build_context(
     *,
-    llm: BaseLLMProvider,
+    llm: BaseLLM,
 ) -> ContextManager:
     """
     Build the context subsystem.

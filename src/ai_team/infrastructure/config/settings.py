@@ -1,4 +1,3 @@
-```python
 """
 Application settings composition.
 
@@ -24,6 +23,7 @@ from pydantic import BaseModel
 from ai_team.infrastructure.config.app import AppSettings
 from ai_team.infrastructure.config.database import DatabaseSettings
 from ai_team.infrastructure.config.evaluation import EvaluationSettings
+from ai_team.infrastructure.config.http import HttpSettings
 from ai_team.infrastructure.config.llm import LLMSettings
 from ai_team.infrastructure.config.qdrant import QdrantSettings
 from ai_team.infrastructure.config.redis import RedisSettings
@@ -51,6 +51,8 @@ class Settings(BaseModel):
 
     evaluation: EvaluationSettings = EvaluationSettings()
 
+    http: HttpSettings = HttpSettings()
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
@@ -65,4 +67,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-```

@@ -1,4 +1,3 @@
-```python
 """
 Telemetry configuration.
 
@@ -160,4 +159,3 @@ class TelemetrySettings(BaseSettings):
         default=True,
         description="Record memory usage.",
     )
-```

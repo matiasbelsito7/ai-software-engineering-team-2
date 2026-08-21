@@ -4,10 +4,14 @@ Context selector.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.context.models import (
     ContextSelection,
 )
-from ai_team.graph.state import GraphState
+
+if TYPE_CHECKING:
+    from ai_team.graph.state import GraphState
 
 
 class ContextSelector:
@@ -45,18 +49,24 @@ class ContextSelector:
             ]
         )
 
-        memories = []
+        memories: list[str] = []
 
         if state.memory is not None:
-            memories = state.memory.items[
-                : self._max_memories
+            memories = [
+                entry.content
+                for entry in state.memory.entries[
+                    : self._max_memories
+                ]
             ]
 
-        documents = []
+        documents: list[str] = []
 
         if state.rag is not None:
-            documents = state.rag.documents[
-                : self._max_documents
+            documents = [
+                chunk.content
+                for chunk in state.rag.chunks[
+                    : self._max_documents
+                ]
             ]
 
         return ContextSelection(

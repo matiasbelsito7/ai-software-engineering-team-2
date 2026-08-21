@@ -6,15 +6,19 @@ Coordinates memory stores and retrieval strategies.
 
 from __future__ import annotations
 
-from ai_team.memory.stores.base import BaseMemoryStore
-from ai_team.memory.models import (
-    MemoryContext,
-    MemoryEntry,
-    MemoryQuery,
-    MemorySearchResult,
-)
-from ai_team.memory.retrieval.base import BaseRetriever
+from typing import TYPE_CHECKING
+
 from ai_team.shared.enums import MemoryType
+
+if TYPE_CHECKING:
+    from ai_team.memory.models import (
+        MemoryContext,
+        MemoryEntry,
+        MemoryQuery,
+        MemorySearchResult,
+    )
+    from ai_team.memory.retrieval.base import BaseRetriever
+    from ai_team.memory.stores.base import BaseMemoryStore
 
 
 class MemoryManager:

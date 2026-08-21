@@ -17,12 +17,9 @@ Used by:
 
 from __future__ import annotations
 
-from typing import Any
-
 import httpx
 
 from ai_team.infrastructure.config.settings import settings
-
 
 DEFAULT_LIMITS = httpx.Limits(
     max_connections=100,

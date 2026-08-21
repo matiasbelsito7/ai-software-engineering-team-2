@@ -11,13 +11,11 @@ observability remain provider-agnostic.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Generic, TypeVar
-
-T = TypeVar("T")
+from typing import Any
 
 
 @dataclass(slots=True, frozen=True)
-class StructuredLLMResponse(Generic[T]):
+class StructuredLLMResponse[T]:
     """
     Structured response returned by an LLM.
     """

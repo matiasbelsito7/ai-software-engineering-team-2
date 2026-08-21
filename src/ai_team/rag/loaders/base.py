@@ -1,47 +1,30 @@
 """
-Markdown document loader.
+Base document loader interface.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from ai_team.rag.loaders.base import (
-    BaseDocumentLoader,
-)
-from ai_team.rag.models import (
-    Document,
-    DocumentMetadata,
-    DocumentSource,
-)
+if TYPE_CHECKING:
+    from ai_team.rag.models import (
+        Document,
+        DocumentSource,
+    )
 
 
-class MarkdownLoader(BaseDocumentLoader):
+class BaseDocumentLoader(ABC):
     """
-    Loads Markdown documents from the local filesystem.
+    Contract implemented by every document loader.
     """
 
+    @abstractmethod
     async def load(
         self,
         source: DocumentSource,
     ) -> Document:
         """
-        Load a Markdown document.
+        Load a single document from the given source.
         """
-
-        path = Path(source.uri)
-
-        content = path.read_text(
-            encoding="utf-8",
-        )
-
-        metadata = DocumentMetadata(
-            source=source.uri,
-            title=source.title or path.stem,
-        )
-
-        return Document(
-            source=source,
-            content=content,
-            metadata=metadata,
-        )
+        raise NotImplementedError

@@ -2,21 +2,34 @@
 Git tool.
 """
 
-from ai_team.tools.git.commands import status, diff, branch, checkout, add, commit, log, restore, init, clone, pull, push
+from ai_team.tools.git.commands import (
+    add,
+    branch,
+    checkout,
+    clone,
+    commit,
+    diff,
+    init,
+    log,
+    pull,
+    push,
+    restore,
+    status,
+)
 from ai_team.tools.git.git import GitTool
 
 __all__ = [
     "GitTool",
-    "status",
-    "diff",
+    "add",
     "branch",
     "checkout",
-    "add",
-    "commit",
-    "log",
-    "restore",
-    "init",
     "clone",
+    "commit",
+    "diff",
+    "init",
+    "log",
     "pull",
-    "push"
+    "push",
+    "restore",
+    "status"
 ]

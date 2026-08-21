@@ -83,7 +83,7 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embedding = response.json()["embeddings"][0]
+        embedding: list[float] = response.json()["embeddings"][0]
 
         if len(embedding) != self.dimensions:
             raise RuntimeError(
@@ -110,7 +110,7 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embeddings = response.json()["embeddings"]
+        embeddings: list[list[float]] = response.json()["embeddings"]
 
         for embedding in embeddings:
             if len(embedding) != self.dimensions:

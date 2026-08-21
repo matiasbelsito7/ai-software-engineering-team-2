@@ -1,4 +1,3 @@
-```python
 """
 SQLAlchemy async engine.
 
@@ -46,4 +45,3 @@ def get_engine() -> AsyncEngine:
 
 
 engine: AsyncEngine = get_engine()
-```

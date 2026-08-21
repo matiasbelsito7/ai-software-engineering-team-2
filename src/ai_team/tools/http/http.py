@@ -4,17 +4,20 @@ HTTP tool.
 
 from __future__ import annotations
 
-from collections.abc import Awaitable
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.base import BaseTool
-from ai_team.tools.http.manager import HttpManager
-from ai_team.tools.http.policy import HttpPolicy
 from ai_team.tools.models import (
     ToolDefinition,
     ToolRequest,
     ToolResult,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
+    from ai_team.tools.http.manager import HttpManager
+    from ai_team.tools.http.policy import HttpPolicy
 
 
 class HttpTool(BaseTool):
@@ -43,7 +46,7 @@ class HttpTool(BaseTool):
         self._operations: dict[
             str,
             Callable[
-                [dict],
+                [dict[str, Any]],
                 Awaitable[ToolResult],
             ],
         ] = {
@@ -73,6 +76,8 @@ class HttpTool(BaseTool):
         operation = request.parameters.get(
             "operation",
         )
+
+        assert operation is not None
 
         self._policy.validate_operation(
             operation,
@@ -106,7 +111,7 @@ class HttpTool(BaseTool):
 
     def _validate_request(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> None:
 
         self._policy.validate_url(
@@ -125,7 +130,7 @@ class HttpTool(BaseTool):
 
     async def _get(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -143,7 +148,7 @@ class HttpTool(BaseTool):
 
     async def _post(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -162,7 +167,7 @@ class HttpTool(BaseTool):
 
     async def _put(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -180,7 +185,7 @@ class HttpTool(BaseTool):
 
     async def _patch(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -198,7 +203,7 @@ class HttpTool(BaseTool):
 
     async def _delete(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -215,7 +220,7 @@ class HttpTool(BaseTool):
 
     async def _head(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -232,7 +237,7 @@ class HttpTool(BaseTool):
 
     async def _options(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._validate_request(parameters)
@@ -249,7 +254,7 @@ class HttpTool(BaseTool):
 
     async def _download(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         self._policy.validate_url(

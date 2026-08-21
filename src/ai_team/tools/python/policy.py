@@ -4,9 +4,10 @@ Python execution policy.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar
 
-from ai_team.infrastructure.workspace import Workspace
+if TYPE_CHECKING:
+    from ai_team.infrastructure.workspace import Workspace
 
 
 class PythonPolicy:
@@ -14,7 +15,7 @@ class PythonPolicy:
     Validates Python operations before execution.
     """
 
-    ALLOWED_EXTENSIONS = {
+    ALLOWED_EXTENSIONS: ClassVar[set[str]] = {
         ".py",
     }
 

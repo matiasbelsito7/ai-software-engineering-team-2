@@ -12,10 +12,10 @@ from ai_team.rag.loaders.text import TextLoader
 
 __all__ = [
     "BaseDocumentLoader",
+    "GitLoader",
     "MarkdownLoader",
     "PDFLoader",
-    "TextLoader",
     "PythonLoader",
-    "GitLoader",
     "RepositoryLoader",
+    "TextLoader",
 ]

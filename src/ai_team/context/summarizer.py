@@ -4,10 +4,17 @@ Conversation summarizer.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.context.models import (
     ContextSummary,
 )
-from ai_team.infrastructure.llm.base import BaseLLMProvider
+from ai_team.infrastructure.llm.messages import (
+    Conversation,
+)
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.llm.base import BaseLLM
 
 
 class ContextSummarizer:
@@ -18,7 +25,7 @@ class ContextSummarizer:
     def __init__(
         self,
         *,
-        llm: BaseLLMProvider,
+        llm: BaseLLM,
     ) -> None:
 
         self._llm = llm
@@ -38,12 +45,15 @@ class ContextSummarizer:
             + "\n".join(conversation)
         )
 
+        conv = Conversation()
+        conv.add_user(prompt)
+
         response = await self._llm.generate(
-            prompt=prompt,
+            conv,
         )
 
         return ContextSummary(
-            summary=response.text,
+            summary=response.content,
             source_messages=len(
                 conversation,
             ),

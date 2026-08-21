@@ -6,8 +6,8 @@ from ai_team.infrastructure.llm.base import BaseLLM
 from ai_team.infrastructure.llm.config import GenerationConfig
 from ai_team.infrastructure.llm.factory import LLMFactory
 from ai_team.infrastructure.llm.messages import (
-    ChatMessage,
     Conversation,
+    Message,
     MessageRole,
 )
 from ai_team.infrastructure.llm.providers.openrouter import OpenRouterLLM
@@ -22,25 +22,20 @@ from ai_team.infrastructure.llm.responses import (
 __all__ = [
     # Base Interface
     "BaseLLM",
-
-    # Factory
-    "LLMFactory",
-
-    # Providers
-    "OpenRouterLLM",
-
+    "Conversation",
     # Configuration
     "GenerationConfig",
-
-    # Messages
-    "MessageRole",
-    "ChatMessage",
-    "Conversation",
-
+    "GenerationMetadata",
+    # Factory
+    "LLMFactory",
     # Responses
     "LLMResponse",
-    "StructuredLLMResponse",
     "LLMStreamChunk",
+    "Message",
+    # Messages
+    "MessageRole",
+    # Providers
+    "OpenRouterLLM",
+    "StructuredLLMResponse",
     "TokenUsage",
-    "GenerationMetadata",
 ]

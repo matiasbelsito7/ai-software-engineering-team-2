@@ -4,6 +4,8 @@ Hybrid retrieval strategy.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.memory.models import (
     MemoryContext,
     MemoryQuery,
@@ -12,15 +14,17 @@ from ai_team.memory.models import (
 from ai_team.memory.retrieval.base import (
     BaseRetriever,
 )
-from ai_team.memory.retrieval.keyword import (
-    KeywordRetriever,
-)
-from ai_team.memory.retrieval.reranker import (
-    MemoryReranker,
-)
-from ai_team.memory.retrieval.semantic import (
-    SemanticRetriever,
-)
+
+if TYPE_CHECKING:
+    from ai_team.memory.retrieval.keyword import (
+        KeywordRetriever,
+    )
+    from ai_team.memory.retrieval.reranker import (
+        MemoryReranker,
+    )
+    from ai_team.memory.retrieval.semantic import (
+        SemanticRetriever,
+    )
 
 
 class HybridRetriever(BaseRetriever):

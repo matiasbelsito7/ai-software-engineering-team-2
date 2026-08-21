@@ -5,15 +5,14 @@ Shared infrastructure for all LLM providers.
 from __future__ import annotations
 
 from abc import abstractmethod
-from collections.abc import AsyncIterator
 from time import perf_counter
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import httpx
+from pydantic import TypeAdapter
 
 from ai_team.infrastructure.http.client import HTTPClient
 from ai_team.infrastructure.llm.base import BaseLLM
-from ai_team.infrastructure.llm.config import GenerationConfig
 from ai_team.infrastructure.llm.exceptions import (
     AuthenticationError,
     AuthorizationError,
@@ -25,7 +24,6 @@ from ai_team.infrastructure.llm.exceptions import (
     ServiceUnavailableError,
     TimeoutError,
 )
-from ai_team.infrastructure.llm.messages import Conversation
 from ai_team.infrastructure.llm.responses import (
     GenerationMetadata,
     LLMResponse,
@@ -33,6 +31,12 @@ from ai_team.infrastructure.llm.responses import (
     StructuredLLMResponse,
     TokenUsage,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from ai_team.infrastructure.llm.config import GenerationConfig
+    from ai_team.infrastructure.llm.messages import Conversation, Message
 
 SchemaT = TypeVar("SchemaT")
 
@@ -202,9 +206,6 @@ class ProviderBase(BaseLLM):
                     model=self.model_name,
                 )
 
-    from pydantic import TypeAdapter
-
-
     # ------------------------------------------------------------------
     # Conversation
     # ------------------------------------------------------------------
@@ -314,28 +315,20 @@ class ProviderBase(BaseLLM):
 
     def _message_to_provider_format(
         self,
-        message: ChatMessage,
+        message: Message,
     ) -> dict[str, Any]:
         """
-        Convert a ChatMessage into the provider-specific format.
+        Convert a Message into the provider-specific format.
 
         Providers with custom message formats (for example,
         Anthropic or Gemini) may override this method without
         reimplementing the entire conversation conversion.
         """
 
-        payload: dict[str, Any] = {
+        return {
             "role": message.role.value,
             "content": message.content,
         }
-
-        if message.name:
-            payload["name"] = message.name
-
-        if message.tool_call_id:
-            payload["tool_call_id"] = message.tool_call_id
-
-        return payload
 
     # ------------------------------------------------------------------
     # Abstract API

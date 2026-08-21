@@ -4,20 +4,62 @@ LangGraph builder.
 
 from __future__ import annotations
 
-from langgraph.graph import END, START, StateGraph
+from typing import TYPE_CHECKING, Any
 
-from ai_team.agents.architect.agent import ArchitectAgent
-from ai_team.agents.backend.agent import BackendAgent
-from ai_team.agents.devops.agent import DevOpsAgent
-from ai_team.agents.documentation.agent import DocumentationAgent
-from ai_team.agents.frontend.agent import FrontendAgent
-from ai_team.agents.git.agent import GitAgent
-from ai_team.agents.planner.agent import PlannerAgent
-from ai_team.agents.qa.agent import QAAgent
-from ai_team.agents.reviewer.agent import ReviewerAgent
+from langgraph.graph import END, START, StateGraph
 
 from ai_team.graph.state import GraphState
 from ai_team.graph.workflow import Workflow, WorkflowNode
+
+if TYPE_CHECKING:
+    from ai_team.agents.architect.agent import ArchitectAgent
+    from ai_team.agents.backend.agent import BackendAgent
+    from ai_team.agents.devops.agent import DevOpsAgent
+    from ai_team.agents.documentation.agent import DocumentationAgent
+    from ai_team.agents.frontend.agent import FrontendAgent
+    from ai_team.agents.git.agent import GitAgent
+    from ai_team.agents.planner.agent import PlannerAgent
+    from ai_team.agents.qa.agent import QAAgent
+    from ai_team.agents.reviewer.agent import ReviewerAgent
+
+
+def _make_agent_node(
+    agent: Any,
+) -> Any:
+    """
+    Wrap a BaseAgent so it can be used as a LangGraph node.
+
+    LangGraph nodes receive and return GraphState.
+    BaseAgent.execute() expects AgentExecution and returns AgentExecution.
+    """
+
+    async def _node(state: GraphState) -> GraphState:
+        from ai_team.agents.execution import (
+            AgentExecution,
+            AgentRequest,
+        )
+
+        execution = AgentExecution(
+            capability=agent.capability,
+            request=AgentRequest(
+                task=state.conversation.user_request,
+            ),
+        )
+
+        execution = await agent.execute(execution)
+
+        state.artifacts.results.append(
+            execution.result,
+        )
+
+        state.execution.current_agent = agent.info.name
+        state.execution.previous_agent = (
+            state.execution.current_agent
+        )
+
+        return state
+
+    return _node
 
 
 class GraphBuilder:
@@ -49,7 +91,7 @@ class GraphBuilder:
         self._devops = devops
         self._git = git
 
-    def build(self):
+    def build(self) -> Any:
         """
         Build and compile the workflow graph.
         """
@@ -62,47 +104,47 @@ class GraphBuilder:
 
         graph.add_node(
             WorkflowNode.PLANNER,
-            self._planner.run,
+            _make_agent_node(self._planner),
         )
 
         graph.add_node(
             WorkflowNode.ARCHITECT,
-            self._architect.run,
+            _make_agent_node(self._architect),
         )
 
         graph.add_node(
             WorkflowNode.BACKEND,
-            self._backend.run,
+            _make_agent_node(self._backend),
         )
 
         graph.add_node(
             WorkflowNode.FRONTEND,
-            self._frontend.run,
+            _make_agent_node(self._frontend),
         )
 
         graph.add_node(
             WorkflowNode.REVIEWER,
-            self._reviewer.run,
+            _make_agent_node(self._reviewer),
         )
 
         graph.add_node(
             WorkflowNode.QA,
-            self._qa.run,
+            _make_agent_node(self._qa),
         )
 
         graph.add_node(
             WorkflowNode.DOCUMENTATION,
-            self._documentation.run,
+            _make_agent_node(self._documentation),
         )
 
         graph.add_node(
             WorkflowNode.DEVOPS,
-            self._devops.run,
+            _make_agent_node(self._devops),
         )
 
         graph.add_node(
             WorkflowNode.GIT,
-            self._git.run,
+            _make_agent_node(self._git),
         )
 
         # -----------------------------------------------------
@@ -131,6 +173,11 @@ class GraphBuilder:
         graph.add_edge(
             WorkflowNode.BACKEND,
             WorkflowNode.FRONTEND,
+        )
+
+        graph.add_edge(
+            WorkflowNode.FRONTEND,
+            WorkflowNode.REVIEWER,
         )
 
         graph.add_edge(

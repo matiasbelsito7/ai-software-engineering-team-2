@@ -5,13 +5,15 @@ Base interface for memory retrieval strategies.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from ai_team.memory.models import (
-    MemoryContext,
-    MemoryEntry,
-    MemoryQuery,
-    MemorySearchResult,
-)
+if TYPE_CHECKING:
+    from ai_team.memory.models import (
+        MemoryContext,
+        MemoryQuery,
+        MemorySearchResult,
+    )
+
 
 class BaseRetriever(ABC):
     """

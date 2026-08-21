@@ -4,19 +4,19 @@ Browser manager.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
-
-from playwright.async_api import (
-    Browser,
-    BrowserContext,
-    Page,
-    async_playwright,
-)
 
 from ai_team.tools.browser.models import (
     BrowserSession,
 )
+
+if TYPE_CHECKING:
+    from playwright.async_api import (
+        Browser,
+        BrowserContext,
+        Page,
+    )
 
 
 class BrowserManager:
@@ -44,12 +44,14 @@ class BrowserManager:
         if self._browser is not None:
             return
 
+        from playwright.async_api import async_playwright
+
         self._playwright = (
             await async_playwright().start()
         )
 
         self._browser = (
-            await self._playwright.chromium.launch(
+            await self._playwright.chromium.launch(  # type: ignore[attr-defined]
                 headless=True,
             )
         )
@@ -74,7 +76,7 @@ class BrowserManager:
             await self._browser.close()
 
         if self._playwright:
-            await self._playwright.stop()
+            await self._playwright.stop()  # type: ignore[unreachable]
 
         self._context = None
         self._browser = None
@@ -89,7 +91,7 @@ class BrowserManager:
 
         await self.start()
 
-        page = await self._context.new_page()
+        page = await self._context.new_page()  # type: ignore[union-attr]
 
         await page.goto(
             url,
@@ -113,18 +115,18 @@ class BrowserManager:
         session: BrowserSession,
     ) -> str:
 
-        return await self._page(
+        return str(await self._page(
             session,
-        ).content()
+        ).content())
 
     async def title(
         self,
         session: BrowserSession,
     ) -> str:
 
-        return await self._page(
+        return str(await self._page(
             session,
-        ).title()
+        ).title())
 
     async def click(
         self,

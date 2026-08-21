@@ -4,21 +4,24 @@ High-level RAG manager.
 
 from __future__ import annotations
 
-from ai_team.rag.indexing.pipeline import (
-    IndexingPipeline,
-)
-from ai_team.rag.models import (
-    Document,
-    RAGContext,
-    RetrievalQuery,
-    RetrievalResult,
-)
-from ai_team.rag.retrieval.base import (
-    BaseRetriever,
-)
-from ai_team.rag.stores.base import (
-    BaseVectorStore,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ai_team.rag.indexing.pipeline import (
+        IndexingPipeline,
+    )
+    from ai_team.rag.models import (
+        Document,
+        RAGContext,
+        RetrievalQuery,
+        RetrievalResult,
+    )
+    from ai_team.rag.retrieval.base import (
+        BaseRetriever,
+    )
+    from ai_team.rag.stores.base import (
+        BaseVectorStore,
+    )
 
 
 class RAGManager:

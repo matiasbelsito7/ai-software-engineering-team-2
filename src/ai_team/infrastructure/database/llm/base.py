@@ -5,15 +5,17 @@ Abstract interface for all Large Language Model providers.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-from ai_team.infrastructure.llm.config import GenerationConfig
-from ai_team.infrastructure.llm.responses import (
-    LLMResponse,
-    LLMStreamChunk,
-    StructuredLLMResponse,
-)
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from ai_team.infrastructure.llm.config import GenerationConfig
+    from ai_team.infrastructure.llm.responses import (
+        LLMResponse,
+        LLMStreamChunk,
+        StructuredLLMResponse,
+    )
 
 SchemaT = TypeVar("SchemaT")
 

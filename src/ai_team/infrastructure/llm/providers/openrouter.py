@@ -4,12 +4,9 @@ OpenRouter provider implementation.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ai_team.infrastructure.config.settings import settings
-from ai_team.infrastructure.llm.config import GenerationConfig
-from ai_team.infrastructure.llm.messages import Conversation
 from ai_team.infrastructure.llm.providers.base import ProviderBase
 from ai_team.infrastructure.llm.responses import (
     GenerationMetadata,
@@ -18,8 +15,14 @@ from ai_team.infrastructure.llm.responses import (
     TokenUsage,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
-class OpenRouterProvider(ProviderBase):
+    from ai_team.infrastructure.llm.config import GenerationConfig
+    from ai_team.infrastructure.llm.messages import Conversation
+
+
+class OpenRouterLLM(ProviderBase):
     """
     OpenRouter implementation of the LLM provider.
     """
@@ -34,13 +37,13 @@ class OpenRouterProvider(ProviderBase):
 
         super().__init__(
             model=model,
-            base_url=settings.llm.openrouter.base_url,
+            base_url=settings.llm.openrouter_base_url,
             headers={
                 "Authorization": (
-                    f"Bearer {settings.llm.openrouter.api_key}"
+                    f"Bearer {settings.llm.openrouter_api_key}"
                 ),
                 "Content-Type": "application/json",
-                "HTTP-Referer": settings.app.url,
+                "HTTP-Referer": f"http://{settings.app.host}:{settings.app.port}",
                 "X-Title": settings.app.name,
             },
         )

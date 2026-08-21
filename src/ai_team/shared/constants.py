@@ -1,4 +1,3 @@
-```python
 """
 Global constants shared across the AI Software Engineering Team project.
 
@@ -129,4 +128,3 @@ UNKNOWN = "unknown"
 EMPTY_STRING = ""
 
 ROOT_SPAN_NAME = "ai-team-root"
-```

@@ -4,12 +4,16 @@ Context-aware retriever.
 
 from __future__ import annotations
 
-from ai_team.rag.models import (
-    RAGContext,
-    RetrievalQuery,
-    RetrievalResult,
-)
+from typing import TYPE_CHECKING
+
 from ai_team.rag.retrieval.base import BaseRetriever
+
+if TYPE_CHECKING:
+    from ai_team.rag.models import (
+        RAGContext,
+        RetrievalQuery,
+        RetrievalResult,
+    )
 
 
 class ContextualRetriever(BaseRetriever):

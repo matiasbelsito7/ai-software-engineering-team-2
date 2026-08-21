@@ -4,16 +4,20 @@ Docker tool.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.base import BaseTool
-from ai_team.tools.docker.manager import DockerManager
-from ai_team.tools.docker.policy import DockerPolicy
 from ai_team.tools.models import (
     ToolDefinition,
     ToolRequest,
     ToolResult,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from ai_team.tools.docker.manager import DockerManager
+    from ai_team.tools.docker.policy import DockerPolicy
 
 
 class DockerTool(BaseTool):
@@ -41,7 +45,7 @@ class DockerTool(BaseTool):
 
         self._operations: dict[
             str,
-            Callable[[dict], ToolResult],
+            Callable[[dict[str, Any]], ToolResult],
         ] = {
 
             "ping": lambda _: ToolResult(
@@ -81,6 +85,8 @@ class DockerTool(BaseTool):
             "operation",
         )
 
+        assert operation is not None
+
         self._policy.validate_operation(
             operation,
         )
@@ -113,7 +119,7 @@ class DockerTool(BaseTool):
 
     def _start(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         container = parameters["container"]
@@ -132,7 +138,7 @@ class DockerTool(BaseTool):
 
     def _stop(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         container = parameters["container"]
@@ -151,7 +157,7 @@ class DockerTool(BaseTool):
 
     def _remove(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         container = parameters["container"]
@@ -174,7 +180,7 @@ class DockerTool(BaseTool):
 
     def _pull(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         image = parameters["image"]
@@ -193,7 +199,7 @@ class DockerTool(BaseTool):
 
     def _run(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         image = parameters["image"]

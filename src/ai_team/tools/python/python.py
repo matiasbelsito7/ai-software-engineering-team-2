@@ -4,7 +4,7 @@ Python tool.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.base import BaseTool
 from ai_team.tools.models import (
@@ -13,7 +13,11 @@ from ai_team.tools.models import (
     ToolResult,
 )
 from ai_team.tools.python import commands
-from ai_team.tools.terminal import TerminalTool
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from ai_team.tools.terminal import TerminalTool
 
 
 class PythonTool(BaseTool):
@@ -39,7 +43,7 @@ class PythonTool(BaseTool):
 
         self._operations: dict[
             str,
-            Callable[[dict], str],
+            Callable[[dict[str, Any]], str],
         ] = {
 
             "run_script": (
@@ -110,6 +114,8 @@ class PythonTool(BaseTool):
         operation = request.parameters.get(
             "operation",
         )
+
+        assert operation is not None
 
         builder = self._operations.get(
             operation,

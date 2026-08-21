@@ -4,14 +4,16 @@ Models used by the Git agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.patches import CodePatch
-from ai_team.shared.enums.git import (
-    GitChangeType,
-    GitOperation,
-)
-
+if TYPE_CHECKING:
+    from ai_team.agents.patches import CodePatch
+    from ai_team.shared.enums.git import (
+        GitChangeType,
+        GitOperation,
+    )
 
 # ============================================================================
 # Git File Change

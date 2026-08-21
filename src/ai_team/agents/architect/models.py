@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 # ============================================================================
 # Module
 # ============================================================================
@@ -26,9 +25,13 @@ class ModuleDesign(BaseModel):
 
     description: str
 
-    responsibilities: list[str] = Field(default_factory=list)
+    responsibilities: list[str] = Field(
+        default_factory=list,
+    )
 
-    dependencies: list[str] = Field(default_factory=list)
+    dependencies: list[str] = Field(
+        default_factory=list,
+    )
 
 
 # ============================================================================
@@ -53,7 +56,20 @@ class InterfaceDesign(BaseModel):
     owner: str
 
 
+# ============================================================================
+# Architectural Decision
+# ============================================================================
+
+
 class ArchitecturalDecision(BaseModel):
+    """
+    Represents an architectural or technology decision.
+    """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+    )
 
     title: str
 
@@ -61,7 +77,9 @@ class ArchitecturalDecision(BaseModel):
 
     rationale: str
 
-    consequences: list[str]
+    consequences: list[str] = Field(
+        default_factory=list,
+    )
 
 
 # ============================================================================
@@ -83,23 +101,36 @@ class ArchitectureDesign(BaseModel):
 
     architecture_style: str
 
-    modules: list[ModuleDesign] = Field(default_factory=list)
+    modules: list[ModuleDesign] = Field(
+        default_factory=list,
+    )
 
-    interfaces: list[InterfaceDesign] = Field(default_factory=list)
+    interfaces: list[InterfaceDesign] = Field(
+        default_factory=list,
+    )
 
-    technology_decisions: list[TechnologyDecision] = Field(default_factory=list)
+    technology_decisions: list[ArchitecturalDecision] = Field(
+        default_factory=list,
+    )
 
-    assumptions: list[str] = Field(default_factory=list)
+    assumptions: list[str] = Field(
+        default_factory=list,
+    )
 
-    risks: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(
+        default_factory=list,
+    )
 
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(
+        default_factory=dict,
+    )
 
     @property
     def total_modules(self) -> int:
         """
         Number of modules.
         """
+
         return len(self.modules)
 
     @property
@@ -107,4 +138,5 @@ class ArchitectureDesign(BaseModel):
         """
         Number of public interfaces.
         """
+
         return len(self.interfaces)

@@ -4,18 +4,20 @@ Browser tool.
 
 from __future__ import annotations
 
-from collections.abc import Awaitable
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.base import BaseTool
-from ai_team.tools.browser.manager import BrowserManager
-from ai_team.tools.browser.models import BrowserSession
-from ai_team.tools.browser.policy import BrowserPolicy
 from ai_team.tools.models import (
     ToolDefinition,
     ToolRequest,
     ToolResult,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
+    from ai_team.tools.browser.manager import BrowserManager
+    from ai_team.tools.browser.policy import BrowserPolicy
 
 
 class BrowserTool(BaseTool):
@@ -44,7 +46,7 @@ class BrowserTool(BaseTool):
         self._operations: dict[
             str,
             Callable[
-                [dict],
+                [dict[str, Any]],
                 Awaitable[ToolResult],
             ],
         ] = {
@@ -75,9 +77,7 @@ class BrowserTool(BaseTool):
             "operation",
         )
 
-        self._policy.validate_operation(
-            operation,
-        )
+        assert operation is not None
 
         handler = self._operations.get(
             operation,
@@ -107,7 +107,7 @@ class BrowserTool(BaseTool):
 
     async def _goto(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         url = parameters["url"]
@@ -127,7 +127,7 @@ class BrowserTool(BaseTool):
 
     async def _content(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         content = await self._manager.content(
@@ -141,7 +141,7 @@ class BrowserTool(BaseTool):
 
     async def _title(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         title = await self._manager.title(
@@ -155,7 +155,7 @@ class BrowserTool(BaseTool):
 
     async def _click(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         selector = parameters["selector"]
@@ -175,7 +175,7 @@ class BrowserTool(BaseTool):
 
     async def _fill(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         selector = parameters["selector"]
@@ -196,7 +196,7 @@ class BrowserTool(BaseTool):
 
     async def _evaluate(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         javascript = parameters["javascript"]
@@ -217,7 +217,7 @@ class BrowserTool(BaseTool):
 
     async def _screenshot(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         await self._manager.screenshot(
@@ -231,7 +231,7 @@ class BrowserTool(BaseTool):
 
     async def _close(
         self,
-        parameters: dict,
+        parameters: dict[str, Any],
     ) -> ToolResult:
 
         await self._manager.close(

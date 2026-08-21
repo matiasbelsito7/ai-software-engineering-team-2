@@ -5,13 +5,15 @@ Central tool executor.
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING
 
-from ai_team.observability.manager import ObservationManager
-from ai_team.tools.manager import ToolManager
-from ai_team.tools.models import (
-    ToolRequest,
-    ToolResult,
-)
+if TYPE_CHECKING:
+    from ai_team.observability.manager import ObservationManager
+    from ai_team.tools.manager import ToolManager
+    from ai_team.tools.models import (
+        ToolRequest,
+        ToolResult,
+    )
 
 
 class ToolExecutor:
@@ -60,9 +62,11 @@ class ToolExecutor:
 
             if self._observations is not None:
 
-                await self._observations.record_tool_execution(
+                await self._observations.record_tool_call(
+                    execution_id="",
+                    agent="",
                     tool=request.tool,
-                    execution_time=(
+                    latency_ms=(
                         time.perf_counter() - started
                     ),
                     success=success,

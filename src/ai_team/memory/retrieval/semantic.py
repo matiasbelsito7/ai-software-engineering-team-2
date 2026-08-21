@@ -4,17 +4,21 @@ Semantic retrieval strategy.
 
 from __future__ import annotations
 
-from ai_team.memory.models import (
-    MemoryContext,
-    MemoryQuery,
-    MemorySearchResult,
-)
+from typing import TYPE_CHECKING
+
 from ai_team.memory.retrieval.base import (
     BaseRetriever,
 )
-from ai_team.memory.stores.semantic import (
-    SemanticMemoryStore,
-)
+
+if TYPE_CHECKING:
+    from ai_team.memory.models import (
+        MemoryContext,
+        MemoryQuery,
+        MemorySearchResult,
+    )
+    from ai_team.memory.stores.semantic import (
+        SemanticMemoryStore,
+    )
 
 
 class SemanticRetriever(BaseRetriever):

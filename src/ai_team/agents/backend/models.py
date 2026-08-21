@@ -8,31 +8,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ai_team.agents.patches import (
     CodePatch,
+    DependencyChange,
     PatchOperation,
 )
-
-
-# ============================================================================
-# Dependency
-# ============================================================================
-
-
-class DependencyChange(BaseModel):
-    """
-    Represents a dependency added or updated.
-    """
-
-    model_config = ConfigDict(
-        frozen=True,
-        extra="forbid",
-    )
-
-    package: str
-
-    version: str | None = None
-
-    reason: str
-
 
 # ============================================================================
 # Backend Result

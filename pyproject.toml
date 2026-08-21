@@ -359,11 +359,9 @@ check_untyped_defs = true
 
 namespace_packages = true
 
-mypy_path = "src"
+explicit_package_bases = true
 
-files = [
-    "src",
-]
+mypy_path = "src"
 
 exclude = [
     "^tests/",
@@ -380,6 +378,8 @@ module = [
     "llama_index.*",
     "qdrant_client.*",
     "deepeval.*",
+    "docker.*",
+    "playwright.*",
 ]
 
 ignore_missing_imports = true

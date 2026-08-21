@@ -4,6 +4,7 @@ Browser policy.
 
 from __future__ import annotations
 
+from typing import ClassVar
 from urllib.parse import urlparse
 
 
@@ -12,7 +13,7 @@ class BrowserPolicy:
     Validate browser operations.
     """
 
-    BLOCKED_SCHEMES = {
+    BLOCKED_SCHEMES: ClassVar[set[str]] = {
         "file",
         "ftp",
     }

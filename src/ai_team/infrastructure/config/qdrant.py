@@ -1,4 +1,3 @@
-```python
 """
 Qdrant configuration.
 
@@ -133,4 +132,3 @@ class QdrantSettings(BaseSettings):
         protocol = "https" if self.use_https else "http"
 
         return f"{protocol}://{self.host}:{self.port}"
-```

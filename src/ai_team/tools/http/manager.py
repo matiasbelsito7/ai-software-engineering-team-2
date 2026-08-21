@@ -4,14 +4,15 @@ HTTP manager.
 
 from __future__ import annotations
 
-from typing import Any
-
-import httpx
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.http.models import (
     DownloadResult,
     HttpResponse,
 )
+
+if TYPE_CHECKING:
+    import httpx
 
 
 class HttpManager:

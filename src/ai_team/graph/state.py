@@ -4,13 +4,15 @@ Graph state models.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.models import AgentResult
-from ai_team.memory.models import MemoryContext
-from ai_team.rag.models import RAGContext
+if TYPE_CHECKING:
+    from ai_team.agents.result import AgentResult
+    from ai_team.memory.models import MemoryContext
+    from ai_team.rag.models import RAGContext
 
 
 class ConversationState(BaseModel):

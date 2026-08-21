@@ -5,11 +5,13 @@ Base interface for vector stores.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from ai_team.rag.models import (
-    DocumentChunk,
-    RetrievedChunk,
-)
+if TYPE_CHECKING:
+    from ai_team.rag.models import (
+        DocumentChunk,
+        RetrievedChunk,
+    )
 
 
 class BaseVectorStore(ABC):

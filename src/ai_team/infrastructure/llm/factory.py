@@ -1,4 +1,3 @@
-```python
 """
 LLM Factory.
 
@@ -21,10 +20,14 @@ This module intentionally does NOT contain:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.infrastructure.config.settings import settings
-from ai_team.infrastructure.llm.base import BaseLLM
 from ai_team.infrastructure.llm.exceptions import UnsupportedProviderError
 from ai_team.infrastructure.llm.providers.openrouter import OpenRouterLLM
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.llm.base import BaseLLM
 
 
 class LLMFactory:
@@ -46,7 +49,7 @@ class LLMFactory:
         """
 
         provider = provider or settings.llm.default_provider
-        model = model or settings.llm.default_model
+        model = model or settings.llm.openrouter_model
 
         match provider.lower():
 

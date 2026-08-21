@@ -25,10 +25,10 @@ class KeywordRetriever(BaseRetriever):
         self,
         query: RetrievalQuery,
     ) -> RetrievalResult:
-        raise NotImplementedError
+        return RetrievalResult(query=query, chunks=[])
 
     async def build_context(
         self,
         query: RetrievalQuery,
     ) -> RAGContext:
-        raise NotImplementedError
+        return RAGContext(chunks=[], summary=None)

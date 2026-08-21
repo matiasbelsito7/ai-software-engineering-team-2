@@ -4,10 +4,10 @@ Docker manager.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from docker import DockerClient
-from docker.errors import DockerException
+if TYPE_CHECKING:
+    from docker import DockerClient  # type: ignore[attr-defined]
 
 
 class DockerManager:
@@ -146,6 +146,8 @@ class DockerManager:
     def ping(
         self,
     ) -> bool:
+
+        from docker.errors import DockerException
 
         try:
             return bool(

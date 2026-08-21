@@ -4,8 +4,12 @@ Shared database models used across AI agents.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field
-from ai_team.shared.enums import RelationshipType
+
+if TYPE_CHECKING:
+    from ai_team.shared.enums import RelationshipType
 
 # ============================================================================
 # Column

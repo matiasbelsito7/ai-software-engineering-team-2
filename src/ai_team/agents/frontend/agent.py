@@ -4,22 +4,26 @@ Frontend agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from ai_team.agents.base import BaseAgent
-from ai_team.agents.frontend.models import (
-    FrontendResult,
-)
-from ai_team.agents.parsers.frontend import (
-    FrontendParser,
-)
 from ai_team.agents.frontend.prompt_builder import (
     FrontendPromptBuilder,
 )
-from ai_team.agents.execution import AgentExecution
 from ai_team.agents.info import AgentInfo
+from ai_team.agents.parsers.frontend import (
+    FrontendParser,
+)
 from ai_team.shared.enums import AgentCapability
 
+if TYPE_CHECKING:
+    from ai_team.agents.execution import AgentExecution
+    from ai_team.agents.frontend.models import (
+        FrontendResult,
+    )
 
-class FrontendAgent(BaseAgent):
+
+class FrontendAgent(BaseAgent[Any]):
     """
     Agent responsible for implementing the presentation layer
     of the application.
@@ -38,7 +42,7 @@ class FrontendAgent(BaseAgent):
 
     PROMPT_BUILDER = FrontendPromptBuilder
 
-    async def run(
+    async def run(  # type: ignore[override]
         self,
         execution: AgentExecution,
     ) -> FrontendResult:
@@ -46,8 +50,6 @@ class FrontendAgent(BaseAgent):
         Execute the frontend workflow.
         """
 
-        self.build_conversation(execution)
-
-        return await self.generate_and_parse(
+        return await self.generate_and_parse(  # type: ignore[no-any-return]
             execution,
         )

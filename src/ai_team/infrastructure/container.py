@@ -4,22 +4,14 @@ Application dependency container.
 
 from __future__ import annotations
 
-# ------------------------------------------------------------------
-# Factories
-# ------------------------------------------------------------------
-
-from ai_team.memory.factory import build_memory
-from ai_team.observability.factory import build_observability
-from ai_team.rag.factory import build_rag
-from ai_team.infrastructure.workspace import Workspace
-from ai_team.tools.factory import build_tools
+from typing import TYPE_CHECKING
 
 # ------------------------------------------------------------------
 # Agents
 # ------------------------------------------------------------------
-
 from ai_team.agents.architect.agent import ArchitectAgent
 from ai_team.agents.backend.agent import BackendAgent
+from ai_team.agents.dependencies import AgentDependencies
 from ai_team.agents.devops.agent import DevOpsAgent
 from ai_team.agents.documentation.agent import DocumentationAgent
 from ai_team.agents.frontend.agent import FrontendAgent
@@ -27,16 +19,80 @@ from ai_team.agents.git.agent import GitAgent
 from ai_team.agents.planner.agent import PlannerAgent
 from ai_team.agents.qa.agent import QAAgent
 from ai_team.agents.reviewer.agent import ReviewerAgent
+from ai_team.agents.tools import AgentTools
 
 # ------------------------------------------------------------------
-# Docker
+# Factories
 # ------------------------------------------------------------------
-
-import docker
-
+from ai_team.context.factory import build_context
+from ai_team.infrastructure.llm.factory import LLMFactory
+from ai_team.infrastructure.workspace import Workspace
+from ai_team.memory.factory import build_memory
+from ai_team.memory.retrieval.keyword import (
+    KeywordRetriever as MemoryKeywordRetriever,
+)
+from ai_team.memory.retrieval.semantic import (
+    SemanticRetriever as MemorySemanticRetriever,
+)
+from ai_team.memory.stores.semantic import SemanticMemoryStore
+from ai_team.observability.factory import build_observability
+from ai_team.rag.factory import build_rag
+from ai_team.rag.retrieval.keyword import KeywordRetriever
+from ai_team.rag.stores.memory import InMemoryVectorStore
 from ai_team.tools.docker.factory import (
     build_docker_tool,
 )
+from ai_team.tools.docker.manager import DockerManager
+from ai_team.tools.executor import ToolExecutor
+from ai_team.tools.filesystem import FilesystemTool
+from ai_team.tools.git import GitTool
+from ai_team.tools.manager import ToolManager
+from ai_team.tools.python import PythonTool
+from ai_team.tools.terminal import TerminalTool
+
+if TYPE_CHECKING:
+    from ai_team.tools.docker.docker import DockerTool
+
+
+class _NoOpChunkingPipeline:
+
+    def process(self, document):  # type: ignore[no-untyped-def]
+        from ai_team.rag.models import DocumentChunk
+
+        return [
+            DocumentChunk(
+                document_id=document.id,
+                content=document.content,
+                uri=document.source.uri,
+                source_type=document.source.type,
+                metadata=document.metadata,
+                chunk_index=0,
+            ),
+        ]
+
+
+class _NoOpEmbeddingProvider:
+
+    @property
+    def model(self) -> str:
+        return "noop"
+
+    @property
+    def dimensions(self) -> int:
+        return 0
+
+    async def embed(self, text: str) -> list[float]:
+        return []
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        return [[] for _ in texts]
+
+    async def health(self) -> bool:
+        return True
+
+    async def close(self) -> None:
+        pass
+
 
 class Container:
     """
@@ -47,120 +103,147 @@ class Container:
 
     def __init__(self) -> None:
 
-        # ---------------------------------------------------------
-        # Shared infrastructure
-        # ---------------------------------------------------------
-
-        self.embedding_provider = None
-        self.vector_store = None
-        self.redis = None
-        self.database = None
-        self.event_bus = None
-        self.llm_provider = None
         self.workspace = Workspace(
             root="./workspace"
         )
-        self.tools = build_tools(
-          workspace=self.workspace,
-        )
-
-        # ---------------------------------------------------------
-        # Shared services
-        # ---------------------------------------------------------
 
         self.observation = build_observability()
 
-        self.memory = build_memory(
-            vector_store=self.vector_store,
+        semantic_store = SemanticMemoryStore()
+
+        memory_semantic = MemorySemanticRetriever(
+            store=semantic_store,
         )
+
+        memory_keyword = MemoryKeywordRetriever(
+            store=semantic_store,
+        )
+
+        self.memory = build_memory(
+            semantic_retriever=memory_semantic,
+            keyword_retriever=memory_keyword,
+        )
+
+        rag_keyword = KeywordRetriever()
 
         self.rag = build_rag(
-            vector_store=self.vector_store,
-            embedding_provider=self.embedding_provider,
+            chunking=_NoOpChunkingPipeline(),  # type: ignore[arg-type]
+            embedding=_NoOpEmbeddingProvider(),  # type: ignore[arg-type]
+            semantic=rag_keyword,
+            keyword=rag_keyword,
+            store=InMemoryVectorStore(),
         )
 
-        # ---------------------------------------------------------
-        # Agents
-        # ---------------------------------------------------------
+        self.llm = LLMFactory.create()
 
-        self.planner = PlannerAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.architect = ArchitectAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.backend = BackendAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.frontend = FrontendAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.reviewer = ReviewerAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.qa = QAAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.documentation = DocumentationAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.devops = DevOpsAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        self.git = GitAgent(
-            memory=self.memory,
-            rag=self.rag,
-            observation=self.observation,
-        )
-
-        # ---------------------------------------------------------
-        # Docker
-        # ---------------------------------------------------------
-
-        self.docker_client = docker.from_env()
-
-        self.docker_manager = DockerManager(
-            client=self.docker_client,
-        )
-
-        self.docker_tool = build_docker_tool(
-            manager=self.docker_manager,
+        self.context = build_context(
+            llm=self.llm,
         )
 
         # ---------------------------------------------------------
         # Tools
         # ---------------------------------------------------------
 
-        self.tools = build_tools(
+        self.terminal_tool = TerminalTool(
             workspace=self.workspace,
+        )
+
+        self.git_tool = GitTool(
             terminal=self.terminal_tool,
-            git=self.git_tool,
-            python=self.python_tool,
-            docker=self.docker_tool,
+        )
+
+        self.python_tool = PythonTool(
+            terminal=self.terminal_tool,
+        )
+
+        self.filesystem_tool = FilesystemTool(
+            workspace=self.workspace,
+        )
+
+        # ---------------------------------------------------------
+        # Docker
+        # ---------------------------------------------------------
+
+        import docker
+
+        self.docker_client = docker.from_env()  # type: ignore[attr-defined]
+
+        self.docker_manager = DockerManager(
+            client=self.docker_client,
+        )
+
+        self.docker_tool: DockerTool = build_docker_tool(
+            manager=self.docker_manager,
+        )
+
+        self.tool_manager = ToolManager()
+
+        for tool in (
+            self.filesystem_tool,
+            self.terminal_tool,
+            self.git_tool,
+            self.python_tool,
+            self.docker_tool,
+        ):
+            self.tool_manager.register(tool)
+
+        self.tool_executor = ToolExecutor(
+            manager=self.tool_manager,
+            observations=self.observation,
+        )
+
+        # ---------------------------------------------------------
+        # Agents
+        # ---------------------------------------------------------
+
+        self.agent_deps = AgentDependencies(
+            llm=self.llm,
+            tools=AgentTools(
+                filesystem=self.filesystem_tool,
+                rag=self.rag,
+                memory=self.memory,
+            ),
+            tool_executor=self.tool_executor,
+            context=self.context,
+            memory=self.memory,
+            rag=self.rag,
+            observability=self.observation,
+        )
+
+        self.planner = PlannerAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.architect = ArchitectAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.backend = BackendAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.frontend = FrontendAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.reviewer = ReviewerAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.qa = QAAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.documentation = DocumentationAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.devops = DevOpsAgent(
+            dependencies=self.agent_deps,
+        )
+
+        self.git_agent = GitAgent(
+            dependencies=self.agent_deps,
         )
 
     async def initialize(self) -> None:

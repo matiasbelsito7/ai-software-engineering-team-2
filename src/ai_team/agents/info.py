@@ -4,9 +4,12 @@ Agent metadata.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict
 
-from ai_team.shared.enums.agents import AgentCapability
+if TYPE_CHECKING:
+    from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentInfo(BaseModel):

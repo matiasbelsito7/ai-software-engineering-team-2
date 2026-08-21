@@ -4,12 +4,15 @@ Repository loader.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.rag.loaders.base import BaseDocumentLoader
-from ai_team.rag.models import (
-    Document,
-    DocumentMetadata,
-    DocumentSource,
-)
+
+if TYPE_CHECKING:
+    from ai_team.rag.models import (
+        Document,
+        DocumentSource,
+    )
 
 
 class RepositoryLoader(BaseDocumentLoader):

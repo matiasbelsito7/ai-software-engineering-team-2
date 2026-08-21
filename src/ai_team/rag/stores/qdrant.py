@@ -4,6 +4,7 @@ Qdrant vector store implementation.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from qdrant_client import AsyncQdrantClient
@@ -14,9 +15,6 @@ from qdrant_client.http.models import (
     VectorParams,
 )
 
-from ai_team.rag.embedding.base import (
-    BaseEmbeddingProvider,
-)
 from ai_team.rag.models import (
     DocumentChunk,
     DocumentMetadata,
@@ -28,6 +26,11 @@ from ai_team.rag.stores.base import (
 from ai_team.shared.enums import (
     SourceType,
 )
+
+if TYPE_CHECKING:
+    from ai_team.rag.embedding.base import (
+        BaseEmbeddingProvider,
+    )
 
 
 class QdrantVectorStore(BaseVectorStore):
@@ -163,100 +166,97 @@ class QdrantVectorStore(BaseVectorStore):
             chunk=chunk,
             score=point.score or 0.0,
         )
-    
-# ------------------------------------------------------------------
-# CRUD
-# ------------------------------------------------------------------
 
-async def upsert(
-    self,
-    chunks: list[DocumentChunk],
-) -> None:
-    """
-    Insert or update document chunks.
-    """
+    # ------------------------------------------------------------------
+    # CRUD
+    # ------------------------------------------------------------------
 
-    if not chunks:
-        return
+    async def upsert(
+        self,
+        chunks: list[DocumentChunk],
+    ) -> None:
+        """
+        Insert or update document chunks.
+        """
 
-    points = [
-        self._chunk_to_point(chunk)
-        for chunk in chunks
-    ]
+        if not chunks:
+            return
 
-    await self._client.upsert(
-        collection_name=self._collection,
-        points=points,
-        wait=True,
-    )
+        points = [
+            self._chunk_to_point(chunk)
+            for chunk in chunks
+        ]
 
+        await self._client.upsert(
+            collection_name=self._collection,
+            points=points,
+            wait=True,
+        )
 
-async def search(
-    self,
-    *,
-    embedding: list[float],
-    limit: int,
-) -> list[RetrievedChunk]:
-    """
-    Perform semantic vector search.
-    """
+    async def search(
+        self,
+        *,
+        embedding: list[float],
+        limit: int,
+    ) -> list[RetrievedChunk]:
+        """
+        Perform semantic vector search.
+        """
 
-    points = await self._client.query_points(
-        collection_name=self._collection,
-        query=embedding,
-        limit=limit,
-        with_payload=True,
-        with_vectors=False,
-    )
+        points = await self._client.query_points(
+            collection_name=self._collection,
+            query=embedding,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )
 
-    return [
-        self._point_to_chunk(point)
-        for point in points.points
-    ]
+        return [
+            self._point_to_chunk(point)
+            for point in points.points
+        ]
 
+    async def delete(
+        self,
+        document_id: str,
+    ) -> None:
+        """
+        Delete every chunk belonging to a document.
+        """
 
-async def delete(
-    self,
-    document_id: UUID,
-) -> None:
-    """
-    Delete every chunk belonging to a document.
-    """
-
-    await self._client.delete(
-        collection_name=self._collection,
-        points_selector={
-            "filter": {
-                "must": [
-                    {
-                        "key": "document_id",
-                        "match": {
-                            "value": str(document_id),
+        await self._client.delete(
+            collection_name=self._collection,
+            points_selector={
+                "filter": {
+                    "must": [
+                        {
+                            "key": "document_id",
+                            "match": {
+                                "value": document_id,
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
-        wait=True,
-    )
+            wait=True,
+        )
 
+    async def clear(
+        self,
+    ) -> None:
+        """
+        Remove every indexed chunk.
+        """
 
-async def clear(
-    self,
-) -> None:
-    """
-    Remove every indexed chunk.
-    """
+        exists = await self._client.collection_exists(
+            self._collection,
+        )
 
-    exists = await self._client.collection_exists(
-        self._collection,
-    )
+        if not exists:
+            return
 
-    if not exists:
-        return
+        await self._client.delete_collection(
+            self._collection,
+        )
 
-    await self._client.delete_collection(
-        self._collection,
-    )
-
-    await self.initialize()
+        await self.initialize()

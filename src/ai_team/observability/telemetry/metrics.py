@@ -5,12 +5,14 @@ Runtime metrics manager.
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
-from ai_team.observability.models import (
-    AgentExecution,
-    LLMCall,
-    ToolCall,
-)
+if TYPE_CHECKING:
+    from ai_team.observability.models import (
+        AgentExecution,
+        LLMCall,
+        ToolCall,
+    )
 
 
 class MetricsManager:
@@ -71,9 +73,9 @@ class MetricsManager:
     async def record_error(
         self,
         *,
-        execution_id,
-        agent,
-        error,
+        execution_id: str,
+        agent: str,
+        error: Exception,
     ) -> None:
 
         self._errors += 1

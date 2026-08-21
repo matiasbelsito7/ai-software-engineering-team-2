@@ -1,4 +1,3 @@
-```python
 """
 Database configuration.
 
@@ -124,8 +123,8 @@ class DatabaseSettings(BaseSettings):
     # URL
     ###########################################################################
 
-    @computed_field
     @property
+    @computed_field
     def url(self) -> str:
         """
         SQLAlchemy async connection URL.
@@ -136,4 +135,3 @@ class DatabaseSettings(BaseSettings):
             f"{self.username}:{self.password}"
             f"@{self.host}:{self.port}/{self.database}"
         )
-```

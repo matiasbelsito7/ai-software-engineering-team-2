@@ -29,12 +29,12 @@ class ContextWindow(BaseModel):
         default_factory=list,
     )
 
-    rag_documents: list[str] = Field(
+    documents: list[str] = Field(
         default_factory=list,
     )
 
-    artifacts: list[str] = Field(
-        default_factory=list,
+    artifacts: dict[str, str] = Field(
+        default_factory=dict,
     )
 
 
@@ -65,15 +65,15 @@ class ContextSelection(BaseModel):
         extra="forbid",
     )
 
-    selected_messages: list[str] = Field(
+    conversation: list[str] = Field(
         default_factory=list,
     )
 
-    selected_memory: list[str] = Field(
+    memories: list[str] = Field(
         default_factory=list,
     )
 
-    selected_documents: list[str] = Field(
+    documents: list[str] = Field(
         default_factory=list,
     )
 

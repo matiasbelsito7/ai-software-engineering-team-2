@@ -2,15 +2,6 @@
 Memory subsystem.
 """
 
-from ai_team.memory.manager import MemoryManager
-from ai_team.memory.models import (
-    MemoryContext,
-    MemoryEntry,
-    MemoryMetadata,
-    MemoryQuery,
-    MemorySearchResult,
-)
-
 from ai_team.memory.exceptions import (
     MemoryConfigurationError,
     MemoryError,
@@ -20,26 +11,31 @@ from ai_team.memory.exceptions import (
     MemoryStoreError,
 )
 from ai_team.memory.factory import build_memory
+from ai_team.memory.manager import MemoryManager
+from ai_team.memory.models import (
+    MemoryContext,
+    MemoryEntry,
+    MemoryMetadata,
+    MemoryQuery,
+    MemorySearchResult,
+)
 
 __all__ = [
-    # Manager
-    "MemoryManager",
-
+    "MemoryConfigurationError",
+    "MemoryContext",
     # Models
     "MemoryEntry",
-    "MemoryMetadata",
-    "MemoryQuery",
-    "MemorySearchResult",
-    "MemoryContext",
-
     # Exceptions
     "MemoryError",
-    "MemoryStoreError",
+    # Manager
+    "MemoryManager",
+    "MemoryMetadata",
     "MemoryNotFoundError",
+    "MemoryQuery",
     "MemoryRetrievalError",
+    "MemorySearchResult",
     "MemorySerializationError",
-    "MemoryConfigurationError",
-
+    "MemoryStoreError",
     # Memory factory
     "build_memory",
 ]

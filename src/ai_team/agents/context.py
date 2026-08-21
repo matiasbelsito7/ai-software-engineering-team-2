@@ -5,16 +5,16 @@ Agent execution context.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
-from uuid import UUID
-from uuid import uuid4
+from typing import TYPE_CHECKING, Any
+from uuid import UUID, uuid4
 
-from ai_team.context.manager import ContextManager
-from ai_team.graph.state import GraphState
-from ai_team.memory.manager import MemoryManager
-from ai_team.observability.manager import ObservationManager
-from ai_team.rag.manager import RAGManager
-from ai_team.tools.executor import ToolExecutor
+if TYPE_CHECKING:
+    from ai_team.context.manager import ContextManager
+    from ai_team.graph.state import GraphState
+    from ai_team.memory.manager import MemoryManager
+    from ai_team.observability.manager import ObservationManager
+    from ai_team.rag.manager import RAGManager
+    from ai_team.tools.executor import ToolExecutor
 
 
 @dataclass(slots=True)

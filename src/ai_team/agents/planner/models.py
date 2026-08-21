@@ -4,12 +4,13 @@ Models used by the Planner agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.shared.enums import AgentCapability
-
+if TYPE_CHECKING:
+    from ai_team.shared.enums import AgentCapability
 
 # ============================================================================
 # Planning Task

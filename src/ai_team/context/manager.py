@@ -4,14 +4,17 @@ Context manager.
 
 from __future__ import annotations
 
-from ai_team.context.compressor import ContextCompressor
+from typing import TYPE_CHECKING
+
 from ai_team.context.models import (
-    ContextSelection,
     ContextWindow,
 )
-from ai_team.context.selector import ContextSelector
-from ai_team.context.summarizer import ContextSummarizer
-from ai_team.graph.state import GraphState
+
+if TYPE_CHECKING:
+    from ai_team.context.compressor import ContextCompressor
+    from ai_team.context.selector import ContextSelector
+    from ai_team.context.summarizer import ContextSummarizer
+    from ai_team.graph.state import GraphState
 
 
 class ContextManager:
@@ -50,7 +53,7 @@ class ContextManager:
         return ContextWindow(
             system_prompt=state.conversation.system_prompt,
             conversation=selection.conversation,
-            memories=selection.memories,
+            memory=selection.memories,
             documents=selection.documents,
             artifacts=state.artifacts.shared_files,
         )

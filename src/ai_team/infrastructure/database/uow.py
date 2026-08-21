@@ -1,4 +1,3 @@
-```python
 """
 Unit of Work implementation.
 
@@ -16,9 +15,14 @@ Concrete repositories should be attached by subclasses or composition.
 
 from __future__ import annotations
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
 
 from ai_team.infrastructure.database.session import SessionFactory
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UnitOfWork:
@@ -41,7 +45,7 @@ class UnitOfWork:
 
         return self._session
 
-    async def __aenter__(self) -> "UnitOfWork":
+    async def __aenter__(self) -> UnitOfWork:
         """
         Start a new transaction.
         """
@@ -50,9 +54,9 @@ class UnitOfWork:
 
     async def __aexit__(
         self,
-        exc_type,
-        exc,
-        tb,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         """
         Commit or rollback the current transaction.
@@ -91,4 +95,3 @@ class UnitOfWork:
         Refresh an entity.
         """
         await self.session.refresh(entity)
-```

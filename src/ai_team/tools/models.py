@@ -19,6 +19,8 @@ class ToolRequest(BaseModel):
         extra="forbid",
     )
 
+    tool: str = ""
+
     parameters: dict[str, Any] = Field(
         default_factory=dict,
     )

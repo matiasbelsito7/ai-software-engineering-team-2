@@ -4,7 +4,7 @@ HTTP execution policy.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 from urllib.parse import urlparse
 
 
@@ -13,12 +13,12 @@ class HttpPolicy:
     Validate HTTP operations before execution.
     """
 
-    ALLOWED_SCHEMES = {
+    ALLOWED_SCHEMES: ClassVar[set[str]] = {
         "http",
         "https",
     }
 
-    ALLOWED_METHODS = {
+    ALLOWED_METHODS: ClassVar[set[str]] = {
         "get",
         "post",
         "put",
@@ -29,7 +29,7 @@ class HttpPolicy:
         "download",
     }
 
-    BLOCKED_HOSTS: set[str] = set()
+    BLOCKED_HOSTS: ClassVar[set[str]] = set()
 
     # ---------------------------------------------------------
 

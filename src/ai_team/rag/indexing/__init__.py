@@ -22,10 +22,10 @@ from ai_team.rag.indexing.splitter import (
 )
 
 __all__ = [
+    "DocumentChunkBuilder",
+    "DocumentChunker",
     "DocumentCleaner",
     "DocumentSplitter",
-    "DocumentChunker",
-    "MetadataExtractor",
-    "DocumentChunkBuilder",
     "IndexingPipeline",
+    "MetadataExtractor",
 ]

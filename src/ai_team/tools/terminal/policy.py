@@ -4,7 +4,10 @@ Terminal command execution policy.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class CommandPolicy:
@@ -12,7 +15,7 @@ class CommandPolicy:
     Validates whether a command can be executed.
     """
 
-    DEFAULT_BLOCKED_COMMANDS = {
+    DEFAULT_BLOCKED_COMMANDS: ClassVar[set[str]] = {
         "rm",
         "rmdir",
         "del",

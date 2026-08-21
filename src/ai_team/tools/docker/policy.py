@@ -4,13 +4,15 @@ Docker execution policy.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 
 class DockerPolicy:
     """
     Validate Docker operations.
     """
 
-    BLOCKED_IMAGES = {
+    BLOCKED_IMAGES: ClassVar[set[str]] = {
         "docker:dind",
     }
 

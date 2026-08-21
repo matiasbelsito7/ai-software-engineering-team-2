@@ -5,27 +5,17 @@ Base parser for AI agent outputs.
 from __future__ import annotations
 
 from abc import ABC
-from typing import ClassVar
-from typing import Generic
-from typing import TypeVar
+from typing import TYPE_CHECKING, ClassVar
 
-from pydantic import BaseModel
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from ai_team.agents.exceptions import AgentExecutionError
-from ai_team.infrastructure.llm.responses import LLMResponse
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.llm.responses import LLMResponse
 
 
-T = TypeVar(
-    "T",
-    bound=BaseModel,
-)
-
-
-class BaseParser(
-    ABC,
-    Generic[T],
-):
+class BaseParser[T: BaseModel](ABC):
     """
     Generic parser for converting LLM responses
     into validated Pydantic models.

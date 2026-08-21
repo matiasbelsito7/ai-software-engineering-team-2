@@ -1,4 +1,3 @@
-```python
 """
 Redis configuration.
 
@@ -129,8 +128,8 @@ class RedisSettings(BaseSettings):
     # URL
     ###########################################################################
 
-    @computed_field
     @property
+    @computed_field
     def url(self) -> str:
         """
         Redis connection URL.
@@ -149,4 +148,3 @@ class RedisSettings(BaseSettings):
             f"{self.host}:{self.port}/"
             f"{self.database}"
         )
-```

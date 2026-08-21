@@ -5,8 +5,10 @@ Workflow definition for the AI Software Engineering Team.
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from ai_team.graph.state import GraphState
+if TYPE_CHECKING:
+    from ai_team.graph.state import GraphState
 
 
 class WorkflowNode(StrEnum):
@@ -112,19 +114,24 @@ class Workflow:
         """
         Reviewer decides whether the implementation
         must be reworked or can continue.
+
+        Checks the last reviewer result for approval status.
         """
 
-        #
-        # Placeholder.
-        # Later this decision will depend on ReviewerAgent.
-        #
+        last_result = (
+            state.artifacts.results[-1]
+            if state.artifacts.results
+            else None
+        )
 
-        approved = True
+        if (
+            last_result is not None
+            and hasattr(last_result, "approved")
+            and not last_result.approved
+        ):
+            return WorkflowNode.BACKEND
 
-        if approved:
-            return WorkflowNode.QA
-
-        return WorkflowNode.BACKEND
+        return WorkflowNode.QA
 
     @staticmethod
     def qa(
@@ -132,15 +139,21 @@ class Workflow:
     ) -> str:
         """
         QA decides whether testing passed.
+
+        Checks the last QA result for pass/fail status.
         """
 
-        #
-        # Placeholder.
-        #
+        last_result = (
+            state.artifacts.results[-1]
+            if state.artifacts.results
+            else None
+        )
 
-        passed = True
+        if (
+            last_result is not None
+            and hasattr(last_result, "passed")
+            and not last_result.passed
+        ):
+            return WorkflowNode.BACKEND
 
-        if passed:
-            return WorkflowNode.DOCUMENTATION
-
-        return WorkflowNode.BACKEND
+        return WorkflowNode.DOCUMENTATION

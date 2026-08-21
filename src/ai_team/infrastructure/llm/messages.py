@@ -8,7 +8,6 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 # ============================================================================
 # Roles
 # ============================================================================
@@ -143,7 +142,7 @@ class Conversation(BaseModel):
         """
         self.messages.clear()
 
-    def copy(self) -> "Conversation":
+    def deep_copy(self) -> Conversation:
         """
         Deep copy of the conversation.
         """

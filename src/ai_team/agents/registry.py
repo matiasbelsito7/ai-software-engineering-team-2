@@ -4,13 +4,19 @@ Registry for AI agent classes.
 
 from __future__ import annotations
 
-from ai_team.agents.base import BaseAgent
+from typing import TYPE_CHECKING, Any
+
 from ai_team.agents.exceptions import (
     AgentNotFoundError,
     AgentRegistrationError,
 )
-from ai_team.agents.info import AgentInfo
-from ai_team.shared.enums.agents import AgentCapability
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from ai_team.agents.base import BaseAgent
+    from ai_team.agents.info import AgentInfo
+    from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentRegistry:
@@ -21,7 +27,7 @@ class AgentRegistry:
     def __init__(self) -> None:
         self._registry: dict[
             AgentCapability,
-            type[BaseAgent],
+            type[BaseAgent[Any]],
         ] = {}
 
     # ------------------------------------------------------------------
@@ -30,7 +36,7 @@ class AgentRegistry:
 
     def register(
         self,
-        agent_cls: type[BaseAgent],
+        agent_cls: type[BaseAgent[Any]],
     ) -> None:
         """
         Register an agent class.
@@ -70,7 +76,7 @@ class AgentRegistry:
     def get(
         self,
         capability: AgentCapability,
-    ) -> type[BaseAgent]:
+    ) -> type[BaseAgent[Any]]:
         """
         Return the registered agent class.
         """
@@ -124,7 +130,7 @@ class AgentRegistry:
     ) -> tuple[
         tuple[
             AgentCapability,
-            type[BaseAgent],
+            type[BaseAgent[Any]],
         ],
         ...,
     ]:
@@ -154,5 +160,5 @@ class AgentRegistry:
     def __len__(self) -> int:
         return len(self._registry)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[type[BaseAgent[Any]]]:
         return iter(self._registry.values())

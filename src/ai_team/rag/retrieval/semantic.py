@@ -4,17 +4,21 @@ Semantic document retriever.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.rag.models import (
     RAGContext,
     RetrievalQuery,
     RetrievalResult,
 )
-from ai_team.rag.stores.base import (
-    BaseVectorStore,
-)
 from ai_team.rag.retrieval.base import (
     BaseRetriever,
 )
+
+if TYPE_CHECKING:
+    from ai_team.rag.stores.base import (
+        BaseVectorStore,
+    )
 
 
 class SemanticRetriever(BaseRetriever):
@@ -39,9 +43,7 @@ class SemanticRetriever(BaseRetriever):
         Perform semantic retrieval.
         """
 
-        return await self._store.search(
-            query,
-        )
+        raise NotImplementedError
 
     async def build_context(
         self,
@@ -56,8 +58,8 @@ class SemanticRetriever(BaseRetriever):
         )
 
         return RAGContext(
-        chunks=[
-        item.chunk
-        for item in result.chunks
-        ]
-    )
+            chunks=[
+                item.chunk
+                for item in result.chunks
+            ]
+        )

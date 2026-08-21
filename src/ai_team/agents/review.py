@@ -8,6 +8,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
+
 class ReviewSeverity(StrEnum):
     """
     Severity of a review issue.

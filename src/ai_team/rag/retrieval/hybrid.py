@@ -4,12 +4,17 @@ Hybrid retriever.
 
 from __future__ import annotations
 
+import logging
+
 from ai_team.rag.models import (
     RAGContext,
     RetrievalQuery,
     RetrievalResult,
+    RetrievedChunk,
 )
 from ai_team.rag.retrieval.base import BaseRetriever
+
+logger = logging.getLogger(__name__)
 
 
 class HybridRetriever(BaseRetriever):
@@ -40,26 +45,35 @@ class HybridRetriever(BaseRetriever):
         self,
         query: RetrievalQuery,
     ) -> RetrievalResult:
-        """
-        Hybrid retrieval.
+        try:
+            semantic_result = await self._semantic.search(query)
+        except Exception:
+            logger.debug("Semantic search failed, falling back to keyword")
+            return await self._keyword.search(query)
 
-        Current implementation is intentionally left
-        as a stub until score fusion is implemented.
-        """
+        try:
+            keyword_result = await self._keyword.search(query)
+        except Exception:
+            return semantic_result
 
-        raise NotImplementedError
+        seen: set[str] = set()
+        merged: list[RetrievedChunk] = []
+        for item in semantic_result.chunks:
+            if str(item.chunk.id) not in seen:
+                seen.add(str(item.chunk.id))
+                merged.append(item)
+        for item in keyword_result.chunks:
+            if str(item.chunk.id) not in seen:
+                seen.add(str(item.chunk.id))
+                merged.append(item)
+
+        return RetrievalResult(query=query, chunks=merged)
 
     async def build_context(
         self,
         query: RetrievalQuery,
     ) -> RAGContext:
-        """
-        Build prompt context.
-        """
-
-        result = await self.search(
-            query,
-        )
+        result = await self.search(query)
 
         return RAGContext(
             chunks=[

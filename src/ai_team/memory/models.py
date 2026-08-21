@@ -5,15 +5,16 @@ Models shared by the memory subsystem.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.shared.enums import (
-    AgentCapability,
-    MemoryType,
-)
-
+if TYPE_CHECKING:
+    from ai_team.shared.enums import (
+        AgentCapability,
+        MemoryType,
+    )
 
 # ============================================================================
 # Memory Metadata

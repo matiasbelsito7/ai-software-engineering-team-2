@@ -36,7 +36,6 @@ class MarkdownLoader(BaseDocumentLoader):
         )
 
         metadata = DocumentMetadata(
-            source=source.uri,
             title=source.title or path.stem,
         )
 

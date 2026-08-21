@@ -5,14 +5,16 @@ Logging manager.
 from __future__ import annotations
 
 import logging
-from typing import Any
-from uuid import UUID
+from typing import TYPE_CHECKING, Any
 
-from ai_team.observability.models import (
-    AgentExecution,
-    LLMCall,
-    ToolCall,
-)
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from ai_team.observability.models import (
+        AgentExecution,
+        LLMCall,
+        ToolCall,
+    )
 
 
 class LoggingManager:

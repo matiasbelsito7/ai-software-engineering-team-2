@@ -1,4 +1,3 @@
-```python
 """
 Shared protocol definitions for the AI Software Engineering Team project.
 
@@ -14,16 +13,16 @@ Guidelines
 
 from __future__ import annotations
 
-from typing import Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
-from ai_team.shared.types import (
-    Embedding,
-    Metadata,
-    Prompt,
-    ToolArguments,
-    ToolResult,
-)
-
+if TYPE_CHECKING:
+    from ai_team.shared.types import (
+        Embedding,
+        Metadata,
+        Prompt,
+        ToolArguments,
+        ToolResult,
+    )
 
 ###############################################################################
 # LLM
@@ -194,4 +193,3 @@ class EventBusProtocol(Protocol):
         event_type: type,
         handler: Any,
     ) -> None: ...
-```

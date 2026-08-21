@@ -7,13 +7,16 @@ Future implementation:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+from ai_team.memory.models import MemoryContext, MemorySearchResult
 from ai_team.memory.stores.base import BaseMemoryStore
-from ai_team.memory.models import (
-    MemoryContext,
-    MemoryEntry,
-    MemoryQuery,
-    MemorySearchResult,
-)
+
+if TYPE_CHECKING:
+    from ai_team.memory.models import (
+        MemoryEntry,
+        MemoryQuery,
+    )
 
 
 class ShortTermMemoryStore(BaseMemoryStore):
@@ -23,41 +26,56 @@ class ShortTermMemoryStore(BaseMemoryStore):
     Intended for recent conversational context.
     """
 
+    def __init__(self) -> None:
+        self._entries: dict[str, MemoryEntry] = {}
+
     async def add(
         self,
         entry: MemoryEntry,
     ) -> None:
-        raise NotImplementedError
+        self._entries[str(entry.id)] = entry
 
     async def update(
         self,
         entry: MemoryEntry,
     ) -> None:
-        raise NotImplementedError
+        self._entries[str(entry.id)] = entry
 
     async def delete(
         self,
         memory_id: str,
     ) -> None:
-        raise NotImplementedError
+        self._entries.pop(memory_id, None)
 
     async def get(
         self,
         memory_id: str,
     ) -> MemoryEntry | None:
-        raise NotImplementedError
+        return self._entries.get(memory_id)
 
     async def search(
         self,
         query: MemoryQuery,
     ) -> MemorySearchResult:
-        raise NotImplementedError
+        results = list(self._entries.values())
+
+        if query.memory_types:
+            results = [e for e in results if e.memory_type in query.memory_types]
+
+        results = [e for e in results if e.score >= query.min_score]
+
+        results.sort(key=lambda e: e.score, reverse=True)
+
+        results = results[: query.top_k]
+
+        return MemorySearchResult(query=query, entries=results)
 
     async def build_context(
         self,
         query: MemoryQuery,
     ) -> MemoryContext:
-        raise NotImplementedError
+        result = await self.search(query)
+        return MemoryContext(entries=result.entries)
 
     async def clear(self) -> None:
-        raise NotImplementedError
+        self._entries.clear()

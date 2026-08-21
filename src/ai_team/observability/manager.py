@@ -5,17 +5,25 @@ Observability manager.
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+from uuid import UUID
 
-from ai_team.observability.costs import CostTracker
 from ai_team.observability.models import (
     AgentExecution,
     LLMCall,
     ToolCall,
 )
-from ai_team.observability.telemetry.logging import LoggingManager
-from ai_team.observability.telemetry.metrics import MetricsManager
-from ai_team.observability.telemetry.tracing import TracingManager
-from ai_team.observability.token_usage import TokenUsageTracker
+from ai_team.shared.enums.observability import (
+    LLMProvider,
+    ToolType,
+)
+
+if TYPE_CHECKING:
+    from ai_team.observability.costs import CostTracker
+    from ai_team.observability.telemetry.logging import LoggingManager
+    from ai_team.observability.telemetry.metrics import MetricsManager
+    from ai_team.observability.telemetry.tracing import TracingManager
+    from ai_team.observability.token_usage import TokenUsageTracker
 
 
 class ObservationManager:
@@ -58,7 +66,7 @@ class ObservationManager:
         """
 
         execution = AgentExecution(
-            execution_id=execution_id,
+            execution_id=UUID(execution_id),
             agent=agent,
             started_at=datetime.now(UTC),
         )
@@ -81,7 +89,7 @@ class ObservationManager:
         )
 
         await self._tracing.finish_execution(
-            execution,
+            execution.execution_id,
         )
 
         await self._metrics.record_execution(
@@ -112,9 +120,9 @@ class ObservationManager:
         """
 
         call = LLMCall(
-            execution_id=execution_id,
+            execution_id=UUID(execution_id),
             agent=agent,
-            provider=provider,
+            provider=LLMProvider(provider),
             model=model,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
@@ -148,9 +156,9 @@ class ObservationManager:
         """
 
         call = ToolCall(
-            execution_id=execution_id,
+            execution_id=UUID(execution_id),
             agent=agent,
-            tool=tool,
+            tool=ToolType(tool),
             latency_ms=latency_ms,
             success=success,
             timestamp=datetime.now(UTC),
@@ -186,7 +194,7 @@ class ObservationManager:
         )
 
         await self._logging.log_error(
-            execution_id=execution_id,
+            execution_id=UUID(execution_id),
             agent=agent,
             error=error,
         )

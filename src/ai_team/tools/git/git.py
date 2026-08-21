@@ -4,7 +4,7 @@ Git tool.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from ai_team.tools.base import BaseTool
 from ai_team.tools.git import commands
@@ -13,7 +13,11 @@ from ai_team.tools.models import (
     ToolRequest,
     ToolResult,
 )
-from ai_team.tools.terminal import TerminalTool
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from ai_team.tools.terminal import TerminalTool
 
 
 class GitTool(BaseTool):
@@ -39,7 +43,7 @@ class GitTool(BaseTool):
 
         self._operations: dict[
             str,
-            Callable[[dict], str],
+            Callable[[dict[str, Any]], str],
         ] = {
 
             "status": lambda _: commands.status(),
@@ -111,6 +115,8 @@ class GitTool(BaseTool):
         operation = request.parameters.get(
             "operation",
         )
+
+        assert operation is not None
 
         builder = self._operations.get(
             operation,

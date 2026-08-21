@@ -4,13 +4,15 @@ Tool factory.
 
 from __future__ import annotations
 
-from ai_team.infrastructure.workspace import Workspace
-
-from ai_team.tools.manager import ToolManager
+from typing import TYPE_CHECKING
 
 from ai_team.tools.filesystem import FilesystemTool
 from ai_team.tools.git import GitTool
+from ai_team.tools.manager import ToolManager
 from ai_team.tools.terminal import TerminalTool
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.workspace import Workspace
 
 
 def build_tools(
@@ -21,22 +23,23 @@ def build_tools(
     Build the application tool registry.
     """
 
-    tools = [
+    terminal = TerminalTool(
+        workspace=workspace,
+    )
 
+    tools = [
         FilesystemTool(
             workspace=workspace,
         ),
-
-        TerminalTool(
-            workspace=workspace,
-        ),
-
+        terminal,
         GitTool(
-            workspace=workspace,
+            terminal=terminal,
         ),
-
     ]
 
-    return ToolManager(
-        tools=tools,
-    )
+    tool_manager = ToolManager()
+
+    for tool in tools:
+        tool_manager.register(tool)
+
+    return tool_manager

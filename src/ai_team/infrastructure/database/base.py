@@ -1,4 +1,3 @@
-```python
 """
 SQLAlchemy declarative base.
 
@@ -49,4 +48,3 @@ class Base(DeclarativeBase):
     """
 
     metadata = metadata
-```

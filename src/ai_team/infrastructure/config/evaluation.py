@@ -1,4 +1,3 @@
-```python
 """
 Evaluation configuration.
 
@@ -154,4 +153,3 @@ class EvaluationSettings(BaseSettings):
         default=True,
         description="Store evaluation history.",
     )
-```

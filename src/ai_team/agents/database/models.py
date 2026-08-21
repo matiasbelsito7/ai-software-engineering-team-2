@@ -4,17 +4,19 @@ Models used by the Database agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.database_models import (
-    DatabaseEntity,
-    DatabaseRelationship,
-)
-from ai_team.agents.models import (
-    CodePatch,
-    DependencyChange,
-)
-
+if TYPE_CHECKING:
+    from ai_team.agents.database_models import (
+        DatabaseEntity,
+        DatabaseRelationship,
+    )
+    from ai_team.agents.patches import (
+        CodePatch,
+        DependencyChange,
+    )
 
 # ============================================================================
 # Database Result

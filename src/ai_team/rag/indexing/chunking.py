@@ -4,25 +4,28 @@ Document chunking pipeline.
 
 from __future__ import annotations
 
-from ai_team.rag.indexing.builder import (
-    DocumentChunkBuilder,
-)
-from ai_team.rag.indexing.chunker import (
-    DocumentChunker,
-)
-from ai_team.rag.indexing.cleaner import (
-    DocumentCleaner,
-)
-from ai_team.rag.indexing.metadata import (
-    MetadataExtractor,
-)
-from ai_team.rag.indexing.splitter import (
-    DocumentSplitter,
-)
-from ai_team.rag.models import (
-    Document,
-    DocumentChunk,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ai_team.rag.indexing.builder import (
+        DocumentChunkBuilder,
+    )
+    from ai_team.rag.indexing.chunker import (
+        DocumentChunker,
+    )
+    from ai_team.rag.indexing.cleaner import (
+        DocumentCleaner,
+    )
+    from ai_team.rag.indexing.metadata import (
+        MetadataExtractor,
+    )
+    from ai_team.rag.indexing.splitter import (
+        DocumentSplitter,
+    )
+    from ai_team.rag.models import (
+        Document,
+        DocumentChunk,
+    )
 
 
 class ChunkingPipeline:

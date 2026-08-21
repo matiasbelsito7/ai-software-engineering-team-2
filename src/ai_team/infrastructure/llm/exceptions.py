@@ -160,3 +160,9 @@ class ConfigurationError(LLMError):
     """
     Invalid LLM configuration.
     """
+
+
+class UnsupportedProviderError(LLMError):
+    """
+    Requested provider is not supported.
+    """

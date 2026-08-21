@@ -5,8 +5,7 @@ Terminal tool.
 from __future__ import annotations
 
 import asyncio
-
-from ai_team.infrastructure.workspace import Workspace
+from typing import TYPE_CHECKING
 
 from ai_team.tools.base import BaseTool
 from ai_team.tools.models import (
@@ -14,10 +13,12 @@ from ai_team.tools.models import (
     ToolRequest,
     ToolResult,
 )
-
 from ai_team.tools.terminal.policy import (
     CommandPolicy,
 )
+
+if TYPE_CHECKING:
+    from ai_team.infrastructure.workspace import Workspace
 
 
 class TerminalTool(BaseTool):

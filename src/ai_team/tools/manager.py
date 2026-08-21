@@ -4,7 +4,11 @@ Tool manager.
 
 from __future__ import annotations
 
-from ai_team.tools.base import BaseTool
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ai_team.tools.base import BaseTool
+    from ai_team.tools.models import ToolDefinition
 
 
 class ToolManager:
@@ -99,7 +103,7 @@ class ToolManager:
 
     def definitions(
         self,
-    ):
+    ) -> tuple[ToolDefinition, ...]:
         """
         Return every tool definition.
         """
@@ -152,7 +156,7 @@ class ToolManager:
 
     def __iter__(
         self,
-    ):
+    ) -> Any:
 
         return iter(
             self._tools.values(),

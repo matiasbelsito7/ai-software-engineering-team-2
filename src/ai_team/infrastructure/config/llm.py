@@ -1,4 +1,3 @@
-```python
 """
 LLM configuration.
 
@@ -149,4 +148,3 @@ class LLMSettings(BaseSettings):
         default=True,
         description="Track estimated request cost.",
     )
-```

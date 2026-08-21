@@ -4,18 +4,19 @@ Agent execution models.
 
 from __future__ import annotations
 
-from datetime import UTC
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
-from uuid import UUID
-from uuid import uuid4
+from typing import TYPE_CHECKING, Any
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.result import AgentResult
 from ai_team.infrastructure.llm.messages import Conversation
-from ai_team.infrastructure.llm.responses import LLMResponse
-from ai_team.shared.enums.agents import AgentCapability
+
+if TYPE_CHECKING:
+    from ai_team.agents.result import AgentResult
+    from ai_team.infrastructure.llm.responses import LLMResponse
+    from ai_team.shared.enums.agents import AgentCapability
 
 
 class AgentStatus(StrEnum):
@@ -79,7 +80,7 @@ class AgentRequest(BaseModel):
 
     task: str
 
-    context: dict = Field(
+    context: dict[str, Any] = Field(
         default_factory=dict,
     )
 

@@ -4,88 +4,60 @@ Shared enumerations used throughout the project.
 
 from .agents import AgentCapability
 from .database import RelationshipType
+from .devops import (
+    DeploymentEnvironment,
+    DeploymentTarget,
+    InfrastructureType,
+)
+from .documentation import DocumentationType
+from .frontend import InteractionType, ResponsiveBreakpoint, UIComponentType
+from .git import (
+    GitChangeType,
+    GitOperation,
+)
 from .llm import (
     EmbeddingProvider,
     LLMProvider,
     MessageRole,
 )
+from .memory import MemoryType
+from .observability import ExecutionStatus, ToolType
 from .qa import Severity
+from .rag import EmbeddingProviderType, SourceType
 from .review import (
     ReviewCategory,
     ReviewStatus,
 )
 from .system import (
     Environment,
-    ExecutionStatus,
     LogLevel,
     TaskStatus,
 )
-from .documentation import DocumentationType
-from .devops import (
-    DeploymentEnvironment,
-    DeploymentTarget,
-    InfrastructureType,
-)
-from .git import (
-    GitChangeType,
-    GitOperation,
-)
-from .frontend import (
-    UIComponentType,
-    InteractionType,
-    ResponsiveBreakpoint
-)
-from .rag import EmbeddingProviderType, SourceType
-from .observability import (
-    ToolType,
-    LLMProvider,
-    ExecutionStatus
-)
+
 __all__ = [
-    # Agents
     "AgentCapability",
-
-    # Database
+    "DeploymentEnvironment",
+    "DeploymentTarget",
+    "DocumentationType",
+    "EmbeddingProvider",
+    "EmbeddingProviderType",
+    "Environment",
+    "ExecutionStatus",
+    "GitChangeType",
+    "GitOperation",
+    "InfrastructureType",
+    "InteractionType",
+    "LLMProvider",
+    "LogLevel",
+    "MemoryType",
+    "MessageRole",
     "RelationshipType",
-
-    # QA
-    "Severity",
-
-    # Review
+    "ResponsiveBreakpoint",
     "ReviewCategory",
     "ReviewStatus",
-
-    # System
-    "Environment",
-    "TaskStatus",
-    "LogLevel",
-    "ExecutionStatus",
-
-    # LLM
-    "MessageRole",
-    "LLMProvider",
-    "EmbeddingProvider",
-
-    # Documentation
-    "DocumentationType",
-
-    # DevOps
-    "DeploymentTarget",
-    "DeploymentEnvironment",
-    "InfrastructureType",
-
-    # Git
-    "GitOperation",
-    "GitChangeType",
-    # Frontend
-    "UIComponentType",
-    "InteractionType",
-    "ResponsiveBreakpoint"
-     # RAG
+    "Severity",
     "SourceType",
-    "EmbeddingProviderType"
-    #observability
-    "ToolType", 
-    "LLMProvider",
-    "ExecutionStatus"
+    "TaskStatus",
+    "ToolType",
+    "UIComponentType",
 ]

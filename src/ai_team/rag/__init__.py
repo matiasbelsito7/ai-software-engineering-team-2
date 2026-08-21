@@ -2,8 +2,17 @@
 Retrieval-Augmented Generation subsystem.
 """
 
+from ai_team.rag.exceptions import (
+    DocumentIndexingError,
+    DocumentNotFoundError,
+    EmbeddingGenerationError,
+    RAGConfigurationError,
+    RAGError,
+    RetrievalError,
+    VectorStoreError,
+)
+from ai_team.rag.factory import build_rag
 from ai_team.rag.manager import RAGManager
-
 from ai_team.rag.models import (
     Document,
     DocumentChunk,
@@ -14,40 +23,25 @@ from ai_team.rag.models import (
     RetrievedChunk,
 )
 
-from ai_team.rag.exceptions import (
-    DocumentIndexingError,
-    DocumentNotFoundError,
-    EmbeddingGenerationError,
-    RAGConfigurationError,
-    RAGError,
-    RetrievalError,
-    VectorStoreError,
-)
-
-from ai_team.rag.factory import build_rag
-
 __all__ = [
-    # Manager
-    "RAGManager",
-
     # Models
     "Document",
-    "DocumentMetadata",
     "DocumentChunk",
-    "RetrievalQuery",
-    "RetrievalResult",
+    "DocumentIndexingError",
+    "DocumentMetadata",
+    "DocumentNotFoundError",
+    "EmbeddingGenerationError",
+    "RAGConfigurationError",
     "RAGContext",
-    "RetrievedChunk",
-
     # Exceptions
     "RAGError",
-    "DocumentNotFoundError",
-    "DocumentIndexingError",
+    # Manager
+    "RAGManager",
     "RetrievalError",
-    "EmbeddingGenerationError",
+    "RetrievalQuery",
+    "RetrievalResult",
+    "RetrievedChunk",
     "VectorStoreError",
-    "RAGConfigurationError",
-
     # Factories
     "build_rag",
 ]

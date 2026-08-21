@@ -35,7 +35,7 @@ class Workspace:
         """
 
         return self._root
-    
+
     @property
     def cwd(self) -> Path:
         return self._root

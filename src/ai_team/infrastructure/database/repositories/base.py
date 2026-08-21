@@ -1,4 +1,3 @@
-```python
 """
 Base repository.
 
@@ -22,17 +21,17 @@ This module intentionally does NOT contain:
 
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai_team.infrastructure.database.base import Base
 
-ModelT = TypeVar("ModelT", bound=Base)
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class BaseRepository(Generic[ModelT]):
+class BaseRepository[ModelT: Base]:
     """
     Generic SQLAlchemy repository.
     """
@@ -108,4 +107,3 @@ class BaseRepository(Generic[ModelT]):
         """
         entity = await self.get(model, entity_id)
         return entity is not None
-```

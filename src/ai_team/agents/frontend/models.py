@@ -4,15 +4,17 @@ Models used by the Frontend agent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.agents.patches import CodePatch
-from ai_team.shared.enums.frontend import (
-    InteractionType,
-    ResponsiveBreakpoint,
-    UIComponentType,
-)
-
+if TYPE_CHECKING:
+    from ai_team.agents.patches import CodePatch
+    from ai_team.shared.enums.frontend import (
+        InteractionType,
+        ResponsiveBreakpoint,
+        UIComponentType,
+    )
 
 # ============================================================================
 # UI Interaction

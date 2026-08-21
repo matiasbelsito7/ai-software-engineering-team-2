@@ -88,7 +88,9 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embedding = response.json()["data"][0]["embedding"]
+        embedding: list[float] = response.json()["data"][0][
+            "embedding"
+        ]
 
         if len(embedding) != self.dimensions:
             raise RuntimeError(
@@ -115,7 +117,7 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embeddings = [
+        embeddings: list[list[float]] = [
             item["embedding"]
             for item in response.json()["data"]
         ]

@@ -5,11 +5,14 @@ LLM cost tracker.
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import TYPE_CHECKING, ClassVar
 
-from ai_team.observability.models import LLMCall
 from ai_team.shared.enums.observability import (
     LLMProvider,
 )
+
+if TYPE_CHECKING:
+    from ai_team.observability.models import LLMCall
 
 
 class CostTracker:
@@ -19,7 +22,7 @@ class CostTracker:
     Prices are expressed in USD per 1M tokens.
     """
 
-    DEFAULT_PRICES: dict[str, tuple[float, float]] = {
+    DEFAULT_PRICES: ClassVar[dict[str, tuple[float, float]]] = {
 
         #
         # OpenAI

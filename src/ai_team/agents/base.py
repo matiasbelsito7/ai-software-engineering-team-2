@@ -5,42 +5,47 @@ Base class for all AI agents.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
-from ai_team.agents.dependencies import AgentDependencies
-from ai_team.agents.execution import (
-    AgentExecution,
-    AgentResult,
-)
-from ai_team.agents.info import AgentInfo
-from ai_team.agents.parsers.base import BaseParser
-from ai_team.agents.prompt_builder import BasePromptBuilder
-from ai_team.context.models import ContextSelection
-from ai_team.infrastructure.llm import BaseLLM
-from ai_team.infrastructure.llm.responses import LLMResponse
-from ai_team.observability.manager import ObservationManager
-from ai_team.rag.models import RetrievedContext
-from ai_team.shared.enums.agents import AgentCapability
-from ai_team.tools.executor import ToolExecutor
+from ai_team.agents.tool_policy import AgentToolPolicy
+from ai_team.rag.models import RetrievalQuery
+from ai_team.tools.models import ToolRequest, ToolResult
+
+if TYPE_CHECKING:
+    from ai_team.agents.dependencies import AgentDependencies
+    from ai_team.agents.execution import AgentExecution
+    from ai_team.agents.info import AgentInfo
+    from ai_team.agents.parsers.base import BaseParser
+    from ai_team.agents.prompt_builder import BasePromptBuilder
+    from ai_team.agents.result import AgentResult
+    from ai_team.context.models import ContextSelection
+    from ai_team.infrastructure.llm import BaseLLM
+    from ai_team.infrastructure.llm.responses import LLMResponse
+    from ai_team.observability.manager import ObservationManager
+    from ai_team.rag.models import RAGContext
+    from ai_team.shared.enums.agents import AgentCapability
+    from ai_team.tools.executor import ToolExecutor
 
 
-class BaseAgent(ABC):
+class BaseAgent[T](ABC):
     """
     Base class for every AI agent.
 
     Provides:
+
     - LLM access
     - Context management
     - Memory access
     - RAG retrieval
     - Tool execution
+    - Tool authorization
     - Observability hooks
     - Standard execution lifecycle
     """
 
     INFO: ClassVar[AgentInfo]
 
-    PARSER: ClassVar[type[BaseParser[Any]]]
+    PARSER: ClassVar[type[BaseParser[T]]]  # type: ignore[type-var]
 
     PROMPT_BUILDER: ClassVar[type[BasePromptBuilder]]
 
@@ -48,14 +53,9 @@ class BaseAgent(ABC):
         self,
         dependencies: AgentDependencies,
     ) -> None:
-
         self._validate_configuration()
 
         self._dependencies = dependencies
-
-        self._tool_executor = ToolExecutor(
-            dependencies.tools,
-        )
 
     # ------------------------------------------------------------------
     # Configuration
@@ -63,6 +63,9 @@ class BaseAgent(ABC):
 
     @classmethod
     def _validate_configuration(cls) -> None:
+        """
+        Validate required agent configuration.
+        """
 
         if getattr(cls, "INFO", None) is None:
             raise RuntimeError(
@@ -104,24 +107,24 @@ class BaseAgent(ABC):
         return self.dependencies.llm
 
     @property
-    def memory(self):
+    def memory(self) -> Any:
         return self.dependencies.memory
 
     @property
-    def rag(self):
+    def rag(self) -> Any:
         return self.dependencies.rag
 
     @property
-    def context(self):
+    def context(self) -> Any:
         return self.dependencies.context
 
     @property
-    def observations(self) -> ObservationManager:
+    def observations(self) -> ObservationManager | None:
         return self.dependencies.observability
 
     @property
     def tool_executor(self) -> ToolExecutor:
-        return self._tool_executor
+        return self.dependencies.tool_executor
 
     # ------------------------------------------------------------------
     # Context
@@ -132,28 +135,52 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> ContextSelection:
         """
-        Build the agent context.
+        Build the context required by the agent.
+
+        The ContextManager currently operates on GraphState, so the
+        orchestration layer is responsible for constructing the final
+        GraphState. This method provides the agent-level extension
+        point without introducing a second incompatible context API.
         """
 
-        return await self.context.build(
-            conversation=execution.conversation.messages,
-            memories=[],
-            documents=[],
+        raise NotImplementedError(
+            "Context construction requires the orchestration "
+            "GraphState and must be implemented by the "
+            "LangGraph orchestration layer."
         )
 
     async def retrieve_context(
         self,
         execution: AgentExecution,
-    ) -> RetrievedContext | None:
+    ) -> RAGContext | None:
         """
         Retrieve additional context from RAG.
         """
 
-        if not execution.query:
+        task = execution.request.task.strip()
+
+        if not task:
             return None
 
-        return await self.rag.retrieve(
-            execution.query,
+        return await self.rag.build_context(  # type: ignore[no-any-return]
+            self._build_rag_query(
+                task,
+            ),
+        )
+
+    @staticmethod
+    def _build_rag_query(
+        task: str,
+    ) -> RetrievalQuery:
+        """
+        Build a RAG retrieval query.
+
+        Kept isolated so the retrieval contract can evolve without
+        coupling concrete agents to the RAG implementation.
+        """
+
+        return RetrievalQuery(
+            query=task,
         )
 
     # ------------------------------------------------------------------
@@ -164,6 +191,9 @@ class BaseAgent(ABC):
         self,
         execution: AgentExecution,
     ) -> LLMResponse:
+        """
+        Generate a response from the LLM.
+        """
 
         response = await self.llm.generate(
             execution.conversation,
@@ -180,13 +210,19 @@ class BaseAgent(ABC):
     async def generate_and_parse(
         self,
         execution: AgentExecution,
-    ) -> Any:
+    ) -> T:
+        """
+        Generate an LLM response and parse it into the
+        agent-specific model.
+        """
 
         response = await self.generate(
             execution,
         )
 
-        return self.PARSER.parse(response)
+        return self.PARSER.parse(
+            response,
+        )
 
     # ------------------------------------------------------------------
     # Tools
@@ -197,14 +233,36 @@ class BaseAgent(ABC):
         *,
         tool_name: str,
         parameters: dict[str, Any],
-    ):
+    ) -> ToolResult:
         """
-        Execute a tool through the ToolExecutor.
+        Execute an authorized tool through the ToolExecutor.
         """
 
-        return await self.tool_executor.execute(
-            tool_name=tool_name,
+        AgentToolPolicy.validate(
+            self.capability,
+            tool_name,
+        )
+
+        request = ToolRequest(
+            tool=tool_name,
             parameters=parameters,
+        )
+
+        return await self.tool_executor.execute(
+            request,
+        )
+
+    def can_use_tool(
+        self,
+        tool_name: str,
+    ) -> bool:
+        """
+        Return whether this agent is authorized to use a tool.
+        """
+
+        return AgentToolPolicy.can_use(
+            self.capability,
+            tool_name,
         )
 
     # ------------------------------------------------------------------
@@ -216,20 +274,30 @@ class BaseAgent(ABC):
         execution: AgentExecution,
     ) -> AgentExecution:
         """
-        Execute the complete lifecycle.
+        Execute the complete agent lifecycle.
         """
 
-        self.validate(execution)
+        self.validate(
+            execution,
+        )
 
-        await self.before_execution(execution)
+        await self.before_execution(
+            execution,
+        )
 
-        await self.prepare(execution)
+        await self.prepare(
+            execution,
+        )
 
-        result = await self.run(execution)
+        result = await self.run(
+            execution,
+        )
 
         execution.result = result
 
-        await self.after_execution(execution)
+        await self.after_execution(
+            execution,
+        )
 
         return execution
 
@@ -241,25 +309,36 @@ class BaseAgent(ABC):
         self,
         execution: AgentExecution,
     ) -> None:
+        """
+        Hook executed before preparation.
+        """
+
         return None
 
     def validate(
         self,
         execution: AgentExecution,
     ) -> None:
+        """
+        Validate the execution before starting.
+        """
+
         return None
 
     async def prepare(
         self,
         execution: AgentExecution,
     ) -> None:
+        """
+        Prepare the agent execution.
 
-        execution.context = await self.build_context(
+        RAG retrieval is performed here. Context construction remains
+        delegated to the orchestration layer because ContextManager
+        currently consumes GraphState.
+        """
+
+        await self.retrieve_context(
             execution,
-        )
-
-        execution.retrieved_context = (
-            await self.retrieve_context(execution)
         )
 
         execution.conversation = (
@@ -277,8 +356,14 @@ class BaseAgent(ABC):
         Execute the agent-specific logic.
         """
 
+        raise NotImplementedError
+
     async def after_execution(
         self,
         execution: AgentExecution,
     ) -> None:
+        """
+        Hook executed after agent execution.
+        """
+
         return None

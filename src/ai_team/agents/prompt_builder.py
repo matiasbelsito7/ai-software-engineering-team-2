@@ -4,16 +4,20 @@ Base prompt builder for AI agents.
 
 from __future__ import annotations
 
-from abc import ABC
 from importlib.resources import files
+from typing import TYPE_CHECKING
 
-from ai_team.agents.execution import AgentExecution
 from ai_team.infrastructure.llm.messages import Conversation
 
+if TYPE_CHECKING:
+    from ai_team.agents.execution import AgentExecution
 
-class BasePromptBuilder(ABC):
+
+class BasePromptBuilder:
     """
     Base class for prompt builders.
+
+    Subclasses must define ``PROMPTS_PACKAGE`` and ``TASK_PROMPT``.
     """
 
     PROMPTS_PACKAGE: str = ""
@@ -40,7 +44,7 @@ class BasePromptBuilder(ABC):
         )
 
         conversation.add_user(
-            execution.input,
+            execution.request.task,
         )
 
         return conversation
@@ -66,7 +70,7 @@ class BasePromptBuilder(ABC):
         )
 
         conversation.add_user(
-            execution.input,
+            execution.request.task,
         )
 
         conversation.add_assistant(
@@ -84,8 +88,21 @@ class BasePromptBuilder(ABC):
         Load a prompt file.
         """
 
+        if not cls.PROMPTS_PACKAGE:
+            raise RuntimeError(
+                f"{cls.__name__} does not define PROMPTS_PACKAGE."
+            )
+
+        if not cls.TASK_PROMPT:
+            raise RuntimeError(
+                f"{cls.__name__} does not define TASK_PROMPT."
+            )
+
         return (
             files(cls.PROMPTS_PACKAGE)
             .joinpath(filename)
-            .read_text(encoding="utf-8")
+            .read_text(
+                encoding="utf-8",
+            )
         )
+

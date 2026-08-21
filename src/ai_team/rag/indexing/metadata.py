@@ -4,10 +4,13 @@ Metadata extraction utilities.
 
 from __future__ import annotations
 
-from ai_team.rag.models import (
-    Document,
-    DocumentMetadata,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ai_team.rag.models import (
+        Document,
+        DocumentMetadata,
+    )
 
 
 class MetadataExtractor:
