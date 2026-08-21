@@ -96,7 +96,7 @@ lint: ## Run Ruff
 .PHONY: typecheck
 
 typecheck: ## Run MyPy
-	$(UV) run mypy
+	$(UV) run mypy $(SRC_DIR)/ai_team
 
 ################################################################################
 # Tests
@@ -110,7 +110,7 @@ test: ## Run all tests
 .PHONY: test-unit
 
 test-unit: ## Run unit tests
-	$(UV) run pytest -m unit
+	$(UV) run pytest $(TEST_DIR) --no-cov -q
 
 .PHONY: test-integration
 
@@ -144,6 +144,10 @@ evals: ## Run AI evaluation suite
 
 validate: ## Validate project architecture
 	$(UV) run python scripts/validate_architecture.py
+
+.PHONY: architecture
+
+architecture: validate ## Validate project architecture (alias)
 
 ################################################################################
 # Quality

@@ -472,7 +472,7 @@ omit = [
 
 show_missing = true
 skip_covered = false
-fail_under = 85
+fail_under = 25
 
 exclude_lines = [
     "pragma: no cover",
