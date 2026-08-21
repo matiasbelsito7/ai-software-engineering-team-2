@@ -6,6 +6,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ai_team.context.exceptions import (
+    ContextCompressionError,
+    ContextSelectionError,
+    ContextSummarizationError,
+)
 from ai_team.context.models import (
     ContextWindow,
 )
@@ -42,13 +47,21 @@ class ContextManager:
         Build the complete context window.
         """
 
-        selection = await self._selector.select(
-            state,
-        )
+        try:
+            selection = await self._selector.select(state)
+        except Exception as exc:
+            raise ContextSelectionError(
+                f"Context selection failed: {exc}",
+            ) from exc
 
-        selection = await self._compressor.compress(
-            selection,
-        )
+        try:
+            selection = await self._compressor.compress(selection)
+        except ContextCompressionError:
+            raise
+        except Exception as exc:
+            raise ContextCompressionError(
+                f"Context compression failed: {exc}",
+            ) from exc
 
         return ContextWindow(
             system_prompt=state.conversation.system_prompt,
@@ -66,8 +79,15 @@ class ContextManager:
         Summarize the current conversation.
         """
 
-        summary = await self._summarizer.summarize(
-            state.conversation.conversation_history,
-        )
+        try:
+            summary = await self._summarizer.summarize(
+                state.conversation.conversation_history,
+            )
+        except ContextSummarizationError:
+            raise
+        except Exception as exc:
+            raise ContextSummarizationError(
+                f"Context summarization failed: {exc}",
+            ) from exc
 
         return summary.summary
