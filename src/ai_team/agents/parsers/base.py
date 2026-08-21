@@ -60,11 +60,8 @@ class BaseParser[T: BaseModel](ABC):
 
         except ValidationError as exc:
             raise AgentExecutionError(
-                f"{cls.__name__} returned invalid "
-                f"{cls.model.__name__} output."
+                f"{cls.__name__} returned invalid {cls.model.__name__} output."
             ) from exc
 
         except ValueError as exc:
-            raise AgentExecutionError(
-                f"{cls.__name__} received invalid JSON."
-            ) from exc
+            raise AgentExecutionError(f"{cls.__name__} received invalid JSON.") from exc

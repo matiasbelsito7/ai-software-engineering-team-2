@@ -69,10 +69,7 @@ class QdrantVectorStore(BaseVectorStore):
 
         collections = await self._client.get_collections()
 
-        exists = any(
-            collection.name == self._collection
-            for collection in collections.collections
-        )
+        exists = any(collection.name == self._collection for collection in collections.collections)
 
         if exists:
             return
@@ -112,9 +109,7 @@ class QdrantVectorStore(BaseVectorStore):
         """
 
         if chunk.embedding is None:
-            raise ValueError(
-                "DocumentChunk has no embedding."
-            )
+            raise ValueError("DocumentChunk has no embedding.")
 
         metadata = chunk.metadata
 
@@ -182,10 +177,7 @@ class QdrantVectorStore(BaseVectorStore):
         if not chunks:
             return
 
-        points = [
-            self._chunk_to_point(chunk)
-            for chunk in chunks
-        ]
+        points = [self._chunk_to_point(chunk) for chunk in chunks]
 
         await self._client.upsert(
             collection_name=self._collection,
@@ -211,10 +203,7 @@ class QdrantVectorStore(BaseVectorStore):
             with_vectors=False,
         )
 
-        return [
-            self._point_to_chunk(point)
-            for point in points.points
-        ]
+        return [self._point_to_chunk(point) for point in points.points]
 
     async def delete(
         self,

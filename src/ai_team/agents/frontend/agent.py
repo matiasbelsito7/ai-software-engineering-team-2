@@ -32,10 +32,7 @@ class FrontendAgent(BaseAgent[Any]):
     INFO = AgentInfo(
         name="frontend",
         capability=AgentCapability.FRONTEND,
-        description=(
-            "Implements user interfaces and reusable "
-            "frontend components."
-        ),
+        description=("Implements user interfaces and reusable frontend components."),
     )
 
     PARSER = FrontendParser

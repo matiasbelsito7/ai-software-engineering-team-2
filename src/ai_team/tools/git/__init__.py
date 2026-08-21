@@ -31,5 +31,5 @@ __all__ = [
     "pull",
     "push",
     "restore",
-    "status"
+    "status",
 ]

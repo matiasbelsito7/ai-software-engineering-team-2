@@ -31,9 +31,7 @@ class PythonPolicy:
         path = workspace.resolve(script)
 
         if path.suffix not in self.ALLOWED_EXTENSIONS:
-            raise PermissionError(
-                f"Unsupported file type: {path.suffix}"
-            )
+            raise PermissionError(f"Unsupported file type: {path.suffix}")
 
     def validate_module(
         self,
@@ -44,9 +42,7 @@ class PythonPolicy:
         """
 
         if not module.strip():
-            raise PermissionError(
-                "Module name cannot be empty."
-            )
+            raise PermissionError("Module name cannot be empty.")
 
     def validate_package(
         self,
@@ -57,9 +53,7 @@ class PythonPolicy:
         """
 
         if not package.strip():
-            raise PermissionError(
-                "Package name cannot be empty."
-            )
+            raise PermissionError("Package name cannot be empty.")
 
     def validate_inline_code(
         self,
@@ -70,6 +64,4 @@ class PythonPolicy:
         """
 
         if not code.strip():
-            raise PermissionError(
-                "Python code cannot be empty."
-            )
+            raise PermissionError("Python code cannot be empty.")

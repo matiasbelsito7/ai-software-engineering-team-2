@@ -118,11 +118,7 @@ class Workflow:
         Checks the last reviewer result for approval status.
         """
 
-        last_result = (
-            state.artifacts.results[-1]
-            if state.artifacts.results
-            else None
-        )
+        last_result = state.artifacts.results[-1] if state.artifacts.results else None
 
         if (
             last_result is not None
@@ -143,17 +139,9 @@ class Workflow:
         Checks the last QA result for pass/fail status.
         """
 
-        last_result = (
-            state.artifacts.results[-1]
-            if state.artifacts.results
-            else None
-        )
+        last_result = state.artifacts.results[-1] if state.artifacts.results else None
 
-        if (
-            last_result is not None
-            and hasattr(last_result, "passed")
-            and not last_result.passed
-        ):
+        if last_result is not None and hasattr(last_result, "passed") and not last_result.passed:
             return WorkflowNode.BACKEND
 
         return WorkflowNode.DOCUMENTATION

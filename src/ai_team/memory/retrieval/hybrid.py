@@ -55,10 +55,7 @@ class HybridRetriever(BaseRetriever):
             *keyword.entries,
         ]
 
-        unique = {
-            entry.id: entry
-            for entry in merged
-        }
+        unique = {entry.id: entry for entry in merged}
 
         entries = list(unique.values())
 

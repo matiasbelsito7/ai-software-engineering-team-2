@@ -35,21 +35,15 @@ class DatabaseResult(BaseModel):
 
     entities: list[DatabaseEntity]
 
-    relationships: list[
-        DatabaseRelationship
-    ] = Field(
+    relationships: list[DatabaseRelationship] = Field(
         default_factory=list,
     )
 
-    code_patches: list[
-        CodePatch
-    ] = Field(
+    code_patches: list[CodePatch] = Field(
         default_factory=list,
     )
 
-    dependencies: list[
-        DependencyChange
-    ] = Field(
+    dependencies: list[DependencyChange] = Field(
         default_factory=list,
     )
 

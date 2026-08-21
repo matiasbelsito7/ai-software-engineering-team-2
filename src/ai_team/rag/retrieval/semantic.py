@@ -16,6 +16,7 @@ from ai_team.rag.retrieval.base import (
 )
 
 if TYPE_CHECKING:
+    from ai_team.rag.embedding.base import BaseEmbeddingProvider
     from ai_team.rag.stores.base import (
         BaseVectorStore,
     )
@@ -25,41 +26,42 @@ class SemanticRetriever(BaseRetriever):
     """
     Semantic similarity retriever.
 
-    Delegates vector search to the configured vector store.
+    Embeds the query, then delegates vector search to the store.
     """
 
     def __init__(
         self,
         *,
         store: BaseVectorStore,
+        embedding: BaseEmbeddingProvider,
     ) -> None:
         self._store = store
+        self._embedding = embedding
 
     async def search(
         self,
         query: RetrievalQuery,
     ) -> RetrievalResult:
-        """
-        Perform semantic retrieval.
-        """
+        embedding = await self._embedding.embed(
+            query.query,
+        )
 
-        raise NotImplementedError
+        chunks = await self._store.search(
+            embedding=embedding,
+            limit=query.top_k,
+        )
+
+        return RetrievalResult(
+            query=query,
+            chunks=chunks,
+        )
 
     async def build_context(
         self,
         query: RetrievalQuery,
     ) -> RAGContext:
-        """
-        Build the prompt context.
-        """
-
         result = await self.search(
             query,
         )
 
-        return RAGContext(
-            chunks=[
-                item.chunk
-                for item in result.chunks
-            ]
-        )
+        return RAGContext(chunks=[item.chunk for item in result.chunks])

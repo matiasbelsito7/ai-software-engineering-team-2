@@ -68,19 +68,13 @@ class BaseAgent[T](ABC):
         """
 
         if getattr(cls, "INFO", None) is None:
-            raise RuntimeError(
-                f"{cls.__name__} does not define INFO."
-            )
+            raise RuntimeError(f"{cls.__name__} does not define INFO.")
 
         if getattr(cls, "PARSER", None) is None:
-            raise RuntimeError(
-                f"{cls.__name__} does not define PARSER."
-            )
+            raise RuntimeError(f"{cls.__name__} does not define PARSER.")
 
         if getattr(cls, "PROMPT_BUILDER", None) is None:
-            raise RuntimeError(
-                f"{cls.__name__} does not define PROMPT_BUILDER."
-            )
+            raise RuntimeError(f"{cls.__name__} does not define PROMPT_BUILDER.")
 
     # ------------------------------------------------------------------
     # Agent Information
@@ -341,10 +335,8 @@ class BaseAgent[T](ABC):
             execution,
         )
 
-        execution.conversation = (
-            self.PROMPT_BUILDER.build(
-                execution,
-            )
+        execution.conversation = self.PROMPT_BUILDER.build(
+            execution,
         )
 
     @abstractmethod

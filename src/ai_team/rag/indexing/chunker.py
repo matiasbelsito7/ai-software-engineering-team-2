@@ -30,20 +30,15 @@ class DocumentChunker:
         chunks: list[str] = []
 
         for section in sections:
-
             start = 0
 
             while start < len(section):
-
                 end = start + self._chunk_size
 
                 chunks.append(
                     section[start:end],
                 )
 
-                start += (
-                    self._chunk_size
-                    - self._overlap
-                )
+                start += self._chunk_size - self._overlap
 
         return chunks

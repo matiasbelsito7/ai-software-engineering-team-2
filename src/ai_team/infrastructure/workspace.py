@@ -50,17 +50,12 @@ class Workspace:
         Prevents escaping outside the workspace.
         """
 
-        path = (
-            self._root
-            / Path(relative_path)
-        ).resolve()
+        path = (self._root / Path(relative_path)).resolve()
 
         if not str(path).startswith(
             str(self._root),
         ):
-            raise PermissionError(
-                "Path escapes workspace."
-            )
+            raise PermissionError("Path escapes workspace.")
 
         return path
 

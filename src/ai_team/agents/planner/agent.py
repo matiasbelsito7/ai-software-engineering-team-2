@@ -28,8 +28,7 @@ class PlannerAgent(BaseAgent[ExecutionPlan]):
         name="planner",
         capability=AgentCapability.PLANNER,
         description=(
-            "Analyzes a software-engineering task and produces "
-            "an ordered execution plan."
+            "Analyzes a software-engineering task and produces an ordered execution plan."
         ),
         version="1.0.0",
     )
@@ -54,14 +53,11 @@ class PlannerAgent(BaseAgent[ExecutionPlan]):
 
         if execution.capability is not self.capability:
             raise ValueError(
-                "PlannerAgent received an execution for "
-                f"capability '{execution.capability.value}'."
+                f"PlannerAgent received an execution for capability '{execution.capability.value}'."
             )
 
         if not execution.request.task.strip():
-            raise ValueError(
-                "PlannerAgent requires a non-empty task."
-            )
+            raise ValueError("PlannerAgent requires a non-empty task.")
 
     # ------------------------------------------------------------------
     # Execution

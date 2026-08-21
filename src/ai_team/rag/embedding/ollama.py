@@ -30,16 +30,12 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
     ) -> None:
 
         if model not in EMBEDDING_MODELS:
-            raise ValueError(
-                f"Unsupported embedding model: {model}"
-            )
+            raise ValueError(f"Unsupported embedding model: {model}")
 
         embedding_model = EMBEDDING_MODELS[model]
 
         if embedding_model.provider != EmbeddingProviderType.OLLAMA:
-            raise ValueError(
-                f"{model} is not an Ollama embedding model."
-            )
+            raise ValueError(f"{model} is not an Ollama embedding model.")
 
         self._model: EmbeddingModel = embedding_model
 
@@ -86,9 +82,7 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
         embedding: list[float] = response.json()["embeddings"][0]
 
         if len(embedding) != self.dimensions:
-            raise RuntimeError(
-                "Embedding dimension mismatch."
-            )
+            raise RuntimeError("Embedding dimension mismatch.")
 
         return embedding
 
@@ -114,9 +108,7 @@ class OllamaEmbeddingProvider(BaseEmbeddingProvider):
 
         for embedding in embeddings:
             if len(embedding) != self.dimensions:
-                raise RuntimeError(
-                    "Embedding dimension mismatch."
-                )
+                raise RuntimeError("Embedding dimension mismatch.")
 
         return embeddings
 

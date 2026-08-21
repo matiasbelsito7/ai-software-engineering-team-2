@@ -143,8 +143,4 @@ class RedisSettings(BaseSettings):
         elif self.password:
             auth = f":{self.password}@"
 
-        return (
-            f"redis://{auth}"
-            f"{self.host}:{self.port}/"
-            f"{self.database}"
-        )
+        return f"redis://{auth}{self.host}:{self.port}/{self.database}"

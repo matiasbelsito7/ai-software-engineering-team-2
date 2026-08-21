@@ -28,10 +28,7 @@ class QAAgent(BaseAgent[Any]):
     INFO = AgentInfo(
         name="qa",
         capability=AgentCapability.QA,
-        description=(
-            "Validates software quality and proposes "
-            "quality improvements."
-        ),
+        description=("Validates software quality and proposes quality improvements."),
     )
 
     PARSER = QAParser

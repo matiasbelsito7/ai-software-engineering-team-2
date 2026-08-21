@@ -56,14 +56,11 @@ class BackendAgent(BaseAgent[BackendResult]):
 
         if execution.capability is not self.capability:
             raise ValueError(
-                "BackendAgent received an execution for "
-                f"capability '{execution.capability.value}'."
+                f"BackendAgent received an execution for capability '{execution.capability.value}'."
             )
 
         if not execution.request.task.strip():
-            raise ValueError(
-                "BackendAgent requires a non-empty task."
-            )
+            raise ValueError("BackendAgent requires a non-empty task.")
 
     # ------------------------------------------------------------------
     # Execution

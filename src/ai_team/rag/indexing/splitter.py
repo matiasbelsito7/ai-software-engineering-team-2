@@ -27,10 +27,6 @@ class DocumentSplitter:
         Split a document into logical sections.
         """
 
-        sections = [
-            section.strip()
-            for section in text.split("\n\n")
-            if section.strip()
-        ]
+        sections = [section.strip() for section in text.split("\n\n") if section.strip()]
 
         return sections

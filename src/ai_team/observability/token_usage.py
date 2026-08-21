@@ -37,13 +37,9 @@ class TokenUsageTracker:
 
         self._prompt_tokens += call.prompt_tokens
 
-        self._completion_tokens += (
-            call.completion_tokens
-        )
+        self._completion_tokens += call.completion_tokens
 
-        self._agent_usage[
-            str(call.agent)
-        ] += call.total_tokens
+        self._agent_usage[str(call.agent)] += call.total_tokens
 
     @property
     def prompt_tokens(
@@ -61,10 +57,7 @@ class TokenUsageTracker:
     def total_tokens(
         self,
     ) -> int:
-        return (
-            self._prompt_tokens
-            + self._completion_tokens
-        )
+        return self._prompt_tokens + self._completion_tokens
 
     def usage_by_agent(
         self,

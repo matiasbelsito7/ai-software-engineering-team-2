@@ -52,13 +52,10 @@ class LLMFactory:
         model = model or settings.llm.openrouter_model
 
         match provider.lower():
-
             case "openrouter":
                 return OpenRouterLLM(
                     model=model,
                 )
 
             case _:
-                raise UnsupportedProviderError(
-                    f"Unsupported LLM provider: {provider}"
-                )
+                raise UnsupportedProviderError(f"Unsupported LLM provider: {provider}")

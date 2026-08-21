@@ -23,6 +23,7 @@ class StructuredLLMResponse[T]:
     data: T
     response: LLMResponse
 
+
 # ---------------------------------------------------------------------------
 # Token Usage
 # ---------------------------------------------------------------------------
@@ -94,8 +95,6 @@ class LLMResponse:
 
     latency_ms: float | None = None
 
-    metadata: GenerationMetadata = field(
-        default_factory=GenerationMetadata
-    )
+    metadata: GenerationMetadata = field(default_factory=GenerationMetadata)
 
     raw_response: dict[str, Any] | None = None

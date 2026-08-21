@@ -56,9 +56,4 @@ class RerankerRetriever(BaseRetriever):
             query,
         )
 
-        return RAGContext(
-            chunks=[
-                item.chunk
-                for item in result.chunks
-            ]
-        )
+        return RAGContext(chunks=[item.chunk for item in result.chunks])

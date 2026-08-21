@@ -53,9 +53,7 @@ def _make_agent_node(
         )
 
         state.execution.current_agent = agent.info.name
-        state.execution.previous_agent = (
-            state.execution.current_agent
-        )
+        state.execution.previous_agent = state.execution.current_agent
 
         return state
 

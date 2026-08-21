@@ -31,16 +31,12 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
     ) -> None:
 
         if model not in EMBEDDING_MODELS:
-            raise ValueError(
-                f"Unsupported embedding model: {model}"
-            )
+            raise ValueError(f"Unsupported embedding model: {model}")
 
         embedding_model = EMBEDDING_MODELS[model]
 
         if embedding_model.provider != EmbeddingProviderType.OPENROUTER:
-            raise ValueError(
-                f"{model} is not an OpenRouter embedding model."
-            )
+            raise ValueError(f"{model} is not an OpenRouter embedding model.")
 
         self._model: EmbeddingModel = embedding_model
 
@@ -88,14 +84,10 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embedding: list[float] = response.json()["data"][0][
-            "embedding"
-        ]
+        embedding: list[float] = response.json()["data"][0]["embedding"]
 
         if len(embedding) != self.dimensions:
-            raise RuntimeError(
-                "Embedding dimension mismatch."
-            )
+            raise RuntimeError("Embedding dimension mismatch.")
 
         return embedding
 
@@ -117,16 +109,11 @@ class OpenRouterEmbeddingProvider(BaseEmbeddingProvider):
 
         response.raise_for_status()
 
-        embeddings: list[list[float]] = [
-            item["embedding"]
-            for item in response.json()["data"]
-        ]
+        embeddings: list[list[float]] = [item["embedding"] for item in response.json()["data"]]
 
         for embedding in embeddings:
             if len(embedding) != self.dimensions:
-                raise RuntimeError(
-                    "Embedding dimension mismatch."
-                )
+                raise RuntimeError("Embedding dimension mismatch.")
 
         return embeddings
 

@@ -63,9 +63,7 @@ class ReviewerAgent(BaseAgent[ReviewerResult]):
             )
 
         if not execution.request.task.strip():
-            raise ValueError(
-                "ReviewerAgent requires a non-empty task."
-            )
+            raise ValueError("ReviewerAgent requires a non-empty task.")
 
     # ------------------------------------------------------------------
     # Execution

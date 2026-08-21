@@ -40,7 +40,6 @@ from ai_team.agents.tool_calls import (
 )
 
 __all__ = [
-
     "AgentCapabilityError",
     "AgentConfigurationError",
     "AgentContext",

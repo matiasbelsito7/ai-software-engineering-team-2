@@ -43,31 +43,17 @@ class ContextSelector:
         Current implementation is heuristic.
         """
 
-        conversation = (
-            state.conversation.conversation_history[
-                -self._max_messages :
-            ]
-        )
+        conversation = state.conversation.conversation_history[-self._max_messages :]
 
         memories: list[str] = []
 
         if state.memory is not None:
-            memories = [
-                entry.content
-                for entry in state.memory.entries[
-                    : self._max_memories
-                ]
-            ]
+            memories = [entry.content for entry in state.memory.entries[: self._max_memories]]
 
         documents: list[str] = []
 
         if state.rag is not None:
-            documents = [
-                chunk.content
-                for chunk in state.rag.chunks[
-                    : self._max_documents
-                ]
-            ]
+            documents = [chunk.content for chunk in state.rag.chunks[: self._max_documents]]
 
         return ContextSelection(
             conversation=conversation,

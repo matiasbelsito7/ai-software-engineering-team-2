@@ -39,4 +39,3 @@ class BaseRetriever(ABC):
         Build the context supplied to an agent.
         """
         ...
-

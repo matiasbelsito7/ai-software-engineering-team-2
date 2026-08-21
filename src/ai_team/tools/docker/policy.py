@@ -22,10 +22,7 @@ class DockerPolicy:
     ) -> None:
 
         if not operation:
-
-            raise PermissionError(
-                "Operation cannot be empty."
-            )
+            raise PermissionError("Operation cannot be empty.")
 
     def validate_image(
         self,
@@ -33,16 +30,10 @@ class DockerPolicy:
     ) -> None:
 
         if not image:
-
-            raise PermissionError(
-                "Image cannot be empty."
-            )
+            raise PermissionError("Image cannot be empty.")
 
         if image in self.BLOCKED_IMAGES:
-
-            raise PermissionError(
-                f"Image '{image}' is blocked."
-            )
+            raise PermissionError(f"Image '{image}' is blocked.")
 
     def validate_container(
         self,
@@ -50,7 +41,4 @@ class DockerPolicy:
     ) -> None:
 
         if not container_id:
-
-            raise PermissionError(
-                "Container id cannot be empty."
-            )
+            raise PermissionError("Container id cannot be empty.")

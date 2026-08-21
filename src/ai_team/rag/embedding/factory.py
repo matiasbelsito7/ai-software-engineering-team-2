@@ -50,7 +50,4 @@ class EmbeddingFactory:
                 )
 
             case _:
-                raise ValueError(
-                    f"Unsupported embedding provider: "
-                    f"{provider!r}"
-                )
+                raise ValueError(f"Unsupported embedding provider: {provider!r}")

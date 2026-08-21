@@ -45,65 +45,47 @@ class GitTool(BaseTool):
             str,
             Callable[[dict[str, Any]], str],
         ] = {
-
             "status": lambda _: commands.status(),
-
             "diff": lambda _: commands.diff(),
-
             "branch": lambda _: commands.branch(),
-
             "checkout": (
-                lambda p:
-                commands.checkout(
+                lambda p: commands.checkout(
                     p["branch"],
                 )
             ),
-
             "add": (
-                lambda p:
-                commands.add(
+                lambda p: commands.add(
                     p.get(
                         "path",
                         ".",
                     ),
                 )
             ),
-
             "commit": (
-                lambda p:
-                commands.commit(
+                lambda p: commands.commit(
                     p["message"],
                 )
             ),
-
             "log": (
-                lambda p:
-                commands.log(
+                lambda p: commands.log(
                     p.get(
                         "limit",
                         10,
                     ),
                 )
             ),
-
             "restore": (
-                lambda p:
-                commands.restore(
+                lambda p: commands.restore(
                     p["path"],
                 )
             ),
-
             "init": lambda _: commands.init(),
-
             "clone": (
-                lambda p:
-                commands.clone(
+                lambda p: commands.clone(
                     p["repository"],
                 )
             ),
-
             "pull": lambda _: commands.pull(),
-
             "push": lambda _: commands.push(),
         }
 
@@ -123,13 +105,9 @@ class GitTool(BaseTool):
         )
 
         if builder is None:
-
             return ToolResult(
                 success=False,
-                error=(
-                    f"Unknown Git operation "
-                    f"'{operation}'."
-                ),
+                error=(f"Unknown Git operation '{operation}'."),
             )
 
         command = builder(

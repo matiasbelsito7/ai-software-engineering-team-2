@@ -38,9 +38,7 @@ class AgentExecution(BaseModel):
 
     agent: str
 
-    status: ExecutionStatus = (
-        ExecutionStatus.RUNNING
-    )
+    status: ExecutionStatus = ExecutionStatus.RUNNING
 
     started_at: datetime
 
@@ -81,10 +79,7 @@ class LLMCall(BaseModel):
     def total_tokens(
         self,
     ) -> int:
-        return (
-            self.prompt_tokens
-            + self.completion_tokens
-        )
+        return self.prompt_tokens + self.completion_tokens
 
 
 class ToolCall(BaseModel):

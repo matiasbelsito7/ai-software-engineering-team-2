@@ -193,7 +193,6 @@ class HttpManager:
             body = response.json()
 
         except Exception:
-
             body = response.text
 
         return HttpResponse(

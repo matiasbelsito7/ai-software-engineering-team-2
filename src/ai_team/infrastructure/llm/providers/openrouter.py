@@ -39,9 +39,7 @@ class OpenRouterLLM(ProviderBase):
             model=model,
             base_url=settings.llm.openrouter_base_url,
             headers={
-                "Authorization": (
-                    f"Bearer {settings.llm.openrouter_api_key}"
-                ),
+                "Authorization": (f"Bearer {settings.llm.openrouter_api_key}"),
                 "Content-Type": "application/json",
                 "HTTP-Referer": f"http://{settings.app.host}:{settings.app.port}",
                 "X-Title": settings.app.name,
@@ -161,6 +159,4 @@ class OpenRouterLLM(ProviderBase):
         """
         Streaming support will be implemented in a future version.
         """
-        raise NotImplementedError(
-            "Streaming is not implemented."
-        )
+        raise NotImplementedError("Streaming is not implemented.")

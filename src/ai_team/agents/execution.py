@@ -132,7 +132,4 @@ class AgentExecution(BaseModel):
         self,
     ) -> bool:
 
-        return (
-            self.result is not None
-            and self.result.success
-        )
+        return self.result is not None and self.result.success

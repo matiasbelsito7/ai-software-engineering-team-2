@@ -47,32 +47,24 @@ class DockerTool(BaseTool):
             str,
             Callable[[dict[str, Any]], ToolResult],
         ] = {
-
             "ping": lambda _: ToolResult(
                 success=True,
                 output=self._manager.ping(),
             ),
-
             "list_containers": lambda p: ToolResult(
                 success=True,
                 output=self._manager.list_containers(
                     all=p.get("all", False),
                 ),
             ),
-
             "list_images": lambda _: ToolResult(
                 success=True,
                 output=self._manager.list_images(),
             ),
-
             "start": self._start,
-
             "stop": self._stop,
-
             "remove": self._remove,
-
             "pull": self._pull,
-
             "run": self._run,
         }
 
@@ -96,20 +88,17 @@ class DockerTool(BaseTool):
         )
 
         if handler is None:
-
             return ToolResult(
                 success=False,
                 error=f"Unknown operation '{operation}'.",
             )
 
         try:
-
             return handler(
                 request.parameters,
             )
 
         except Exception as exc:
-
             return ToolResult(
                 success=False,
                 error=str(exc),

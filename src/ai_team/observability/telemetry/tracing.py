@@ -35,9 +35,7 @@ class TracingManager:
         Register a new execution.
         """
 
-        self._executions[
-            execution.execution_id
-        ] = execution
+        self._executions[execution.execution_id] = execution
 
     async def finish_execution(
         self,

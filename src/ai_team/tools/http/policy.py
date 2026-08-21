@@ -39,10 +39,7 @@ class HttpPolicy:
     ) -> None:
 
         if operation not in self.ALLOWED_METHODS:
-
-            raise PermissionError(
-                f"Unsupported HTTP operation '{operation}'."
-            )
+            raise PermissionError(f"Unsupported HTTP operation '{operation}'.")
 
     # ---------------------------------------------------------
 
@@ -54,22 +51,13 @@ class HttpPolicy:
         parsed = urlparse(url)
 
         if parsed.scheme not in self.ALLOWED_SCHEMES:
-
-            raise PermissionError(
-                f"Unsupported scheme '{parsed.scheme}'."
-            )
+            raise PermissionError(f"Unsupported scheme '{parsed.scheme}'.")
 
         if not parsed.netloc:
-
-            raise PermissionError(
-                "Invalid URL."
-            )
+            raise PermissionError("Invalid URL.")
 
         if parsed.hostname in self.BLOCKED_HOSTS:
-
-            raise PermissionError(
-                f"Blocked host '{parsed.hostname}'."
-            )
+            raise PermissionError(f"Blocked host '{parsed.hostname}'.")
 
     # ---------------------------------------------------------
 
@@ -85,24 +73,14 @@ class HttpPolicy:
             headers,
             dict,
         ):
-
-            raise PermissionError(
-                "Headers must be a dictionary."
-            )
+            raise PermissionError("Headers must be a dictionary.")
 
         for key, value in headers.items():
-
             if not isinstance(key, str):
-
-                raise PermissionError(
-                    "Header keys must be strings."
-                )
+                raise PermissionError("Header keys must be strings.")
 
             if not isinstance(value, str):
-
-                raise PermissionError(
-                    "Header values must be strings."
-                )
+                raise PermissionError("Header values must be strings.")
 
     # ---------------------------------------------------------
 
@@ -123,7 +101,4 @@ class HttpPolicy:
                 bytes,
             ),
         ):
-
-            raise PermissionError(
-                "Unsupported payload type."
-            )
+            raise PermissionError("Unsupported payload type.")

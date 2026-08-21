@@ -75,9 +75,4 @@ class HybridRetriever(BaseRetriever):
     ) -> RAGContext:
         result = await self.search(query)
 
-        return RAGContext(
-            chunks=[
-                item.chunk
-                for item in result.chunks
-            ]
-        )
+        return RAGContext(chunks=[item.chunk for item in result.chunks])

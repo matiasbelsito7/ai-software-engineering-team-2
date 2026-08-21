@@ -8,7 +8,6 @@ from enum import StrEnum
 
 
 class SourceType(StrEnum):
-
     FILE = "file"
 
     MARKDOWN = "markdown"
@@ -22,6 +21,7 @@ class SourceType(StrEnum):
     HTTP = "http"
 
     REPOSITORY = "repository"
+
 
 class EmbeddingProviderType(StrEnum):
     """

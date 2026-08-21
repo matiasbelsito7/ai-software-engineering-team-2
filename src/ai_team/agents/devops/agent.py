@@ -32,10 +32,7 @@ class DevOpsAgent(BaseAgent[Any]):
     INFO = AgentInfo(
         name="devops",
         capability=AgentCapability.DEVOPS,
-        description=(
-            "Generates deployment infrastructure and "
-            "CI/CD artifacts."
-        ),
+        description=("Generates deployment infrastructure and CI/CD artifacts."),
     )
 
     PARSER = DevOpsParser

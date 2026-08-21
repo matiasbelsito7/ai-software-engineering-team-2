@@ -39,9 +39,7 @@ class UnitOfWork:
         Return the active session.
         """
         if self._session is None:
-            raise RuntimeError(
-                "UnitOfWork has not been entered."
-            )
+            raise RuntimeError("UnitOfWork has not been entered.")
 
         return self._session
 

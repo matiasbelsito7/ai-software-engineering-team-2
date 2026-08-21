@@ -25,11 +25,7 @@ from uuid import UUID
 
 type JSONPrimitive = str | int | float | bool | None
 
-type JSONValue = (
-    JSONPrimitive
-    | list["JSONValue"]
-    | dict[str, "JSONValue"]
-)
+type JSONValue = JSONPrimitive | list["JSONValue"] | dict[str, "JSONValue"]
 
 type JSONObject = dict[str, JSONValue]
 type JSONArray = list[JSONValue]

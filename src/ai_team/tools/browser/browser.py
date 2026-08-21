@@ -50,21 +50,13 @@ class BrowserTool(BaseTool):
                 Awaitable[ToolResult],
             ],
         ] = {
-
             "goto": self._goto,
-
             "content": self._content,
-
             "title": self._title,
-
             "click": self._click,
-
             "fill": self._fill,
-
             "evaluate": self._evaluate,
-
             "screenshot": self._screenshot,
-
             "close": self._close,
         }
 
@@ -84,20 +76,17 @@ class BrowserTool(BaseTool):
         )
 
         if handler is None:
-
             return ToolResult(
                 success=False,
                 error=f"Unknown browser operation '{operation}'.",
             )
 
         try:
-
             return await handler(
                 request.parameters,
             )
 
         except Exception as exc:
-
             return ToolResult(
                 success=False,
                 error=str(exc),

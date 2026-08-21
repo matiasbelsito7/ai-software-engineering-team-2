@@ -45,10 +45,7 @@ class AgentRegistry:
         capability = agent_cls.INFO.capability
 
         if capability in self._registry:
-            raise AgentRegistrationError(
-                f"Agent already registered for "
-                f"{capability.value!r}"
-            )
+            raise AgentRegistrationError(f"Agent already registered for {capability.value!r}")
 
         self._registry[capability] = agent_cls
 
@@ -64,10 +61,7 @@ class AgentRegistry:
             del self._registry[capability]
 
         except KeyError as exc:
-            raise AgentNotFoundError(
-                f"No agent registered for "
-                f"{capability.value!r}"
-            ) from exc
+            raise AgentNotFoundError(f"No agent registered for {capability.value!r}") from exc
 
     # ------------------------------------------------------------------
     # Lookup
@@ -85,10 +79,7 @@ class AgentRegistry:
             return self._registry[capability]
 
         except KeyError as exc:
-            raise AgentNotFoundError(
-                f"No agent registered for "
-                f"{capability.value!r}"
-            ) from exc
+            raise AgentNotFoundError(f"No agent registered for {capability.value!r}") from exc
 
     def info(
         self,
@@ -120,10 +111,7 @@ class AgentRegistry:
         Return metadata for every registered agent.
         """
 
-        return tuple(
-            agent.INFO
-            for agent in self._registry.values()
-        )
+        return tuple(agent.INFO for agent in self._registry.values())
 
     def items(
         self,

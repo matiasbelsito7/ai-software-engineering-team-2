@@ -55,11 +55,7 @@ class BackendResult(BaseModel):
         Files created by the agent.
         """
 
-        return [
-            patch
-            for patch in self.patches
-            if patch.operation == PatchOperation.CREATE
-        ]
+        return [patch for patch in self.patches if patch.operation == PatchOperation.CREATE]
 
     @property
     def modified_files(self) -> list[CodePatch]:
@@ -67,11 +63,7 @@ class BackendResult(BaseModel):
         Files modified by the agent.
         """
 
-        return [
-            patch
-            for patch in self.patches
-            if patch.operation == PatchOperation.MODIFY
-        ]
+        return [patch for patch in self.patches if patch.operation == PatchOperation.MODIFY]
 
     @property
     def deleted_files(self) -> list[CodePatch]:
@@ -79,8 +71,4 @@ class BackendResult(BaseModel):
         Files deleted by the agent.
         """
 
-        return [
-            patch
-            for patch in self.patches
-            if patch.operation == PatchOperation.DELETE
-        ]
+        return [patch for patch in self.patches if patch.operation == PatchOperation.DELETE]

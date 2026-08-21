@@ -18,9 +18,7 @@ class DevOpsPromptBuilder(BasePromptBuilder):
     Prompt builder used by the DevOps agent.
     """
 
-    PROMPTS_DIR = (
-        Path(__file__).parent / "prompts"
-    )
+    PROMPTS_DIR = Path(__file__).parent / "prompts"
 
     SYSTEM_PROMPT = "system.md"
 
@@ -34,9 +32,7 @@ class DevOpsPromptBuilder(BasePromptBuilder):
         execution: AgentExecution,
     ) -> str:
         conversation = cls.build(execution)
-        return "\n\n".join(
-            msg.content for msg in conversation.messages
-        )
+        return "\n\n".join(msg.content for msg in conversation.messages)
 
     @classmethod
     def build_user_prompt(

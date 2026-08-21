@@ -32,9 +32,7 @@ class DocumentationAgent(BaseAgent[Any]):
     INFO = AgentInfo(
         name="documentation",
         capability=AgentCapability.DOCUMENTATION,
-        description=(
-            "Generates technical documentation for software projects."
-        ),
+        description=("Generates technical documentation for software projects."),
     )
 
     PARSER = DocumentationParser

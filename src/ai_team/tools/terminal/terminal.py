@@ -43,10 +43,7 @@ class TerminalTool(BaseTool):
 
         self._workspace = workspace
 
-        self._policy = (
-            policy
-            or CommandPolicy()
-        )
+        self._policy = policy or CommandPolicy()
 
     async def run(
         self,
@@ -69,19 +66,16 @@ class TerminalTool(BaseTool):
             )
 
         try:
-
             self._policy.validate(
                 command,
                 cwd=self._workspace.cwd,
             )
 
-            process = (
-                await asyncio.create_subprocess_shell(
-                    command,
-                    cwd=self._workspace.cwd,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
+            process = await asyncio.create_subprocess_shell(
+                command,
+                cwd=self._workspace.cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
 
             stdout, stderr = await asyncio.wait_for(
@@ -104,7 +98,6 @@ class TerminalTool(BaseTool):
             )
 
         except TimeoutError:
-
             process.kill()
 
             await process.wait()
@@ -115,7 +108,6 @@ class TerminalTool(BaseTool):
             )
 
         except Exception as exc:
-
             return ToolResult(
                 success=False,
                 error=str(exc),

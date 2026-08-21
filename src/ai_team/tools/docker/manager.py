@@ -42,11 +42,7 @@ class DockerManager:
                 "id": container.id,
                 "name": container.name,
                 "status": container.status,
-                "image": (
-                    container.image.tags[0]
-                    if container.image.tags
-                    else "<none>"
-                ),
+                "image": (container.image.tags[0] if container.image.tags else "<none>"),
             }
             for container in containers
         ]

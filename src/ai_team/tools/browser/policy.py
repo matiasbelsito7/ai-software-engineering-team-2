@@ -31,14 +31,10 @@ class BrowserPolicy:
             "http",
             "https",
         }:
-            raise PermissionError(
-                "Unsupported protocol."
-            )
+            raise PermissionError("Unsupported protocol.")
 
         if parsed.scheme in self.BLOCKED_SCHEMES:
-            raise PermissionError(
-                "Blocked protocol."
-            )
+            raise PermissionError("Blocked protocol.")
 
     def validate_selector(
         self,
@@ -46,9 +42,7 @@ class BrowserPolicy:
     ) -> None:
 
         if not selector.strip():
-            raise PermissionError(
-                "Selector cannot be empty."
-            )
+            raise PermissionError("Selector cannot be empty.")
 
     def validate_script(
         self,
@@ -56,6 +50,4 @@ class BrowserPolicy:
     ) -> None:
 
         if not javascript.strip():
-            raise PermissionError(
-                "Empty JavaScript."
-            )
+            raise PermissionError("Empty JavaScript.")

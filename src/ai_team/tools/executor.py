@@ -49,7 +49,6 @@ class ToolExecutor:
         success = False
 
         try:
-
             result = await tool.run(
                 request,
             )
@@ -59,16 +58,12 @@ class ToolExecutor:
             return result
 
         finally:
-
             if self._observations is not None:
-
                 await self._observations.record_tool_call(
                     execution_id="",
                     agent="",
                     tool=request.tool,
-                    latency_ms=(
-                        time.perf_counter() - started
-                    ),
+                    latency_ms=(time.perf_counter() - started),
                     success=success,
                 )
 

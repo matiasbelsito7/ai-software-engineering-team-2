@@ -47,6 +47,7 @@ SessionFactory = async_sessionmaker(
 # FastAPI Dependency
 # ---------------------------------------------------------------------------
 
+
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """
     Yield a database session.
@@ -61,6 +62,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 # ---------------------------------------------------------------------------
 # Generic Context Manager
 # ---------------------------------------------------------------------------
+
 
 @asynccontextmanager
 async def session_scope() -> AsyncGenerator[AsyncSession, None]:

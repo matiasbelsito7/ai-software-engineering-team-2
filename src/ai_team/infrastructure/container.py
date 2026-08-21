@@ -4,7 +4,7 @@ Application dependency container.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # ------------------------------------------------------------------
 # Agents
@@ -38,6 +38,7 @@ from ai_team.memory.stores.semantic import SemanticMemoryStore
 from ai_team.observability.factory import build_observability
 from ai_team.rag.factory import build_rag
 from ai_team.rag.retrieval.keyword import KeywordRetriever
+from ai_team.rag.retrieval.semantic import SemanticRetriever
 from ai_team.rag.stores.memory import InMemoryVectorStore
 from ai_team.tools.docker.factory import (
     build_docker_tool,
@@ -55,7 +56,6 @@ if TYPE_CHECKING:
 
 
 class _NoOpChunkingPipeline:
-
     def process(self, document):  # type: ignore[no-untyped-def]
         from ai_team.rag.models import DocumentChunk
 
@@ -72,7 +72,6 @@ class _NoOpChunkingPipeline:
 
 
 class _NoOpEmbeddingProvider:
-
     @property
     def model(self) -> str:
         return "noop"
@@ -103,9 +102,7 @@ class Container:
 
     def __init__(self) -> None:
 
-        self.workspace = Workspace(
-            root="./workspace"
-        )
+        self.workspace = Workspace(root="./workspace")
 
         self.observation = build_observability()
 
@@ -124,14 +121,25 @@ class Container:
             keyword_retriever=memory_keyword,
         )
 
-        rag_keyword = KeywordRetriever()
+        rag_store = InMemoryVectorStore()
+
+        rag_embedding: Any = _NoOpEmbeddingProvider()
+
+        rag_semantic = SemanticRetriever(
+            store=rag_store,
+            embedding=rag_embedding,
+        )
+
+        rag_keyword = KeywordRetriever(
+            store=rag_store,
+        )
 
         self.rag = build_rag(
             chunking=_NoOpChunkingPipeline(),  # type: ignore[arg-type]
-            embedding=_NoOpEmbeddingProvider(),  # type: ignore[arg-type]
-            semantic=rag_keyword,
+            embedding=rag_embedding,
+            semantic=rag_semantic,
             keyword=rag_keyword,
-            store=InMemoryVectorStore(),
+            store=rag_store,
         )
 
         self.llm = LLMFactory.create()

@@ -24,8 +24,7 @@ class DatabaseAgent(BaseAgent[Any]):
         name="database",
         capability=AgentCapability.DATABASE,
         description=(
-            "Designs database schemas, entities, "
-            "relationships and persistence strategies."
+            "Designs database schemas, entities, relationships and persistence strategies."
         ),
     )
 

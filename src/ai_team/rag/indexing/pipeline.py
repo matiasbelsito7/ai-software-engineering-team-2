@@ -45,12 +45,7 @@ class IndexingPipeline:
             document,
         )
 
-        embeddings = await self._embedding.embed_batch(
-            [
-                chunk.content
-                for chunk in chunks
-            ]
-        )
+        embeddings = await self._embedding.embed_batch([chunk.content for chunk in chunks])
 
         return [
             chunk.model_copy(

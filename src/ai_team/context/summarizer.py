@@ -40,10 +40,7 @@ class ContextSummarizer:
         The current implementation uses a placeholder prompt.
         """
 
-        prompt = (
-            "Summarize the following conversation:\n\n"
-            + "\n".join(conversation)
-        )
+        prompt = "Summarize the following conversation:\n\n" + "\n".join(conversation)
 
         conv = Conversation()
         conv.add_user(prompt)

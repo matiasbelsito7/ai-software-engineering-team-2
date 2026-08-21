@@ -32,10 +32,7 @@ class GitAgent(BaseAgent[Any]):
     INFO = AgentInfo(
         name="git",
         capability=AgentCapability.GIT,
-        description=(
-            "Organizes version control operations and "
-            "project history."
-        ),
+        description=("Organizes version control operations and project history."),
     )
 
     PARSER = GitParser

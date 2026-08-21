@@ -59,9 +59,7 @@ class ArchitectAgent(BaseAgent[ArchitectureDesign]):
             )
 
         if not execution.request.task.strip():
-            raise ValueError(
-                "ArchitectAgent requires a non-empty task."
-            )
+            raise ValueError("ArchitectAgent requires a non-empty task.")
 
     # ------------------------------------------------------------------
     # Execution

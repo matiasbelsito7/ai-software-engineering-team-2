@@ -46,19 +46,13 @@ class BrowserManager:
 
         from playwright.async_api import async_playwright
 
-        self._playwright = (
-            await async_playwright().start()
+        self._playwright = await async_playwright().start()
+
+        self._browser = await self._playwright.chromium.launch(  # type: ignore[attr-defined]
+            headless=True,
         )
 
-        self._browser = (
-            await self._playwright.chromium.launch(  # type: ignore[attr-defined]
-                headless=True,
-            )
-        )
-
-        self._context = (
-            await self._browser.new_context()
-        )
+        self._context = await self._browser.new_context()
 
     async def stop(
         self,
@@ -102,9 +96,7 @@ class BrowserManager:
             id=uuid4(),
         )
 
-        self._sessions[
-            session.id
-        ] = page
+        self._sessions[session.id] = page
 
         return session
 
@@ -115,18 +107,22 @@ class BrowserManager:
         session: BrowserSession,
     ) -> str:
 
-        return str(await self._page(
-            session,
-        ).content())
+        return str(
+            await self._page(
+                session,
+            ).content()
+        )
 
     async def title(
         self,
         session: BrowserSession,
     ) -> str:
 
-        return str(await self._page(
-            session,
-        ).title())
+        return str(
+            await self._page(
+                session,
+            ).title()
+        )
 
     async def click(
         self,
@@ -207,8 +203,6 @@ class BrowserManager:
         )
 
         if page is None:
-            raise ValueError(
-                f"Unknown browser session: {session.id}"
-            )
+            raise ValueError(f"Unknown browser session: {session.id}")
 
         return page

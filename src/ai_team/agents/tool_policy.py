@@ -21,7 +21,6 @@ class AgentToolPolicy:
         # =====================================================================
         # Planning
         # =====================================================================
-
         AgentCapability.PLANNER: frozenset(
             {
                 "search",
@@ -30,11 +29,9 @@ class AgentToolPolicy:
                 "memory",
             }
         ),
-
         # =====================================================================
         # Architecture
         # =====================================================================
-
         AgentCapability.ARCHITECT: frozenset(
             {
                 "search",
@@ -43,11 +40,9 @@ class AgentToolPolicy:
                 "memory",
             }
         ),
-
         # =====================================================================
         # Backend
         # =====================================================================
-
         AgentCapability.BACKEND: frozenset(
             {
                 "repository",
@@ -65,11 +60,9 @@ class AgentToolPolicy:
                 "type_checker",
             }
         ),
-
         # =====================================================================
         # Frontend
         # =====================================================================
-
         AgentCapability.FRONTEND: frozenset(
             {
                 "repository",
@@ -86,11 +79,9 @@ class AgentToolPolicy:
                 "type_checker",
             }
         ),
-
         # =====================================================================
         # Database
         # =====================================================================
-
         AgentCapability.DATABASE: frozenset(
             {
                 "repository",
@@ -106,11 +97,9 @@ class AgentToolPolicy:
                 "type_checker",
             }
         ),
-
         # =====================================================================
         # Review
         # =====================================================================
-
         AgentCapability.REVIEWER: frozenset(
             {
                 "repository",
@@ -127,11 +116,9 @@ class AgentToolPolicy:
                 "type_checker",
             }
         ),
-
         # =====================================================================
         # QA
         # =====================================================================
-
         AgentCapability.QA: frozenset(
             {
                 "repository",
@@ -147,11 +134,9 @@ class AgentToolPolicy:
                 "type_checker",
             }
         ),
-
         # =====================================================================
         # Documentation
         # =====================================================================
-
         AgentCapability.DOCUMENTATION: frozenset(
             {
                 "repository",
@@ -162,11 +147,9 @@ class AgentToolPolicy:
                 "memory",
             }
         ),
-
         # =====================================================================
         # DevOps
         # =====================================================================
-
         AgentCapability.DEVOPS: frozenset(
             {
                 "repository",
@@ -231,6 +214,5 @@ class AgentToolPolicy:
             tool_name,
         ):
             raise PermissionError(
-                f"Agent '{capability.value}' is not allowed "
-                f"to use tool '{tool_name}'."
+                f"Agent '{capability.value}' is not allowed to use tool '{tool_name}'."
             )

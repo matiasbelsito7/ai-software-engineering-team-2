@@ -38,10 +38,7 @@ class ToolManager:
         name = tool.definition.name
 
         if name in self._tools:
-
-            raise ValueError(
-                f"Tool '{name}' is already registered."
-            )
+            raise ValueError(f"Tool '{name}' is already registered.")
 
         self._tools[name] = tool
 
@@ -71,14 +68,10 @@ class ToolManager:
         """
 
         try:
-
             return self._tools[name]
 
         except KeyError as exc:
-
-            raise ValueError(
-                f"Unknown tool '{name}'."
-            ) from exc
+            raise ValueError(f"Unknown tool '{name}'.") from exc
 
     def has(
         self,
@@ -97,9 +90,7 @@ class ToolManager:
         Return registered tool names.
         """
 
-        return tuple(
-            self._tools.keys()
-        )
+        return tuple(self._tools.keys())
 
     def definitions(
         self,
@@ -108,10 +99,7 @@ class ToolManager:
         Return every tool definition.
         """
 
-        return tuple(
-            tool.definition
-            for tool in self._tools.values()
-        )
+        return tuple(tool.definition for tool in self._tools.values())
 
     def all(
         self,
@@ -120,9 +108,7 @@ class ToolManager:
         Return every registered tool.
         """
 
-        return tuple(
-            self._tools.values()
-        )
+        return tuple(self._tools.values())
 
     # ---------------------------------------------------------
 

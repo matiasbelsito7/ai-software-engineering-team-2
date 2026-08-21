@@ -89,14 +89,10 @@ class BasePromptBuilder:
         """
 
         if not cls.PROMPTS_PACKAGE:
-            raise RuntimeError(
-                f"{cls.__name__} does not define PROMPTS_PACKAGE."
-            )
+            raise RuntimeError(f"{cls.__name__} does not define PROMPTS_PACKAGE.")
 
         if not cls.TASK_PROMPT:
-            raise RuntimeError(
-                f"{cls.__name__} does not define TASK_PROMPT."
-            )
+            raise RuntimeError(f"{cls.__name__} does not define TASK_PROMPT.")
 
         return (
             files(cls.PROMPTS_PACKAGE)
@@ -105,4 +101,3 @@ class BasePromptBuilder:
                 encoding="utf-8",
             )
         )
-

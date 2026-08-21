@@ -37,10 +37,7 @@ class CommandPolicy:
         blocked_commands: set[str] | None = None,
     ) -> None:
 
-        self._blocked_commands = (
-            blocked_commands
-            or self.DEFAULT_BLOCKED_COMMANDS
-        )
+        self._blocked_commands = blocked_commands or self.DEFAULT_BLOCKED_COMMANDS
 
     def validate(
         self,
@@ -55,13 +52,9 @@ class CommandPolicy:
         stripped = command.strip()
 
         if not stripped:
-            raise PermissionError(
-                "Empty command."
-            )
+            raise PermissionError("Empty command.")
 
         executable = stripped.split()[0].lower()
 
         if executable in self._blocked_commands:
-            raise PermissionError(
-                f"Command '{executable}' is blocked."
-            )
+            raise PermissionError(f"Command '{executable}' is blocked.")

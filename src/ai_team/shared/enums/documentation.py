@@ -2,7 +2,6 @@ from enum import StrEnum
 
 
 class DocumentationType(StrEnum):
-
     README = "readme"
 
     ARCHITECTURE = "architecture"

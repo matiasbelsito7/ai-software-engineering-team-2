@@ -38,14 +38,8 @@ class ContextCompressor:
         """
 
         return ContextSelection(
-            conversation=selection.conversation[
-                -self._max_messages :
-            ],
-            memories=selection.memories[
-                : self._max_memories
-            ],
-            documents=selection.documents[
-                : self._max_documents
-            ],
+            conversation=selection.conversation[-self._max_messages :],
+            memories=selection.memories[: self._max_memories],
+            documents=selection.documents[: self._max_documents],
             metadata=selection.metadata,
         )

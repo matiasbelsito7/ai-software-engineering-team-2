@@ -50,9 +50,7 @@ class MetricsManager:
 
         self._executions += 1
 
-        self._agent_calls[
-            execution.agent
-        ] += 1
+        self._agent_calls[execution.agent] += 1
 
     async def record_llm_call(
         self,

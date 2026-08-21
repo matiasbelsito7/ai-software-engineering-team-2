@@ -50,21 +50,13 @@ class HttpTool(BaseTool):
                 Awaitable[ToolResult],
             ],
         ] = {
-
             "get": self._get,
-
             "post": self._post,
-
             "put": self._put,
-
             "patch": self._patch,
-
             "delete": self._delete,
-
             "head": self._head,
-
             "options": self._options,
-
             "download": self._download,
         }
 
@@ -88,20 +80,17 @@ class HttpTool(BaseTool):
         )
 
         if handler is None:
-
             return ToolResult(
                 success=False,
                 error=f"Unknown HTTP operation '{operation}'.",
             )
 
         try:
-
             return await handler(
                 request.parameters,
             )
 
         except Exception as exc:
-
             return ToolResult(
                 success=False,
                 error=str(exc),

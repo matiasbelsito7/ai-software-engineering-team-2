@@ -96,11 +96,7 @@ class ExecutionPlan(BaseModel):
         """
         Return every task in execution order.
         """
-        return [
-            task
-            for phase in self.phases
-            for task in phase.tasks
-        ]
+        return [task for phase in self.phases for task in phase.tasks]
 
     @property
     def total_tasks(self) -> int:
@@ -114,7 +110,4 @@ class ExecutionPlan(BaseModel):
         """
         Capabilities required by the plan.
         """
-        return {
-            task.capability
-            for task in self.tasks
-        }
+        return {task.capability for task in self.tasks}

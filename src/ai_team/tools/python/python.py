@@ -45,59 +45,43 @@ class PythonTool(BaseTool):
             str,
             Callable[[dict[str, Any]], str],
         ] = {
-
             "run_script": (
-                lambda p:
-                commands.run_script(
+                lambda p: commands.run_script(
                     p["script"],
                 )
             ),
-
             "run_module": (
-                lambda p:
-                commands.run_module(
+                lambda p: commands.run_module(
                     p["module"],
                 )
             ),
-
             "run_code": (
-                lambda p:
-                commands.run_code(
+                lambda p: commands.run_code(
                     p["code"],
                 )
             ),
-
             "pip_install": (
-                lambda p:
-                commands.pip_install(
+                lambda p: commands.pip_install(
                     p["package"],
                 )
             ),
-
             "pip_uninstall": (
-                lambda p:
-                commands.pip_uninstall(
+                lambda p: commands.pip_uninstall(
                     p["package"],
                 )
             ),
-
             "format": (
-                lambda p:
-                commands.format_script(
+                lambda p: commands.format_script(
                     p["script"],
                 )
             ),
-
             "lint": (
-                lambda p:
-                commands.lint_script(
+                lambda p: commands.lint_script(
                     p["script"],
                 )
             ),
-
             "test": (
-                lambda p:
-                commands.test(
+                lambda p: commands.test(
                     p.get(
                         "path",
                         ".",
@@ -122,13 +106,9 @@ class PythonTool(BaseTool):
         )
 
         if builder is None:
-
             return ToolResult(
                 success=False,
-                error=(
-                    f"Unknown Python operation "
-                    f"'{operation}'."
-                ),
+                error=(f"Unknown Python operation '{operation}'."),
             )
 
         command = builder(
