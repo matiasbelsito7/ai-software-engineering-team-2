@@ -4,20 +4,16 @@ Observability models.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from datetime import datetime  # noqa: TC003 - Pydantic needs at runtime
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ai_team.shared.enums.observability import ExecutionStatus
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from ai_team.shared.enums.observability import (
-        LLMProvider,
-        ToolType,
-    )
+from ai_team.shared.enums.observability import (
+    ExecutionStatus,
+    LLMProvider,
+    ToolType,
+)
 
 
 class AgentExecution(BaseModel):

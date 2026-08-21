@@ -7,6 +7,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, ClassVar
 
+from ai_team.observability.exceptions import CostCalculationError
 from ai_team.shared.enums.observability import (
     LLMProvider,
 )
@@ -58,6 +59,51 @@ class CostTracker:
             float,
         ] = defaultdict(float)
 
+        self._custom_prices: dict[str, tuple[float, float]] = {}
+
+    # ---------------------------------------------------------
+    # Configuration
+    # ---------------------------------------------------------
+
+    def set_price(
+        self,
+        model: str,
+        prompt_price: float,
+        completion_price: float,
+    ) -> None:
+        """
+        Override or add a price entry for a model.
+
+        Prices are in USD per 1M tokens.
+        """
+
+        if prompt_price < 0 or completion_price < 0:
+            raise CostCalculationError(
+                f"Prices must be non-negative, got prompt={prompt_price}, "
+                f"completion={completion_price}",
+            )
+
+        self._custom_prices[model] = (prompt_price, completion_price)
+
+    def get_price(
+        self,
+        model: str,
+    ) -> tuple[float, float] | None:
+        """
+        Look up the price for a model.
+
+        Returns (prompt_price, completion_price) or None if unknown.
+        """
+
+        if model in self._custom_prices:
+            return self._custom_prices[model]
+
+        return self.DEFAULT_PRICES.get(model)
+
+    # ---------------------------------------------------------
+    # Recording
+    # ---------------------------------------------------------
+
     async def record(
         self,
         call: LLMCall,
@@ -69,10 +115,12 @@ class CostTracker:
         if call.provider == LLMProvider.OLLAMA:
             return
 
-        if call.model not in self.DEFAULT_PRICES:
+        prices = self.get_price(call.model)
+
+        if prices is None:
             return
 
-        prompt_price, completion_price = self.DEFAULT_PRICES[call.model]
+        prompt_price, completion_price = prices
 
         cost = ((call.prompt_tokens / 1_000_000) * prompt_price) + (
             (call.completion_tokens / 1_000_000) * completion_price

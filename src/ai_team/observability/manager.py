@@ -4,6 +4,7 @@ Observability manager.
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -24,6 +25,8 @@ if TYPE_CHECKING:
     from ai_team.observability.telemetry.metrics import MetricsManager
     from ai_team.observability.telemetry.tracing import TracingManager
     from ai_team.observability.token_usage import TokenUsageTracker
+
+logger = logging.getLogger("ai_team.observability")
 
 
 class ObservationManager:
@@ -60,7 +63,7 @@ class ObservationManager:
         *,
         execution_id: str,
         agent: str,
-    ) -> None:
+    ) -> AgentExecution:
         """
         Start observing an agent execution.
         """
@@ -73,6 +76,20 @@ class ObservationManager:
 
         await self._tracing.start_execution(
             execution,
+        )
+
+        return execution
+
+    def get_execution(
+        self,
+        execution_id: str,
+    ) -> AgentExecution | None:
+        """
+        Retrieve an active execution by ID.
+        """
+
+        return self._tracing.get_execution(
+            UUID(execution_id),
         )
 
     async def finish_execution(
@@ -205,10 +222,15 @@ class ObservationManager:
 
     async def initialize(
         self,
+        *,
+        log_level: int = logging.INFO,
     ) -> None:
         """
         Initialize observability resources.
         """
+
+        logger.setLevel(log_level)
+        logger.info("Observability subsystem initialized.")
 
     async def shutdown(
         self,

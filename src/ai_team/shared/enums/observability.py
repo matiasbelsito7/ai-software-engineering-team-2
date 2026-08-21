@@ -32,6 +32,8 @@ class ToolType(StrEnum):
 
     FILESYSTEM = "filesystem"
 
+    TERMINAL = "terminal"
+
     API = "api"
 
 
