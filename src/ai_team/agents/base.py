@@ -4,10 +4,12 @@ Base class for all AI agents.
 
 from __future__ import annotations
 
+import contextlib
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from ai_team.agents.tool_policy import AgentToolPolicy
+from ai_team.memory.models import MemoryQuery
 from ai_team.rag.models import RetrievalQuery
 from ai_team.tools.models import ToolRequest, ToolResult
 
@@ -18,9 +20,10 @@ if TYPE_CHECKING:
     from ai_team.agents.parsers.base import BaseParser
     from ai_team.agents.prompt_builder import BasePromptBuilder
     from ai_team.agents.result import AgentResult
-    from ai_team.context.models import ContextSelection
+    from ai_team.context.models import ContextWindow
     from ai_team.infrastructure.llm import BaseLLM
     from ai_team.infrastructure.llm.responses import LLMResponse
+    from ai_team.memory.models import MemoryContext
     from ai_team.observability.manager import ObservationManager
     from ai_team.rag.models import RAGContext
     from ai_team.shared.enums.agents import AgentCapability
@@ -127,21 +130,22 @@ class BaseAgent[T](ABC):
     async def build_context(
         self,
         execution: AgentExecution,
-    ) -> ContextSelection:
+    ) -> ContextWindow | None:
         """
-        Build the context required by the agent.
+        Build the context window using the ContextManager.
 
-        The ContextManager currently operates on GraphState, so the
-        orchestration layer is responsible for constructing the final
-        GraphState. This method provides the agent-level extension
-        point without introducing a second incompatible context API.
+        Requires execution.graph_state to be set by the orchestration layer.
         """
 
-        raise NotImplementedError(
-            "Context construction requires the orchestration "
-            "GraphState and must be implemented by the "
-            "LangGraph orchestration layer."
-        )
+        if execution.graph_state is None:
+            return None
+
+        try:
+            return await self.context.build(  # type: ignore[no-any-return]
+                execution.graph_state,
+            )
+        except Exception:
+            return None
 
     async def retrieve_context(
         self,
@@ -176,6 +180,31 @@ class BaseAgent[T](ABC):
         return RetrievalQuery(
             query=task,
         )
+
+    async def retrieve_memory(
+        self,
+        execution: AgentExecution,
+    ) -> MemoryContext | None:
+        """
+        Retrieve relevant memories for the current task.
+        """
+
+        task = execution.request.task.strip()
+
+        if not task:
+            return None
+
+        query = MemoryQuery(
+            query=task,
+            agent=self.capability,
+        )
+
+        try:
+            return await self.memory.build_context(  # type: ignore[no-any-return]
+                query,
+            )
+        except Exception:
+            return None
 
     # ------------------------------------------------------------------
     # LLM
@@ -305,9 +334,16 @@ class BaseAgent[T](ABC):
     ) -> None:
         """
         Hook executed before preparation.
+
+        Starts observability tracking for this agent execution.
         """
 
-        return None
+        if self.observations is not None:
+            with contextlib.suppress(Exception):
+                await self.observations.start_execution(
+                    execution_id=str(execution.id),
+                    agent=self.info.name,
+                )
 
     def validate(
         self,
@@ -326,17 +362,27 @@ class BaseAgent[T](ABC):
         """
         Prepare the agent execution.
 
-        RAG retrieval is performed here. Context construction remains
-        delegated to the orchestration layer because ContextManager
-        currently consumes GraphState.
+        Retrieves RAG context, memory context, builds the context
+        window, and constructs the initial conversation prompt.
         """
 
-        await self.retrieve_context(
+        rag_context = await self.retrieve_context(
+            execution,
+        )
+
+        memory_context = await self.retrieve_memory(
+            execution,
+        )
+
+        context_window = await self.build_context(
             execution,
         )
 
         execution.conversation = self.PROMPT_BUILDER.build(
             execution,
+            rag_context=rag_context,
+            memory_context=memory_context,
+            context_window=context_window,
         )
 
     @abstractmethod
@@ -356,6 +402,48 @@ class BaseAgent[T](ABC):
     ) -> None:
         """
         Hook executed after agent execution.
+
+        Finishes observability tracking and stores results in memory.
         """
 
-        return None
+        if self.observations is not None:
+            with contextlib.suppress(Exception):
+                obs_execution = self.observations.get_execution(
+                    str(execution.id),
+                )
+                if obs_execution is not None:
+                    await self.observations.finish_execution(
+                        execution=obs_execution,
+                    )
+
+        if execution.successful and execution.result is not None:
+            await self._store_result_in_memory(execution)
+
+    async def _store_result_in_memory(
+        self,
+        execution: AgentExecution,
+    ) -> None:
+        """
+        Store the agent result as a memory entry for future reference.
+        """
+
+        from ai_team.memory.models import MemoryEntry, MemoryMetadata
+        from ai_team.shared.enums import MemoryType
+
+        result = execution.result
+        output = result.output if result is not None else None
+        message = result.message if result is not None else ""
+        output_str = str(output) if output is not None else str(message)
+
+        entry = MemoryEntry(
+            memory_type=MemoryType.PROJECT,
+            content=f"[{self.info.name}] {execution.request.task}: {output_str[:500]}",
+            agent=self.capability,
+            metadata=MemoryMetadata(
+                source=f"agent:{self.info.name}",
+                tags=[self.info.name, "agent_result"],
+            ),
+        )
+
+        with contextlib.suppress(Exception):
+            await self.memory.add(entry)

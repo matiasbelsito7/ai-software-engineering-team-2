@@ -15,6 +15,7 @@ from ai_team.infrastructure.llm.messages import Conversation
 
 if TYPE_CHECKING:
     from ai_team.agents.result import AgentResult
+    from ai_team.graph.state import GraphState
     from ai_team.infrastructure.llm.responses import LLMResponse
     from ai_team.shared.enums.agents import AgentCapability
 
@@ -113,6 +114,8 @@ class AgentExecution(BaseModel):
     llm_response: LLMResponse | None = None
 
     result: AgentResult | None = None
+
+    graph_state: GraphState | None = None
 
     attempt: int = 1
 

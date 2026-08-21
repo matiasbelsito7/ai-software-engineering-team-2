@@ -44,6 +44,7 @@ def _make_agent_node(
             request=AgentRequest(
                 task=state.conversation.user_request,
             ),
+            graph_state=state,
         )
 
         execution = await agent.execute(execution)
