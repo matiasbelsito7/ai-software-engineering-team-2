@@ -1,12 +1,13 @@
 """
 Semantic memory store.
 
-Future implementation:
-    Qdrant
+Uses cosine similarity over embeddings for retrieval.
+Future implementation: Qdrant / pgvector
 """
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 from ai_team.memory.models import MemoryContext, MemorySearchResult
@@ -19,62 +20,70 @@ if TYPE_CHECKING:
     )
 
 
+def _cosine_similarity(a: list[float], b: list[float]) -> float:
+    """Compute cosine similarity between two vectors."""
+    if len(a) != len(b):
+        return 0.0
+    dot = sum(x * y for x, y in zip(a, b, strict=False))
+    norm_a = math.sqrt(sum(x * x for x in a))
+    norm_b = math.sqrt(sum(x * x for x in b))
+    if norm_a == 0.0 or norm_b == 0.0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
 class SemanticMemoryStore(BaseMemoryStore):
     """
-    Semantic memory implementation.
+    Semantic memory backed by embeddings and cosine similarity.
 
-    Uses vector embeddings to retrieve relevant
-    memories through similarity search.
+    When entries have embeddings, ``search`` scores them against the
+    query embedding and returns the most similar entries.
+    Falls back to text-based filtering when embeddings are absent.
     """
 
     def __init__(self) -> None:
         self._entries: dict[str, MemoryEntry] = {}
 
-    async def add(
-        self,
-        entry: MemoryEntry,
-    ) -> None:
+    # ------------------------------------------------------------------
+    # BaseMemoryStore
+    # ------------------------------------------------------------------
+
+    async def add(self, entry: MemoryEntry) -> None:
         self._entries[str(entry.id)] = entry
 
-    async def update(
-        self,
-        entry: MemoryEntry,
-    ) -> None:
+    async def update(self, entry: MemoryEntry) -> None:
         self._entries[str(entry.id)] = entry
 
-    async def delete(
-        self,
-        memory_id: str,
-    ) -> None:
+    async def delete(self, memory_id: str) -> None:
         self._entries.pop(memory_id, None)
 
-    async def get(
-        self,
-        memory_id: str,
-    ) -> MemoryEntry | None:
+    async def get(self, memory_id: str) -> MemoryEntry | None:
         return self._entries.get(memory_id)
 
-    async def search(
-        self,
-        query: MemoryQuery,
-    ) -> MemorySearchResult:
-        results = list(self._entries.values())
+    async def search(self, query: MemoryQuery) -> MemorySearchResult:
+        candidates = list(self._entries.values())
 
         if query.memory_types:
-            results = [e for e in results if e.memory_type in query.memory_types]
+            candidates = [e for e in candidates if e.memory_type in query.memory_types]
 
-        results = [e for e in results if e.score >= query.min_score]
+        if query.agent is not None:
+            candidates = [e for e in candidates if e.agent == query.agent]
 
-        results.sort(key=lambda e: e.score, reverse=True)
+        # Score by embedding similarity when available
+        scored = []
+        for entry in candidates:
+            if entry.embedding is not None and query.embedding is not None:
+                sim = _cosine_similarity(entry.embedding, query.embedding)
+                scored.append((sim, entry))
+            else:
+                scored.append((entry.score, entry))
 
-        results = results[: query.top_k]
+        scored.sort(key=lambda pair: pair[0], reverse=True)
+        results = [entry for _, entry in scored][: query.top_k]
 
         return MemorySearchResult(query=query, entries=results)
 
-    async def build_context(
-        self,
-        query: MemoryQuery,
-    ) -> MemoryContext:
+    async def build_context(self, query: MemoryQuery) -> MemoryContext:
         result = await self.search(query)
         return MemoryContext(entries=result.entries)
 

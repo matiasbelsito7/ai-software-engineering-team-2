@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING
 
 from ai_team.infrastructure.config.settings import settings
 from ai_team.infrastructure.llm.exceptions import UnsupportedProviderError
-from ai_team.infrastructure.llm.providers.openrouter import OpenRouterLLM
 
 if TYPE_CHECKING:
     from ai_team.infrastructure.llm.base import BaseLLM
@@ -49,12 +48,24 @@ class LLMFactory:
         """
 
         provider = provider or settings.llm.default_provider
-        model = model or settings.llm.openrouter_model
 
         match provider.lower():
             case "openrouter":
+                from ai_team.infrastructure.llm.providers.openrouter import (
+                    OpenRouterLLM,
+                )
+
                 return OpenRouterLLM(
-                    model=model,
+                    model=model or settings.llm.openrouter_model,
+                )
+
+            case "ollama":
+                from ai_team.infrastructure.llm.providers.ollama import (
+                    OllamaLLM,
+                )
+
+                return OllamaLLM(
+                    model=model or settings.llm.ollama_model,
                 )
 
             case _:

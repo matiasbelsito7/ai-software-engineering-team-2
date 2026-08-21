@@ -10,6 +10,7 @@ from ai_team.infrastructure.llm.messages import (
     Message,
     MessageRole,
 )
+from ai_team.infrastructure.llm.providers.ollama import OllamaLLM
 from ai_team.infrastructure.llm.providers.openrouter import OpenRouterLLM
 from ai_team.infrastructure.llm.responses import (
     GenerationMetadata,
@@ -35,6 +36,7 @@ __all__ = [
     # Messages
     "MessageRole",
     # Providers
+    "OllamaLLM",
     "OpenRouterLLM",
     "StructuredLLMResponse",
     "TokenUsage",

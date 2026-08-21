@@ -4,7 +4,7 @@ Models shared by the memory subsystem.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
@@ -80,11 +80,11 @@ class MemoryEntry(BaseModel):
     )
 
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
     )
 
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
     )
 
 
@@ -104,6 +104,8 @@ class MemoryQuery(BaseModel):
     )
 
     query: str
+
+    embedding: list[float] | None = None
 
     memory_types: list[MemoryType] = Field(
         default_factory=list,

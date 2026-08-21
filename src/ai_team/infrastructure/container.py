@@ -172,17 +172,25 @@ class Container:
         # Docker
         # ---------------------------------------------------------
 
-        import docker
+        self.docker_tool: DockerTool | None = None
+        self.docker_client: object = None
+        self.docker_manager: object = None
 
-        self.docker_client = docker.from_env()  # type: ignore[attr-defined]
+        try:
+            import docker
 
-        self.docker_manager = DockerManager(
-            client=self.docker_client,
-        )
+            self.docker_client = docker.from_env()  # type: ignore[attr-defined]
 
-        self.docker_tool: DockerTool = build_docker_tool(
-            manager=self.docker_manager,
-        )
+            self.docker_manager = DockerManager(
+                client=self.docker_client,
+            )
+
+            self.docker_tool = build_docker_tool(
+                manager=self.docker_manager,
+            )
+        except Exception:
+            self.docker_client = None
+            self.docker_manager = None
 
         self.tool_manager = ToolManager()
 
@@ -191,9 +199,11 @@ class Container:
             self.terminal_tool,
             self.git_tool,
             self.python_tool,
-            self.docker_tool,
         ):
             self.tool_manager.register(tool)
+
+        if self.docker_tool is not None:
+            self.tool_manager.register(self.docker_tool)
 
         self.tool_executor = ToolExecutor(
             manager=self.tool_manager,

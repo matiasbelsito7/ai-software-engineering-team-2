@@ -1,5 +1,5 @@
 """
-OpenRouter provider implementation.
+Ollama provider implementation.
 """
 
 from __future__ import annotations
@@ -25,12 +25,12 @@ if TYPE_CHECKING:
     from ai_team.infrastructure.llm.messages import Conversation
 
 
-class OpenRouterLLM(ProviderBase):
+class OllamaLLM(ProviderBase):
     """
-    OpenRouter implementation of the LLM provider.
+    Ollama provider for local LLM inference.
     """
 
-    CHAT_COMPLETIONS_ENDPOINT = "/chat/completions"
+    CHAT_ENDPOINT = "/api/chat"
 
     def __init__(
         self,
@@ -39,13 +39,7 @@ class OpenRouterLLM(ProviderBase):
     ) -> None:
         super().__init__(
             model=model,
-            base_url=settings.llm.openrouter_base_url,
-            headers={
-                "Authorization": f"Bearer {settings.llm.openrouter_api_key}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": f"http://{settings.app.host}:{settings.app.port}",
-                "X-Title": settings.app.name,
-            },
+            base_url=settings.llm.ollama_base_url.rstrip("/"),
         )
 
     # ------------------------------------------------------------------
@@ -54,7 +48,7 @@ class OpenRouterLLM(ProviderBase):
 
     @property
     def provider_name(self) -> str:
-        return "openrouter"
+        return "ollama"
 
     # ------------------------------------------------------------------
     # Payload
@@ -65,17 +59,30 @@ class OpenRouterLLM(ProviderBase):
         conversation: Conversation,
         config: GenerationConfig | None,
     ) -> dict[str, Any]:
-        payload = {
+        messages = self._conversation_to_messages(conversation)
+
+        payload: dict[str, Any] = {
             "model": self.model_name,
-            "messages": self._conversation_to_messages(
-                conversation,
-            ),
+            "messages": messages,
+            "stream": False,
         }
 
-        return self._apply_generation_config(
-            payload,
-            config,
-        )
+        if config is not None:
+            if config.temperature is not None:
+                payload.setdefault("options", {})["temperature"] = config.temperature
+            if config.max_tokens is not None:
+                payload.setdefault("options", {})["num_predict"] = config.max_tokens
+
+        return payload
+
+    def _build_stream_payload(
+        self,
+        conversation: Conversation,
+        config: GenerationConfig | None,
+    ) -> dict[str, Any]:
+        payload = self._build_payload(conversation, config)
+        payload["stream"] = True
+        return payload
 
     # ------------------------------------------------------------------
     # Response
@@ -86,38 +93,31 @@ class OpenRouterLLM(ProviderBase):
         data: dict[str, Any],
         latency_ms: float,
     ) -> LLMResponse:
-        choice = data["choices"][0]
+        message = data.get("message", {})
+        content = message.get("content", "")
 
-        usage_json = data.get("usage", {})
+        prompt_tokens = data.get("prompt_eval_count", 0)
+        completion_tokens = data.get("eval_count", 0)
 
         usage = TokenUsage(
-            prompt_tokens=usage_json.get(
-                "prompt_tokens",
-                0,
-            ),
-            completion_tokens=usage_json.get(
-                "completion_tokens",
-                0,
-            ),
-            total_tokens=usage_json.get(
-                "total_tokens",
-                0,
-            ),
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
         )
 
         metadata = GenerationMetadata(
-            request_id=data.get("id"),
-            created=data.get("created"),
-            finish_reason=choice.get(
-                "finish_reason",
-            ),
+            request_id=None,
+            created=None,
+            finish_reason="stop" if data.get("done") else None,
             extra={
-                "provider": data.get("provider"),
+                "total_duration_ns": data.get("total_duration"),
+                "load_duration_ns": data.get("load_duration"),
+                "model": data.get("model"),
             },
         )
 
         return self._build_response(
-            content=choice["message"]["content"],
+            content=content,
             usage=usage,
             metadata=metadata,
             latency_ms=latency_ms,
@@ -134,20 +134,14 @@ class OpenRouterLLM(ProviderBase):
         *,
         config: GenerationConfig | None = None,
     ) -> LLMResponse:
-        payload = self._build_payload(
-            conversation,
-            config,
-        )
+        payload = self._build_payload(conversation, config)
 
         data, latency = await self._post(
-            endpoint=self.CHAT_COMPLETIONS_ENDPOINT,
+            endpoint=self.CHAT_ENDPOINT,
             payload=payload,
         )
 
-        return self._parse_response(
-            data,
-            latency,
-        )
+        return self._parse_response(data, latency)
 
     async def stream(  # type: ignore[misc,override]
         self,
@@ -156,39 +150,32 @@ class OpenRouterLLM(ProviderBase):
         config: GenerationConfig | None = None,
     ) -> AsyncIterator[LLMStreamChunk]:
         """
-        Stream response tokens from OpenRouter.
+        Stream response tokens from Ollama.
         """
-        payload = self._build_payload(conversation, config)
-        payload["stream"] = True
+        payload = self._build_stream_payload(conversation, config)
 
         try:
             async with self.client.stream(
                 "POST",
-                self.CHAT_COMPLETIONS_ENDPOINT,
+                self.CHAT_ENDPOINT,
                 json=payload,
             ) as response:
                 self._raise_for_status(response)
 
                 async for line in response.aiter_lines():
-                    if not line.startswith("data: "):
+                    if not line.strip():
                         continue
 
-                    data_str = line[6:]
-
-                    if data_str.strip() == "[DONE]":
-                        break
-
                     try:
-                        data = json.loads(data_str)
+                        data = json.loads(line)
                     except json.JSONDecodeError:
                         continue
 
-                    choice = data.get("choices", [{}])[0]
-                    delta = choice.get("delta", {})
-                    content = delta.get("content", "")
+                    message = data.get("message", {})
+                    content = message.get("content", "")
 
                     if content:
-                        is_finished = choice.get("finish_reason") is not None
+                        is_finished = data.get("done", False)
                         yield LLMStreamChunk(
                             content=content,
                             is_finished=is_finished,
