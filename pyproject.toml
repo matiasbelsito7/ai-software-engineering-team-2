@@ -377,12 +377,23 @@ module = [
     "langgraph.*",
     "llama_index.*",
     "qdrant_client.*",
+    "qdrant_client",
     "deepeval.*",
+    "docker",
     "docker.*",
     "playwright.*",
 ]
 
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+
+module = [
+    "docker",
+    "docker.*",
+]
+
+follow_imports = "skip"
 
 ###############################################################################
 # OpenTelemetry

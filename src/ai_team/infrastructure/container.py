@@ -179,7 +179,7 @@ class Container:
         try:
             import docker
 
-            self.docker_client = docker.from_env()  # type: ignore[attr-defined]
+            self.docker_client = docker.from_env()
 
             self.docker_manager = DockerManager(
                 client=self.docker_client,

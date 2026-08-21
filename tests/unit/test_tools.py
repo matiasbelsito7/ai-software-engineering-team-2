@@ -256,11 +256,19 @@ class TestTestRunnerTool:
 @pytest.mark.asyncio
 class TestDependencyManagerTool:
     async def test_list(self):
+        import shutil
+
+        if not shutil.which("pip") and not shutil.which("pip3"):
+            pytest.skip("pip not available in this environment")
         tool = DependencyManagerTool()
         result = await tool.run(ToolRequest(parameters={"operation": "list"}))
         assert result.success is True
 
     async def test_freeze(self):
+        import shutil
+
+        if not shutil.which("pip") and not shutil.which("pip3"):
+            pytest.skip("pip not available in this environment")
         tool = DependencyManagerTool()
         result = await tool.run(ToolRequest(parameters={"operation": "freeze"}))
         assert result.success is True
