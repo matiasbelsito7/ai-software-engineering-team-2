@@ -204,6 +204,25 @@ docker-logs: ## Show container logs
 	docker compose logs -f
 
 ################################################################################
+# Documentation
+################################################################################
+
+.PHONY: docs-serve
+
+docs-serve: ## Serve documentation locally (requires mkdocs)
+	$(UV) run mkdocs serve
+
+.PHONY: docs-build
+
+docs-build: ## Build documentation site
+	$(UV) run mkdocs build
+
+.PHONY: openapi-export
+
+openapi-export: ## Export OpenAPI schema to docs/api/openapi.json
+	$(UV) run python -c "import json; from ai_team.app.api.main import app; from fastapi.openapi.utils import get_openapi; json.dump(get_openapi(title=app.title, version=app.version, routes=app.routes), open('docs/api/openapi.json', 'w'), indent=2)"
+
+################################################################################
 # Release
 ################################################################################
 

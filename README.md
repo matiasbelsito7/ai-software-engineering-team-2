@@ -1,74 +1,179 @@
-# AI Software Engineering Team - CI/CD Pipeline Documentation
+# AI Software Engineering Team
 
-## Phase 3.5 Completion Status
+Production-ready multi-agent AI software engineering platform built with LangGraph.
 
-✅ **GitHub Actions Workflows** - Complete
-   - ci.yml: Comprehensive CI/CD pipeline with caching, testing, coverage, security, Docker validation, and architecture checks
-   - lint.yml: Linting with Ruff, Black, and isort
-   - test.yml: Automated testing with pytest, coverage, and codecov integration
+A team of 9 specialized AI agents that collaborate to plan, design, build, review, test, document, and deploy software projects through a structured workflow.
 
-✅ **Code Coverage** - Integrated
-   - Coverage reporting in CI pipeline
-   - Codecov integration for coverage tracking
+## Architecture
 
-✅ **Security Scanning** - Implemented
-   - pip-audit for dependency security scanning
-   - Docker image scanning for vulnerabilities
+```
+Planner → Architect → Backend → Frontend → Reviewer → QA → Documentation → DevOps → Git
+    ↑                         ↑                                    │
+    │                         └────────────────────────────────────┘
+    │                                    (review loop)
+    └─────────────────────────────────────────────────────────────────────
+```
 
-✅ **Docker Validation** - Completed
-   - Dockerfile present and functional
-   - Docker Compose configuration validation in CI
-   - Health checks for containerized services
+Each agent is powered by an LLM and has access to specialized tools (filesystem, terminal, git, code analysis, Docker, RAG, memory). The workflow is orchestrated via LangGraph with conditional routing — the Reviewer can send tasks back to Backend for revisions, and QA can trigger rework if tests fail.
 
-✅ **Architecture Validation** - Available
-   - check_architecture.py script for layer validation and forbidden imports
+## Quick Start
 
-✅ **Project Validation** - Available
-   - check_project.py script for missing __init__.py files, duplicates, broken links, and large files
+### Prerequisites
 
-✅ **Makefile Commands** - Available
-   - install: Setup dependencies
-   - format: Code formatting with Black and isort
-   - lint: Code quality checks with Ruff
-   - typecheck: Type checking with mypy
-   - test: Test execution with coverage
-   - check: Combined lint, typecheck, and test validation
-   - ci: Execute full CI pipeline
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) (package manager)
+- Docker & Docker Compose (optional, for containerized deployment)
 
-✅ **Developer Documentation** - In Progress
-   - This file provides documentation for CI/CD setup, workflows, and validation scripts
-   - Future documentation should be added to the docs/ directory
+### Installation
 
-## How to Use CI/CD Pipeline
+```bash
+git clone https://github.com/matiasbelsito7/ai-software-engineering-team-2.git
+cd ai-software-engineering-team-2
+make install
+```
 
-### Local Development
-1. Install dependencies: `make install`
-2. Format code: `make format`
-3. Check code quality: `make lint`
-4. Run type checking: `make typecheck`
-5. Run tests with coverage: `make test`
+### Configuration
 
-### CI/CD Pipeline
-The pipeline runs automatically on:
-- Push to main branch
-- Pull requests to main branch
+```bash
+cp .env.example .env
+# Edit .env with your settings (LLM provider API keys, etc.)
+```
 
-Key components:
-1. **CI Pipeline** (ci.yml): Runs all validation checks, tests, coverage, and security scans
-2. **Test Pipeline** (test.yml): Runs pytest with coverage and generates codecov reports
-3. **Linting** (lint.yml): Enforces code style and quality standards
+### Run Locally
 
-### Validation Scripts
-1. **check_architecture.py**: Validates module structure, layer dependencies, and forbidden imports
-2. **check_project.py**: Detects missing __init__.py files, duplicate files, broken symlinks, and oversized files
+```bash
+make run
+# API available at http://localhost:8000
+# Swagger UI at http://localhost:8000/docs
+```
 
-## Project Structure & Setup
+### Run with Docker
 
-To contribute effectively:
-1. Maintain clean architecture with proper layer separation
-2. Ensure all Python packages have __init__.py files
-3. Keep duplicate files to a minimum
-4. Use standard naming conventions
-5. Document new features in the README or relevant files
+```bash
+make docker-build
+make docker-up
+# API available at http://localhost:8000
+```
 
-All validation scripts are run automatically in CI and can be run locally using Makefile commands.
+## API
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v1/health` | Health check |
+| `POST` | `/api/v1/tasks` | Submit a task (runs in background) |
+| `GET` | `/api/v1/tasks` | List tasks with pagination |
+| `GET` | `/api/v1/tasks/{id}` | Get task status and results |
+| `DELETE` | `/api/v1/tasks/{id}` | Delete a task |
+| `WS` | `/ws/tasks/{id}` | Real-time task progress |
+
+### Example
+
+```bash
+# Submit a task
+curl -X POST http://localhost:8000/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"task": "Build a REST API for user management with CRUD operations"}'
+
+# Check status
+curl http://localhost:8000/api/v1/tasks/{task_id}
+```
+
+### WebSocket
+
+Connect to `ws://localhost:8000/ws/tasks/{task_id}` for real-time progress:
+
+```json
+{"type": "progress", "task_id": "...", "status": "running", "agent": "backend", "progress": 0.4}
+{"type": "complete", "task_id": "...", "status": "completed", "results": [...]}
+```
+
+## Project Structure
+
+```
+src/ai_team/
+├── agents/          # 9 specialized AI agents
+│   ├── planner/     # Task decomposition
+│   ├── architect/   # System design
+│   ├── backend/     # Backend implementation
+│   ├── frontend/    # Frontend implementation
+│   ├── reviewer/    # Code review
+│   ├── qa/          # Quality assurance
+│   ├── documentation/ # Documentation generation
+│   ├── devops/      # Deployment & infrastructure
+│   └── git/         # Version control
+├── app/api/         # FastAPI application
+│   ├── routers/     # API endpoints
+│   ├── schemas/     # Request/response models
+│   ├── middleware/   # Logging, error handling
+│   └── exceptions/  # Custom error types
+├── graph/           # LangGraph workflow orchestration
+├── tools/           # 25+ tools (filesystem, git, Docker, RAG, etc.)
+├── rag/             # Retrieval-Augmented Generation
+├── memory/          # Agent memory (short-term, project, semantic)
+├── context/         # Context management (selection, compression, summarization)
+├── observability/   # Tracing, metrics, logging, cost tracking
+├── evals/           # Evaluation framework with 5 heuristic metrics
+└── infrastructure/  # Config, container, LLM providers, workspace
+```
+
+## Available Commands
+
+```bash
+make help           # Show all commands
+make install        # Install dependencies
+make run            # Start API server
+make test           # Run all tests
+make test-unit      # Run unit tests only
+make lint           # Run linter
+make typecheck      # Run type checker
+make format         # Format code
+make check          # Run all quality checks
+make docker-up      # Start Docker services
+make docker-down    # Stop Docker services
+```
+
+## Development
+
+### Code Quality
+
+- **Linting**: Ruff (configured in `pyproject.toml`)
+- **Formatting**: Black
+- **Type Checking**: mypy (strict mode)
+- **Testing**: pytest with coverage
+
+```bash
+make check   # Runs format-check + lint + typecheck + test
+```
+
+### Architecture
+
+The project follows a layered architecture:
+
+- **Agents** → depend on tools, memory, RAG, context, observability
+- **Tools** → depend on infrastructure (workspace, Docker, HTTP)
+- **Graph** → orchestrates agents via LangGraph
+- **API** → exposes agents via FastAPI
+- **Infrastructure** → config, container, LLM providers
+
+Run architecture validation:
+
+```bash
+make validate
+```
+
+## Tech Stack
+
+- **Orchestration**: LangGraph, LangChain
+- **LLM Providers**: OpenRouter, Ollama (OpenAI-compatible)
+- **API**: FastAPI, uvicorn
+- **Vector Store**: Qdrant (in-memory fallback)
+- **Cache**: Redis
+- **Observability**: OpenTelemetry, structlog
+- **Evaluation**: Custom heuristic metrics
+- **Containerization**: Docker, Docker Compose
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
