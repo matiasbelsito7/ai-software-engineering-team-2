@@ -16,12 +16,17 @@ if TYPE_CHECKING:
 def build_docker_tool(
     *,
     manager: DockerManager,
+    blocked_images: list[str] | None = None,
+    privileged: bool = False,
 ) -> DockerTool:
     """
     Build the Docker tool.
     """
 
-    policy = DockerPolicy()
+    policy = DockerPolicy(
+        blocked_images=blocked_images,
+        privileged=privileged,
+    )
 
     return DockerTool(
         manager=manager,

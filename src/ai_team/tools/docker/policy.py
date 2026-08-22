@@ -14,7 +14,22 @@ class DockerPolicy:
 
     BLOCKED_IMAGES: ClassVar[set[str]] = {
         "docker:dind",
+        "docker:latest",
     }
+
+    def __init__(
+        self,
+        *,
+        blocked_images: list[str] | None = None,
+        privileged: bool = False,
+    ) -> None:
+
+        self._blocked = self.BLOCKED_IMAGES.copy()
+
+        if blocked_images is not None:
+            self._blocked.update(blocked_images)
+
+        self._privileged = privileged
 
     def validate_operation(
         self,
@@ -32,7 +47,7 @@ class DockerPolicy:
         if not image:
             raise PermissionError("Image cannot be empty.")
 
-        if image in self.BLOCKED_IMAGES:
+        if image in self._blocked:
             raise PermissionError(f"Image '{image}' is blocked.")
 
     def validate_container(
@@ -42,3 +57,6 @@ class DockerPolicy:
 
         if not container_id:
             raise PermissionError("Container id cannot be empty.")
+
+    def is_privileged(self) -> bool:
+        return self._privileged

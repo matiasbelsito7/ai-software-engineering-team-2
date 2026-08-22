@@ -14,8 +14,6 @@ from ai_team.tools.models import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from ai_team.tools.docker.manager import DockerManager
     from ai_team.tools.docker.policy import DockerPolicy
 
@@ -43,31 +41,6 @@ class DockerTool(BaseTool):
         self._manager = manager
         self._policy = policy
 
-        self._operations: dict[
-            str,
-            Callable[[dict[str, Any]], ToolResult],
-        ] = {
-            "ping": lambda _: ToolResult(
-                success=True,
-                output=self._manager.ping(),
-            ),
-            "list_containers": lambda p: ToolResult(
-                success=True,
-                output=self._manager.list_containers(
-                    all=p.get("all", False),
-                ),
-            ),
-            "list_images": lambda _: ToolResult(
-                success=True,
-                output=self._manager.list_images(),
-            ),
-            "start": self._start,
-            "stop": self._stop,
-            "remove": self._remove,
-            "pull": self._pull,
-            "run": self._run,
-        }
-
     async def run(
         self,
         request: ToolRequest,
@@ -83,19 +56,16 @@ class DockerTool(BaseTool):
             operation,
         )
 
-        handler = self._operations.get(
-            operation,
-        )
-
-        if handler is None:
-            return ToolResult(
-                success=False,
-                error=f"Unknown operation '{operation}'.",
+        try:
+            return self._dispatch(
+                operation,
+                request.parameters,
             )
 
-        try:
-            return handler(
-                request.parameters,
+        except PermissionError as exc:
+            return ToolResult(
+                success=False,
+                error=str(exc),
             )
 
         except Exception as exc:
@@ -104,111 +74,202 @@ class DockerTool(BaseTool):
                 error=str(exc),
             )
 
+    def _dispatch(
+        self,
+        operation: str,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        handlers: dict[str, Any] = {
+            "ping": lambda: ToolResult(
+                success=True,
+                output=self._manager.ping(),
+            ),
+            "list_containers": lambda: ToolResult(
+                success=True,
+                output=self._manager.list_containers(
+                    all=params.get("all", False),
+                ),
+            ),
+            "list_images": lambda: ToolResult(
+                success=True,
+                output=self._manager.list_images(),
+            ),
+            "start": lambda: self._start(params),
+            "stop": lambda: self._stop(params),
+            "remove": lambda: self._remove(params),
+            "pull": lambda: self._pull(params),
+            "run": lambda: self._run(params),
+            "logs": lambda: self._logs(params),
+            "exec": lambda: self._exec(params),
+            "inspect": lambda: self._inspect(params),
+            "remove_image": lambda: self._remove_image(params),
+        }
+
+        handler = handlers.get(operation)
+
+        if handler is None:
+            return ToolResult(
+                success=False,
+                error=f"Unknown operation '{operation}'.",
+            )
+
+        return handler()  # type: ignore[no-any-return]
+
+    # ---------------------------------------------------------
+    # Container operations
     # ---------------------------------------------------------
 
     def _start(
         self,
-        parameters: dict[str, Any],
+        params: dict[str, Any],
     ) -> ToolResult:
 
-        container = parameters["container"]
+        container = params["container"]
 
-        self._policy.validate_container(
-            container,
-        )
+        self._policy.validate_container(container)
 
-        self._manager.start_container(
-            container,
-        )
+        self._manager.start_container(container)
 
-        return ToolResult(
-            success=True,
-        )
+        return ToolResult(success=True)
 
     def _stop(
         self,
-        parameters: dict[str, Any],
+        params: dict[str, Any],
     ) -> ToolResult:
 
-        container = parameters["container"]
+        container = params["container"]
 
-        self._policy.validate_container(
-            container,
-        )
+        self._policy.validate_container(container)
 
-        self._manager.stop_container(
-            container,
-        )
+        self._manager.stop_container(container)
 
-        return ToolResult(
-            success=True,
-        )
+        return ToolResult(success=True)
 
     def _remove(
         self,
-        parameters: dict[str, Any],
+        params: dict[str, Any],
     ) -> ToolResult:
 
-        container = parameters["container"]
+        container = params["container"]
 
-        self._policy.validate_container(
-            container,
-        )
+        self._policy.validate_container(container)
 
         self._manager.remove_container(
             container,
-            force=parameters.get(
-                "force",
-                False,
-            ),
+            force=params.get("force", False),
         )
 
-        return ToolResult(
-            success=True,
-        )
-
-    def _pull(
-        self,
-        parameters: dict[str, Any],
-    ) -> ToolResult:
-
-        image = parameters["image"]
-
-        self._policy.validate_image(
-            image,
-        )
-
-        self._manager.pull_image(
-            image,
-        )
-
-        return ToolResult(
-            success=True,
-        )
+        return ToolResult(success=True)
 
     def _run(
         self,
-        parameters: dict[str, Any],
+        params: dict[str, Any],
     ) -> ToolResult:
 
-        image = parameters["image"]
+        image = params["image"]
 
-        self._policy.validate_image(
-            image,
-        )
+        self._policy.validate_image(image)
 
         container = self._manager.run_container(
             image=image,
-            command=parameters.get(
-                "command",
-            ),
-            detach=parameters.get(
-                "detach",
-                True,
-            ),
+            command=params.get("command"),
+            detach=params.get("detach", True),
+            ports=params.get("ports"),
+            volumes=params.get("volumes"),
+            environment=params.get("environment"),
+            network=params.get("network"),
+            name=params.get("name"),
         )
 
         return ToolResult(
             success=True,
             output=container,
         )
+
+    def _logs(
+        self,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        container = params["container"]
+
+        self._policy.validate_container(container)
+
+        logs = self._manager.get_container_logs(
+            container,
+            tail=params.get("tail", 100),
+            since=params.get("since"),
+        )
+
+        return ToolResult(
+            success=True,
+            output={"logs": logs},
+        )
+
+    def _exec(
+        self,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        container = params["container"]
+
+        self._policy.validate_container(container)
+
+        result = self._manager.exec_in_container(
+            container,
+            command=params["command"],
+            workdir=params.get("workdir"),
+            user=params.get("user"),
+        )
+
+        return ToolResult(
+            success=result["exit_code"] == 0,
+            output=result,
+        )
+
+    def _inspect(
+        self,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        container = params["container"]
+
+        self._policy.validate_container(container)
+
+        info = self._manager.inspect_container(container)
+
+        return ToolResult(
+            success=True,
+            output=info,
+        )
+
+    # ---------------------------------------------------------
+    # Image operations
+    # ---------------------------------------------------------
+
+    def _pull(
+        self,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        image = params["image"]
+
+        self._policy.validate_image(image)
+
+        self._manager.pull_image(image)
+
+        return ToolResult(success=True)
+
+    def _remove_image(
+        self,
+        params: dict[str, Any],
+    ) -> ToolResult:
+
+        image = params["image"]
+
+        self._policy.validate_image(image)
+
+        self._manager.remove_image(image)
+
+        return ToolResult(success=True)

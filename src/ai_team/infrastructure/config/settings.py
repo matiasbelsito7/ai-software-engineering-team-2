@@ -22,6 +22,7 @@ from pydantic import BaseModel
 
 from ai_team.infrastructure.config.app import AppSettings
 from ai_team.infrastructure.config.database import DatabaseSettings
+from ai_team.infrastructure.config.docker import DockerSettings
 from ai_team.infrastructure.config.evaluation import EvaluationSettings
 from ai_team.infrastructure.config.http import HttpSettings
 from ai_team.infrastructure.config.llm import LLMSettings
@@ -38,6 +39,8 @@ class Settings(BaseModel):
     """
 
     app: AppSettings = AppSettings()
+
+    docker: DockerSettings = DockerSettings()
 
     llm: LLMSettings = LLMSettings()
 

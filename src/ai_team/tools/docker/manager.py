@@ -84,20 +84,96 @@ class DockerManager:
         image: str,
         command: str | None = None,
         detach: bool = True,
+        ports: dict[str, Any] | None = None,
+        volumes: dict[str, Any] | None = None,
+        environment: dict[str, str] | None = None,
+        network: str | None = None,
+        name: str | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
 
-        container = self._client.containers.run(
-            image=image,
-            command=command,
-            detach=detach,
-            **kwargs,
-        )
+        run_kwargs: dict[str, Any] = {
+            "image": image,
+            "command": command,
+            "detach": detach,
+        }
+
+        if ports is not None:
+            run_kwargs["ports"] = ports
+
+        if volumes is not None:
+            run_kwargs["volumes"] = volumes
+
+        if environment is not None:
+            run_kwargs["environment"] = environment
+
+        if network is not None:
+            run_kwargs["network"] = network
+
+        if name is not None:
+            run_kwargs["name"] = name
+
+        run_kwargs.update(kwargs)
+
+        container = self._client.containers.run(**run_kwargs)
 
         return {
             "id": container.id,
             "name": container.name,
         }
+
+    def get_container_logs(
+        self,
+        container_id: str,
+        *,
+        tail: int = 100,
+        since: str | None = None,
+    ) -> str:
+
+        container = self._client.containers.get(container_id)
+
+        raw: bytes = container.logs(
+            tail=tail,
+            since=since,
+        )
+
+        return raw.decode("utf-8", errors="replace")
+
+    def exec_in_container(
+        self,
+        container_id: str,
+        *,
+        command: str,
+        workdir: str | None = None,
+        user: str | None = None,
+    ) -> dict[str, Any]:
+
+        container = self._client.containers.get(container_id)
+
+        exit_code, output = container.exec_run(
+            cmd=command,
+            workdir=workdir,
+            user=user,
+            demux=True,
+        )
+
+        stdout = output[0].decode("utf-8", errors="replace") if output[0] else ""
+        stderr = output[1].decode("utf-8", errors="replace") if output[1] else ""
+
+        return {
+            "exit_code": exit_code,
+            "stdout": stdout,
+            "stderr": stderr,
+        }
+
+    def inspect_container(
+        self,
+        container_id: str,
+    ) -> dict[str, Any]:
+
+        container = self._client.containers.get(container_id)
+
+        return container.attrs  # type: ignore[no-any-return]
 
     # ------------------------------------------------------------------
     # Images
@@ -151,3 +227,12 @@ class DockerManager:
             )
         except DockerException:
             return False
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def close(self) -> None:
+        """Close the Docker client connection."""
+
+        self._client.close()

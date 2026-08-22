@@ -174,14 +174,18 @@ class Container:
         # Docker
         # ---------------------------------------------------------
 
+        from ai_team.infrastructure.config.settings import settings as app_settings
+
         self.docker_tool: DockerTool | None = None
-        self.docker_client: object = None
-        self.docker_manager: object = None
+        self.docker_client: Any = None
+        self.docker_manager: Any = None
 
         try:
             import docker
 
-            self.docker_client = docker.from_env()
+            self.docker_client = docker.from_env(
+                timeout=app_settings.docker.timeout,
+            )
 
             self.docker_manager = DockerManager(
                 client=self.docker_client,
@@ -189,6 +193,8 @@ class Container:
 
             self.docker_tool = build_docker_tool(
                 manager=self.docker_manager,
+                blocked_images=app_settings.docker.blocked_images,
+                privileged=app_settings.docker.privileged,
             )
         except Exception:
             self.docker_client = None
@@ -320,3 +326,6 @@ class Container:
 
             if shutdown is not None:
                 await shutdown()
+
+        if self.docker_manager is not None:
+            self.docker_manager.close()

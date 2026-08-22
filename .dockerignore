@@ -1,0 +1,59 @@
+# Version control
+.git
+.github
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist
+build
+.eggs
+
+# Virtual environments
+.venv
+venv
+env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.coverage.*
+
+# Type checking
+.mypy_cache
+.ruff_cache
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Docker (prevent recursive copies)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Workspace (mounted as volume)
+workspace/
+
+# Logs
+*.log
+logs/
