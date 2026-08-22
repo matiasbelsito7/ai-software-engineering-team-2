@@ -28,6 +28,7 @@ from ai_team.infrastructure.config.http import HttpSettings
 from ai_team.infrastructure.config.llm import LLMSettings
 from ai_team.infrastructure.config.qdrant import QdrantSettings
 from ai_team.infrastructure.config.redis import RedisSettings
+from ai_team.infrastructure.config.security import SecuritySettings
 from ai_team.infrastructure.config.telemetry import TelemetrySettings
 
 
@@ -55,6 +56,8 @@ class Settings(BaseModel):
     evaluation: EvaluationSettings = EvaluationSettings()
 
     http: HttpSettings = HttpSettings()
+
+    security: SecuritySettings = SecuritySettings()
 
 
 @lru_cache(maxsize=1)
