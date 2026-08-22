@@ -5,6 +5,7 @@ Base class for all AI agents.
 from __future__ import annotations
 
 import contextlib
+import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -12,6 +13,8 @@ from ai_team.agents.tool_policy import AgentToolPolicy
 from ai_team.memory.models import MemoryQuery
 from ai_team.rag.models import RetrievalQuery
 from ai_team.tools.models import ToolRequest, ToolResult
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from ai_team.agents.dependencies import AgentDependencies
@@ -287,6 +290,73 @@ class BaseAgent[T](ABC):
             self.capability,
             tool_name,
         )
+
+    # ------------------------------------------------------------------
+    # Feedback
+    # ------------------------------------------------------------------
+
+    async def request_feedback(
+        self,
+        execution: AgentExecution,
+        *,
+        feedback_type: str,
+        question: str,
+        context: str | None = None,
+        options: list[str] | None = None,
+    ) -> str:
+        """
+        Request feedback from the user during execution.
+
+        Returns the user's response string.
+        """
+        import uuid
+
+        from ai_team.agents.feedback import FeedbackRecord, FeedbackType
+
+        if execution.graph_state is None:
+            return ""
+
+        feedback_id = str(uuid.uuid4())
+        fb_type = FeedbackType(feedback_type)
+
+        record = FeedbackRecord(
+            feedback_id=feedback_id,
+            task_id=str(execution.graph_state.execution.execution_id),
+            agent=self.info.name,
+            feedback_type=fb_type,
+            question=question,
+            context=context,
+            options=options,
+            status="pending",
+        )
+
+        execution.graph_state.feedback.add_pending(record)
+
+        logger.info(
+            "Agent %s requested feedback: %s",
+            self.info.name,
+            question[:100],
+        )
+
+        # In a real implementation, this would wait for the user response
+        # For now, return the feedback_id for tracking
+        return feedback_id
+
+    def get_feedback_response(
+        self,
+        execution: AgentExecution,
+        feedback_id: str,
+    ) -> str | None:
+        """
+        Get the response to a previously requested feedback.
+        """
+        if execution.graph_state is None:
+            return None
+
+        for record in execution.graph_state.feedback.feedback_history:
+            if record.feedback_id == feedback_id:
+                return record.response
+        return None
 
     # ------------------------------------------------------------------
     # Public API

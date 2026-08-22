@@ -9,6 +9,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ai_team.agents.feedback_state import FeedbackState
+
 if TYPE_CHECKING:
     from ai_team.agents.result import AgentResult
     from ai_team.memory.models import MemoryContext
@@ -98,4 +100,8 @@ class GraphState(BaseModel):
 
     artifacts: ArtifactState = Field(
         default_factory=ArtifactState,
+    )
+
+    feedback: FeedbackState = Field(
+        default_factory=FeedbackState,
     )

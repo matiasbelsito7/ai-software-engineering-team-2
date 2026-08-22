@@ -22,6 +22,12 @@ from ai_team.agents.execution import (
     AgentStatus,
 )
 from ai_team.agents.factory import AgentFactory
+from ai_team.agents.feedback import (
+    AgentFeedback,
+    FeedbackRecord,
+    FeedbackResponse,
+    FeedbackType,
+)
 from ai_team.agents.info import AgentInfo
 from ai_team.agents.patches import (
     CodePatch,
@@ -44,52 +50,29 @@ __all__ = [
     "AgentConfigurationError",
     "AgentContext",
     "AgentDependencies",
-    # -----------------------------------------------------------------
-    # Exceptions
-    # -----------------------------------------------------------------
     "AgentError",
-    # -----------------------------------------------------------------
-    # Execution
-    # -----------------------------------------------------------------
     "AgentExecution",
     "AgentExecutionError",
     "AgentFactory",
-    # -----------------------------------------------------------------
-    # Metadata
-    # -----------------------------------------------------------------
+    "AgentFeedback",
     "AgentInfo",
     "AgentMetadata",
     "AgentNotFoundError",
     "AgentRegistrationError",
-    # -----------------------------------------------------------------
-    # Infrastructure
-    # -----------------------------------------------------------------
     "AgentRegistry",
     "AgentRequest",
-    # -----------------------------------------------------------------
-    # Result
-    # -----------------------------------------------------------------
     "AgentResult",
     "AgentStatus",
-    # -----------------------------------------------------------------
-    # Tool Calling
-    # -----------------------------------------------------------------
     "AgentToolCall",
     "AgentToolResult",
     "AgentValidationError",
-    # -----------------------------------------------------------------
-    # Base
-    # -----------------------------------------------------------------
     "BaseAgent",
     "CodePatch",
     "DependencyChange",
-    # -----------------------------------------------------------------
-    # Patches
-    # -----------------------------------------------------------------
+    "FeedbackRecord",
+    "FeedbackResponse",
+    "FeedbackType",
     "PatchOperation",
-    # -----------------------------------------------------------------
-    # Review
-    # -----------------------------------------------------------------
     "ReviewIssue",
     "ReviewSeverity",
     "ToolExecutionError",

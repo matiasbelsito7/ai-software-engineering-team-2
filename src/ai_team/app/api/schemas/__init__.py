@@ -2,6 +2,11 @@
 API schemas package.
 """
 
+from ai_team.app.api.schemas.feedback import (
+    FeedbackListResponse,
+    FeedbackRecordSchema,
+    FeedbackRequestSchema,
+)
 from ai_team.app.api.schemas.tasks import (
     AgentResultResponse,
     CreateTaskRequest,
@@ -28,6 +33,9 @@ __all__ = [
     "CreateTaskFromTemplateRequest",
     "CreateTaskRequest",
     "ErrorResponse",
+    "FeedbackListResponse",
+    "FeedbackRecordSchema",
+    "FeedbackRequestSchema",
     "HealthResponse",
     "StreamEvent",
     "TaskCompleteMessage",
