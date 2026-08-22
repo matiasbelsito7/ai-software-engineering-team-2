@@ -13,9 +13,18 @@ from ai_team.app.api.schemas.tasks import (
     TaskProgressMessage,
     TaskResponse,
 )
+from ai_team.app.api.schemas.templates import (
+    CreateTaskFromTemplateRequest,
+    TemplateListResponse,
+    TemplateParameterSchema,
+    TemplateRenderRequest,
+    TemplateRenderResponse,
+    TemplateResponse,
+)
 
 __all__ = [
     "AgentResultResponse",
+    "CreateTaskFromTemplateRequest",
     "CreateTaskRequest",
     "ErrorResponse",
     "HealthResponse",
@@ -24,4 +33,9 @@ __all__ = [
     "TaskListResponse",
     "TaskProgressMessage",
     "TaskResponse",
+    "TemplateListResponse",
+    "TemplateParameterSchema",
+    "TemplateRenderRequest",
+    "TemplateRenderResponse",
+    "TemplateResponse",
 ]
