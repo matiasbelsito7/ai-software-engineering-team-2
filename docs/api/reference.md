@@ -4,53 +4,100 @@ Base URL: `http://localhost:8000/api/v1`
 
 ## Authentication
 
-Currently, no authentication is required. CORS is configured to allow all origins by default.
+API key authentication is available via the `X-API-Key` header. Rate limiting is applied per IP address.
 
 ## Endpoints
 
-### Health Check
+### Core
 
-```
-GET /api/v1/health
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Health check |
+| `POST` | `/tasks` | Submit a task (202 Accepted) |
+| `GET` | `/tasks` | List tasks with pagination |
+| `GET` | `/tasks/{task_id}` | Get task status and results |
+| `DELETE` | `/tasks/{task_id}` | Delete a task |
+| `GET` | `/tasks/{task_id}/stream` | SSE streaming |
+| `GET` | `/tasks/{task_id}/feedback` | Get feedback |
+| `POST` | `/tasks/{task_id}/feedback/{id}` | Submit feedback |
+| `WS` | `/ws/tasks/{task_id}` | WebSocket progress |
 
-**Response** `200 OK`
+### Templates
 
-```json
-{
-  "status": "ok",
-  "version": "0.1.0",
-  "uptime_seconds": 123.45
-}
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/templates` | List all templates |
+| `GET` | `/templates/{template_id}` | Get template details |
+| `POST` | `/templates/{template_id}/render` | Render template |
+| `POST` | `/templates/{template_id}/create-task` | Create task from template |
 
----
+### Code Review
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/review` | Run automated code review |
+
+### Testing
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/tests/generate` | Generate test files |
+
+### Deployment
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/deployment/generate` | Generate CI/CD pipelines |
+
+### Knowledge Base
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/knowledge` | Add knowledge entry |
+| `GET` | `/knowledge` | List entries |
+| `GET` | `/knowledge/search` | Search knowledge |
+| `GET` | `/knowledge/{entry_id}` | Get entry |
+| `DELETE` | `/knowledge/{entry_id}` | Delete entry |
+| `GET` | `/knowledge/stats` | Knowledge statistics |
+
+### Orchestration
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/orchestration/plans` | Create orchestration plan |
+| `GET` | `/orchestration/plans` | List plans |
+| `GET` | `/orchestration/plans/{plan_id}` | Get plan |
+| `GET` | `/orchestration/plans/{plan_id}/result` | Get result |
+| `GET` | `/orchestration/plans/{plan_id}/execution-order` | Get execution stages |
+| `GET` | `/orchestration/plans/{plan_id}/runnable` | Get runnable tasks |
+| `DELETE` | `/orchestration/plans/{plan_id}` | Delete plan |
+
+### Cost Tracking
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/cost-tracking/records` | Record LLM usage |
+| `GET` | `/cost-tracking/summary` | Cost summary |
+| `GET` | `/cost-tracking/records` | List cost records |
+| `GET` | `/cost-tracking/stats` | Cost statistics |
+| `POST` | `/cost-tracking/alerts` | Create alert |
+| `GET` | `/cost-tracking/alerts` | List alerts |
+| `DELETE` | `/cost-tracking/alerts/{alert_id}` | Delete alert |
+| `POST` | `/cost-tracking/budgets` | Create budget |
+| `GET` | `/cost-tracking/budgets` | List budgets |
+| `DELETE` | `/cost-tracking/budgets/{budget_id}` | Delete budget |
+
+## Detailed Examples
 
 ### Create Task
 
-```
-POST /api/v1/tasks
-```
-
-Submit a task for execution. The task runs in the background. Use the returned `task_id` to poll status or subscribe via WebSocket.
-
-**Request Body**
-
-```json
-{
-  "task": "Build a REST API for user management",
-  "system_prompt": "Use FastAPI and SQLAlchemy",
-  "metadata": {"priority": "high"}
-}
+```bash
+curl -X POST http://localhost:8000/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"task": "Build a REST API for user management"}'
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `task` | string | Yes | Natural-language task description (1–10,000 chars) |
-| `system_prompt` | string | No | Optional system prompt override |
-| `metadata` | object | No | Arbitrary metadata attached to the task |
-
-**Response** `202 Accepted`
+Response `202 Accepted`:
 
 ```json
 {
@@ -61,162 +108,71 @@ Submit a task for execution. The task runs in the background. Use the returned `
 }
 ```
 
----
+### SSE Streaming
 
-### Get Task
-
-```
-GET /api/v1/tasks/{task_id}
+```bash
+curl -N http://localhost:8000/api/v1/tasks/{task_id}/stream
 ```
 
-Retrieve the current status and results of a task.
+Events: `task_start`, `agent_progress`, `task_complete`, `error`, `ping`
 
-**Path Parameters**
+### Code Review
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `task_id` | string | The task UUID |
-
-**Response** `200 OK`
-
-```json
-{
-  "task_id": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "completed",
-  "created_at": "2024-01-01T00:00:00+00:00",
-  "updated_at": "2024-01-01T00:05:00+00:00",
-  "results": [
-    {
-      "agent": "backend",
-      "success": true,
-      "output": {"files": ["api/users.py", "models/user.py"]},
-      "message": "Backend implementation completed",
-      "next_agent": "frontend",
-      "metadata": {}
-    }
-  ],
-  "files": {
-    "api/users.py": "from fastapi import APIRouter...",
-    "models/user.py": "from pydantic import BaseModel..."
-  },
-  "error": null
-}
+```bash
+curl -X POST http://localhost:8000/api/v1/review \
+  -H "Content-Type: application/json" \
+  -d '{"task_id": "...", "files": [{"file_path": "app.py", "content": "..."}]}'
 ```
 
-**Task Status Values**
+### Knowledge Base
 
-| Status | Description |
-|--------|-------------|
-| `pending` | Task created, waiting to start |
-| `running` | Task is being executed |
-| `completed` | Task finished successfully |
-| `failed` | Task failed with an error |
+```bash
+# Add entry
+curl -X POST http://localhost:8000/api/v1/knowledge \
+  -H "Content-Type: application/json" \
+  -d '{"entry_id": "auth", "title": "Authentication", "content": "...", "knowledge_type": "procedure", "tags": ["auth"]}'
 
----
-
-### List Tasks
-
-```
-GET /api/v1/tasks
+# Search
+curl "http://localhost:8000/api/v1/knowledge/search?q=authentication"
 ```
 
-List tasks with optional filtering and pagination.
+### Orchestration
 
-**Query Parameters**
+```bash
+# Create plan with dependencies
+curl -X POST http://localhost:8000/api/v1/orchestration/plans \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": "stack",
+    "name": "Full Stack",
+    "tasks": [
+      {"task_id": "api", "name": "API", "task_prompt": "Build API"},
+      {"task_id": "ui", "name": "UI", "task_prompt": "Build UI", "dependencies": ["api"]}
+    ]
+  }'
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `offset` | int | `0` | Pagination offset |
-| `limit` | int | `50` | Maximum items to return |
-| `status` | string | — | Filter by status |
-
-**Response** `200 OK`
-
-```json
-{
-  "tasks": [
-    {
-      "task_id": "...",
-      "status": "completed",
-      "created_at": "...",
-      "updated_at": "..."
-    }
-  ],
-  "total": 42,
-  "offset": 0,
-  "limit": 50
-}
+# Get execution order
+curl http://localhost:8000/api/v1/orchestration/plans/stack/execution-order
 ```
 
----
+### Cost Tracking
 
-### Delete Task
+```bash
+# Record usage
+curl -X POST http://localhost:8000/api/v1/cost-tracking/records \
+  -H "Content-Type: application/json" \
+  -d '{"record_id": "r1", "provider": "openai", "model": "gpt-4o", "input_tokens": 1000, "output_tokens": 500}'
 
+# Get summary
+curl "http://localhost:8000/api/v1/cost-tracking/summary"
+
+# Create budget
+curl -X POST http://localhost:8000/api/v1/cost-tracking/budgets \
+  -H "Content-Type: application/json" \
+  -d '{"budget_id": "monthly", "name": "Monthly", "limit": 100.0}'
 ```
-DELETE /api/v1/tasks/{task_id}
-```
-
-Delete a task and its results.
-
-**Response** `204 No Content`
-
----
-
-### WebSocket: Task Progress
-
-```
-WS /ws/tasks/{task_id}
-```
-
-Connect for real-time task progress updates.
-
-**Messages**
-
-Progress update:
-```json
-{
-  "type": "progress",
-  "task_id": "...",
-  "status": "running",
-  "agent": "backend",
-  "message": "Generating API endpoints",
-  "progress": 0.4,
-  "timestamp": "2024-01-01T00:00:00+00:00"
-}
-```
-
-Task complete:
-```json
-{
-  "type": "complete",
-  "task_id": "...",
-  "status": "completed",
-  "results": [...],
-  "files": {...},
-  "timestamp": "2024-01-01T00:05:00+00:00"
-}
-```
-
-Task failed:
-```json
-{
-  "type": "error",
-  "task_id": "...",
-  "error": "LLM provider unavailable",
-  "timestamp": "2024-01-01T00:01:00+00:00"
-}
-```
-
-Ping (keepalive, every 30s):
-```json
-{"type": "ping"}
-```
-
----
 
 ## Error Responses
-
-All errors follow a standard format:
 
 ```json
 {
@@ -225,13 +181,13 @@ All errors follow a standard format:
 }
 ```
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 404 | `task_not_found` | Task does not exist |
-| 409 | `task_conflict` | Task state conflict |
-| 422 | `validation_error` | Request validation failed |
+| Status | Error Code | Description |
+|--------|------------|-------------|
+| 404 | `task_not_found` | Resource not found |
+| 409 | `task_conflict` | State conflict |
+| 422 | `validation_error` | Validation failed |
 | 429 | `rate_limit_exceeded` | Too many requests |
-| 500 | `internal_error` | Unexpected server error |
+| 500 | `internal_error` | Server error |
 
 ## Interactive Documentation
 
