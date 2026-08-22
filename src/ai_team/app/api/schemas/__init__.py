@@ -2,6 +2,17 @@
 API schemas package.
 """
 
+from ai_team.app.api.schemas.cost_tracking import (
+    CostAlertRequest,
+    CostAlertSchema,
+    CostBudgetRequest,
+    CostBudgetSchema,
+    CostRecordRequest,
+    CostRecordSchema,
+    CostStatsResponse,
+    CostSummarySchema,
+    ModelPricingSchema,
+)
 from ai_team.app.api.schemas.deployment import (
     DeploymentPlanSchema,
     DeploymentRequestSchema,
@@ -11,6 +22,22 @@ from ai_team.app.api.schemas.feedback import (
     FeedbackListResponse,
     FeedbackRecordSchema,
     FeedbackRequestSchema,
+)
+from ai_team.app.api.schemas.knowledge import (
+    KnowledgeCreateRequest,
+    KnowledgeEntrySchema,
+    KnowledgeListResponse,
+    KnowledgeSearchResponse,
+    KnowledgeSearchResultSchema,
+    KnowledgeStatsSchema,
+)
+from ai_team.app.api.schemas.orchestration import (
+    OrchestrationListResponse,
+    OrchestrationPlanResponse,
+    OrchestrationPlanSchema,
+    OrchestrationResultSchema,
+    OrchestrationTaskSchema,
+    TaskExecutionStateSchema,
 )
 from ai_team.app.api.schemas.review import (
     ReviewFileSchema,
@@ -47,6 +74,14 @@ from ai_team.app.api.schemas.testing import (
 
 __all__ = [
     "AgentResultResponse",
+    "CostAlertRequest",
+    "CostAlertSchema",
+    "CostBudgetRequest",
+    "CostBudgetSchema",
+    "CostRecordRequest",
+    "CostRecordSchema",
+    "CostStatsResponse",
+    "CostSummarySchema",
     "CreateTaskFromTemplateRequest",
     "CreateTaskRequest",
     "DeploymentPlanSchema",
@@ -56,6 +91,18 @@ __all__ = [
     "FeedbackRecordSchema",
     "FeedbackRequestSchema",
     "HealthResponse",
+    "KnowledgeCreateRequest",
+    "KnowledgeEntrySchema",
+    "KnowledgeListResponse",
+    "KnowledgeSearchResponse",
+    "KnowledgeSearchResultSchema",
+    "KnowledgeStatsSchema",
+    "ModelPricingSchema",
+    "OrchestrationListResponse",
+    "OrchestrationPlanResponse",
+    "OrchestrationPlanSchema",
+    "OrchestrationResultSchema",
+    "OrchestrationTaskSchema",
     "PipelineFileSchema",
     "ReviewFileSchema",
     "ReviewInlineCommentSchema",
@@ -64,6 +111,7 @@ __all__ = [
     "StreamEvent",
     "TaskCompleteMessage",
     "TaskErrorMessage",
+    "TaskExecutionStateSchema",
     "TaskListResponse",
     "TaskProgressMessage",
     "TaskResponse",
