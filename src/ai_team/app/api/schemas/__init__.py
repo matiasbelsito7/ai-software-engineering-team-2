@@ -2,10 +2,21 @@
 API schemas package.
 """
 
+from ai_team.app.api.schemas.deployment import (
+    DeploymentPlanSchema,
+    DeploymentRequestSchema,
+    PipelineFileSchema,
+)
 from ai_team.app.api.schemas.feedback import (
     FeedbackListResponse,
     FeedbackRecordSchema,
     FeedbackRequestSchema,
+)
+from ai_team.app.api.schemas.review import (
+    ReviewFileSchema,
+    ReviewInlineCommentSchema,
+    ReviewRequestSchema,
+    ReviewResultSchema,
 )
 from ai_team.app.api.schemas.tasks import (
     AgentResultResponse,
@@ -27,16 +38,29 @@ from ai_team.app.api.schemas.templates import (
     TemplateRenderResponse,
     TemplateResponse,
 )
+from ai_team.app.api.schemas.testing import (
+    TestFileSchema,
+    TestGenerationRequestSchema,
+    TestGenerationResultSchema,
+    TestSuiteSchema,
+)
 
 __all__ = [
     "AgentResultResponse",
     "CreateTaskFromTemplateRequest",
     "CreateTaskRequest",
+    "DeploymentPlanSchema",
+    "DeploymentRequestSchema",
     "ErrorResponse",
     "FeedbackListResponse",
     "FeedbackRecordSchema",
     "FeedbackRequestSchema",
     "HealthResponse",
+    "PipelineFileSchema",
+    "ReviewFileSchema",
+    "ReviewInlineCommentSchema",
+    "ReviewRequestSchema",
+    "ReviewResultSchema",
     "StreamEvent",
     "TaskCompleteMessage",
     "TaskErrorMessage",
@@ -48,4 +72,8 @@ __all__ = [
     "TemplateRenderRequest",
     "TemplateRenderResponse",
     "TemplateResponse",
+    "TestFileSchema",
+    "TestGenerationRequestSchema",
+    "TestGenerationResultSchema",
+    "TestSuiteSchema",
 ]

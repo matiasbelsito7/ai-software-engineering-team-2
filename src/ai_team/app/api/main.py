@@ -23,11 +23,14 @@ from ai_team.app.api.middleware import (
     SecurityHeadersMiddleware,
 )
 from ai_team.app.api.routers import (
+    deployment_router,
     feedback_router,
     health_router,
+    review_router,
     streaming_router,
     tasks_router,
     templates_router,
+    testing_router,
     ws_router,
 )
 from ai_team.app.api.security.audit import SecurityAuditLogger
@@ -116,6 +119,9 @@ def create_app() -> FastAPI:
     application.include_router(templates_router, prefix=app_settings.api_prefix)
     application.include_router(streaming_router, prefix=app_settings.api_prefix)
     application.include_router(feedback_router, prefix=app_settings.api_prefix)
+    application.include_router(review_router, prefix=app_settings.api_prefix)
+    application.include_router(testing_router, prefix=app_settings.api_prefix)
+    application.include_router(deployment_router, prefix=app_settings.api_prefix)
     application.include_router(ws_router, prefix=app_settings.api_prefix)
 
     return application
