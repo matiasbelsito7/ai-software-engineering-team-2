@@ -391,6 +391,8 @@ ignore_missing_imports = true
 module = [
     "docker",
     "docker.*",
+    "qdrant_client",
+    "qdrant_client.*",
 ]
 
 follow_imports = "skip"
