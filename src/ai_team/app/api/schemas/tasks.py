@@ -189,3 +189,24 @@ class TaskErrorMessage(BaseModel):
     timestamp: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat(),
     )
+
+
+# =====================================================================
+# SSE Streaming Events
+# =====================================================================
+
+
+class StreamEvent(BaseModel):
+    """SSE event sent during task streaming."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    event: str = Field(
+        ...,
+        description="Event type: agent_start, agent_progress, agent_complete, task_complete, error, ping",
+    )
+    task_id: str
+    data: dict[str, Any] = Field(default_factory=dict)
+    timestamp: str = Field(
+        default_factory=lambda: datetime.utcnow().isoformat(),
+    )

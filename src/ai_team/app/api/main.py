@@ -24,6 +24,7 @@ from ai_team.app.api.middleware import (
 )
 from ai_team.app.api.routers import (
     health_router,
+    streaming_router,
     tasks_router,
     templates_router,
     ws_router,
@@ -112,6 +113,7 @@ def create_app() -> FastAPI:
     application.include_router(health_router, prefix=app_settings.api_prefix)
     application.include_router(tasks_router, prefix=app_settings.api_prefix)
     application.include_router(templates_router, prefix=app_settings.api_prefix)
+    application.include_router(streaming_router, prefix=app_settings.api_prefix)
     application.include_router(ws_router, prefix=app_settings.api_prefix)
 
     return application
