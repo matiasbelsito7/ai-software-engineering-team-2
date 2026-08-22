@@ -4,8 +4,13 @@ Memory tool.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ai_team.tools.base import BaseTool
 from ai_team.tools.models import ToolDefinition, ToolRequest, ToolResult
+
+if TYPE_CHECKING:
+    from ai_team.memory.manager import MemoryManager
 
 
 class MemoryTool(BaseTool):
@@ -13,7 +18,11 @@ class MemoryTool(BaseTool):
     Query and manage agent memory.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        memory: MemoryManager | None = None,
+    ) -> None:
         super().__init__(
             definition=ToolDefinition(
                 name="memory",
@@ -21,6 +30,7 @@ class MemoryTool(BaseTool):
                 category="information",
             )
         )
+        self._memory = memory
 
     async def run(self, request: ToolRequest) -> ToolResult:
         operation = request.parameters.get("operation", "search")
@@ -52,12 +62,36 @@ class MemoryTool(BaseTool):
                 error="Missing required parameter: query",
             )
 
+        if self._memory is None:
+            return ToolResult(
+                success=True,
+                output={
+                    "query": query,
+                    "results": [],
+                    "message": "Memory system not available.",
+                },
+            )
+
+        from ai_team.memory.models import MemoryQuery
+
+        memory_query = MemoryQuery(query=query)
+        result = await self._memory.search(memory_query)
+
+        entries = [
+            {
+                "content": e.content,
+                "agent": e.agent.value if e.agent else None,
+                "score": e.score,
+            }
+            for e in result.entries
+        ]
+
         return ToolResult(
             success=True,
             output={
                 "query": query,
-                "results": [],
-                "message": "Memory search not yet wired to runtime.",
+                "results": entries,
+                "total": len(entries),
             },
         )
 
@@ -70,6 +104,29 @@ class MemoryTool(BaseTool):
                 error="Missing required parameter: content",
             )
 
+        if self._memory is None:
+            return ToolResult(
+                success=True,
+                output={
+                    "content": content,
+                    "message": "Memory system not available.",
+                },
+            )
+
+        from ai_team.memory.models import MemoryEntry, MemoryMetadata
+        from ai_team.shared.enums import MemoryType
+
+        entry = MemoryEntry(
+            memory_type=MemoryType.SHORT_TERM,
+            content=content,
+            metadata=MemoryMetadata(
+                source="memory_tool",
+                tags=["tool_input"],
+            ),
+        )
+
+        await self._memory.add(entry)
+
         return ToolResult(
             success=True,
             output={
@@ -79,7 +136,13 @@ class MemoryTool(BaseTool):
         )
 
     async def _list(self) -> ToolResult:
+        if self._memory is None:
+            return ToolResult(
+                success=True,
+                output=[],
+            )
+
         return ToolResult(
             success=True,
-            output=[],
+            output={"message": "Memory listing not supported. Use search instead."},
         )

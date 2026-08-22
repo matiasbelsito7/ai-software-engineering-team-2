@@ -48,7 +48,9 @@ from ai_team.tools.executor import ToolExecutor
 from ai_team.tools.filesystem import FilesystemTool
 from ai_team.tools.git import GitTool
 from ai_team.tools.manager import ToolManager
+from ai_team.tools.memory_tool import MemoryTool
 from ai_team.tools.python import PythonTool
+from ai_team.tools.rag_tool import RAGTool
 from ai_team.tools.terminal import TerminalTool
 
 if TYPE_CHECKING:
@@ -202,8 +204,39 @@ class Container:
         ):
             self.tool_manager.register(tool)
 
+        rag_tool = RAGTool(rag=self.rag)
+        self.tool_manager.register(rag_tool)
+
+        memory_tool = MemoryTool(memory=self.memory)
+        self.tool_manager.register(memory_tool)
+
         if self.docker_tool is not None:
             self.tool_manager.register(self.docker_tool)
+
+        # HTTP tool
+        try:
+            import httpx
+
+            from ai_team.tools.http.factory import build_http_tool
+            from ai_team.tools.http.manager import HttpManager
+
+            http_client = httpx.AsyncClient()
+            http_manager = HttpManager(client=http_client)
+            http_tool = build_http_tool(manager=http_manager)
+            self.tool_manager.register(http_tool)
+        except Exception:
+            pass
+
+        # Browser tool
+        try:
+            from ai_team.tools.browser.factory import build_browser_tool
+            from ai_team.tools.browser.manager import BrowserManager
+
+            browser_manager = BrowserManager()
+            browser_tool = build_browser_tool(manager=browser_manager)
+            self.tool_manager.register(browser_tool)
+        except Exception:
+            pass
 
         self.tool_executor = ToolExecutor(
             manager=self.tool_manager,

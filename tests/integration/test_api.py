@@ -30,7 +30,7 @@ async def client():
 @pytest.mark.asyncio
 class TestHealthEndpoint:
     async def test_health(self, client: AsyncClient):
-        response = await client.get("/health")
+        response = await client.get("/api/v1/health")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "ok"
@@ -44,13 +44,13 @@ class TestHealthEndpoint:
 @pytest.mark.asyncio
 class TestTaskEndpoint:
     async def test_get_task_not_implemented(self, client: AsyncClient):
-        response = await client.get("/tasks/some-id")
+        response = await client.get("/api/v1/tasks/some-id")
         assert response.status_code == 501
 
     async def test_post_task_empty_request(self, client: AsyncClient):
-        response = await client.post("/tasks", json={})
+        response = await client.post("/api/v1/tasks", json={})
         assert response.status_code == 422
 
     async def test_post_task_invalid_body(self, client: AsyncClient):
-        response = await client.post("/tasks", json={"invalid_field": "value"})
+        response = await client.post("/api/v1/tasks", json={"invalid_field": "value"})
         assert response.status_code == 422

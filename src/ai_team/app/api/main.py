@@ -11,14 +11,18 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 
 from ai_team.app.api.lifespan import lifespan
+from ai_team.infrastructure.config.app import AppSettings
 
 if TYPE_CHECKING:
     from ai_team.graph.state import GraphState
 
 logger = logging.getLogger(__name__)
+
+settings = AppSettings()
 
 # =====================================================================
 # API schemas
@@ -78,8 +82,19 @@ class HealthResponse(BaseModel):
 
 app = FastAPI(
     title="AI Software Engineering Team",
-    version="0.1.0",
+    version=settings.version,
+    docs_url=settings.docs_url,
+    redoc_url=settings.redoc_url,
+    openapi_url=settings.openapi_url,
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.allowed_origins,
+    allow_methods=settings.allowed_methods,
+    allow_headers=settings.allowed_headers,
+    allow_credentials=settings.allow_credentials,
 )
 
 
@@ -88,14 +103,14 @@ app = FastAPI(
 # =====================================================================
 
 
-@app.get("/health", response_model=HealthResponse)
+@app.get(f"{settings.api_prefix}/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
     """Health check endpoint."""
 
     return HealthResponse()
 
 
-@app.post("/tasks", response_model=TaskResponse)
+@app.post(f"{settings.api_prefix}/tasks", response_model=TaskResponse)
 async def run_task(
     request: TaskRequest,
     raw: Request,
@@ -130,7 +145,7 @@ async def run_task(
     )
 
 
-@app.get("/tasks/{task_id}", response_model=TaskResponse)
+@app.get(f"{settings.api_prefix}/tasks/{{task_id}}", response_model=TaskResponse)
 async def get_task(
     task_id: str,
     raw: Request,
