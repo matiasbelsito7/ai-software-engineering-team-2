@@ -83,6 +83,7 @@ async def _run_task_background(
     task: str,
     system_prompt: str | None,
     graph: Any,
+    container: Any = None,
 ) -> None:
     """Execute the agent graph in the background."""
     try:
@@ -94,6 +95,12 @@ async def _run_task_background(
             agent="planner",
             message="Task started",
         )
+
+        if container is not None:
+            container.set_approval_context(
+                task_store=task_store,
+                task_id=task_id,
+            )
 
         initial = _build_initial_state(
             task=task,
@@ -132,6 +139,13 @@ async def _run_task_background(
             error=str(exc),
         )
 
+    finally:
+        if container is not None:
+            container.set_approval_context(
+                task_store=None,
+                task_id=None,
+            )
+
 
 @router.post(
     "/tasks",
@@ -159,6 +173,7 @@ async def create_task(
     )
 
     graph: Any = getattr(request.app.state, "graph", None)
+    container: Any = getattr(request.app.state, "container", None)
 
     if graph is not None:
         background_tasks.add_task(
@@ -168,6 +183,7 @@ async def create_task(
             task=request_body.task,
             system_prompt=request_body.system_prompt,
             graph=graph,
+            container=container,
         )
 
     return TaskResponse(

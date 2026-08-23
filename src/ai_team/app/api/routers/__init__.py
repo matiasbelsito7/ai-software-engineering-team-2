@@ -2,6 +2,7 @@
 API routers package.
 """
 
+from ai_team.app.api.routers.approvals import router as approvals_router
 from ai_team.app.api.routers.cost_tracking import router as cost_tracking_router
 from ai_team.app.api.routers.deployment import router as deployment_router
 from ai_team.app.api.routers.feedback import router as feedback_router
@@ -16,6 +17,7 @@ from ai_team.app.api.routers.testing import router as testing_router
 from ai_team.app.api.routers.ws import router as ws_router
 
 __all__ = [
+    "approvals_router",
     "cost_tracking_router",
     "deployment_router",
     "feedback_router",

@@ -22,6 +22,15 @@ API key authentication is available via the `X-API-Key` header. Rate limiting is
 | `POST` | `/tasks/{task_id}/feedback/{id}` | Submit feedback |
 | `WS` | `/ws/tasks/{task_id}` | WebSocket progress |
 
+### Approvals (Human-in-the-Loop)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/tasks/{task_id}/approvals` | Get pending approvals for a task |
+| `POST` | `/tasks/{task_id}/approvals/{approval_id}` | Approve or reject a command |
+
+See [Human-in-the-Loop Guide](../guides/human-in-the-loop.md) for details.
+
 ### Templates
 
 | Method | Path | Description |

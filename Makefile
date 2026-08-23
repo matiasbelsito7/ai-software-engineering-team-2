@@ -57,6 +57,35 @@ run: ## Start the API server
 	$(UV) run uvicorn ai_team.app.api.main:app --reload --host 0.0.0.0 --port 8000
 
 ################################################################################
+# Frontend
+################################################################################
+
+.PHONY: frontend-install
+
+frontend-install: ## Install frontend dependencies
+	cd frontend && npm install
+
+.PHONY: frontend-dev
+
+frontend-dev: ## Start frontend dev server
+	cd frontend && npm run dev
+
+.PHONY: frontend-build
+
+frontend-build: ## Build frontend for production
+	cd frontend && npm run build
+
+.PHONY: frontend-preview
+
+frontend-preview: ## Preview frontend production build
+	cd frontend && npm run preview
+
+.PHONY: frontend-lint
+
+frontend-lint: ## Run frontend linter
+	cd frontend && npm run lint
+
+################################################################################
 # Cleaning
 ################################################################################
 

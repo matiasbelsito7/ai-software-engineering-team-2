@@ -55,10 +55,12 @@ class TestTemplatesAPI:
         assert data["name"] == "CRUD REST API"
 
     async def test_get_template_not_found(self, client: AsyncClient) -> None:
+        await asyncio.sleep(1.5)
         response = await client.get("/api/v1/templates/nonexistent")
         assert response.status_code == 404
 
     async def test_render_template(self, client: AsyncClient) -> None:
+        await asyncio.sleep(1.5)
         response = await client.post(
             "/api/v1/templates/crud_api/render",
             json={"params": {"resource_name": "User", "fields": "name,email"}},
@@ -69,6 +71,7 @@ class TestTemplatesAPI:
         assert "User" in data["task"]
 
     async def test_render_template_invalid_params(self, client: AsyncClient) -> None:
+        await asyncio.sleep(1.5)
         response = await client.post(
             "/api/v1/templates/crud_api/render",
             json={"params": {}},

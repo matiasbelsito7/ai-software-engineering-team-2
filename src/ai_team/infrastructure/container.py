@@ -329,3 +329,18 @@ class Container:
 
         if self.docker_manager is not None:
             self.docker_manager.close()
+
+    def set_approval_context(
+        self,
+        *,
+        task_store: Any = None,
+        task_id: str | None = None,
+        agent: str | None = None,
+    ) -> None:
+        """Set human-in-the-loop approval context on the terminal tool."""
+
+        self.terminal_tool.set_approval_context(
+            task_store=task_store,
+            task_id=task_id,
+            agent=agent,
+        )

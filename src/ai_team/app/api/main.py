@@ -23,6 +23,7 @@ from ai_team.app.api.middleware import (
     SecurityHeadersMiddleware,
 )
 from ai_team.app.api.routers import (
+    approvals_router,
     cost_tracking_router,
     deployment_router,
     feedback_router,
@@ -119,6 +120,7 @@ def create_app() -> FastAPI:
     # --- Routers ---
     application.include_router(health_router, prefix=app_settings.api_prefix)
     application.include_router(tasks_router, prefix=app_settings.api_prefix)
+    application.include_router(approvals_router, prefix=app_settings.api_prefix)
     application.include_router(templates_router, prefix=app_settings.api_prefix)
     application.include_router(streaming_router, prefix=app_settings.api_prefix)
     application.include_router(feedback_router, prefix=app_settings.api_prefix)

@@ -5,6 +5,7 @@ This guide walks you through setting up and running the AI Software Engineering 
 ## Prerequisites
 
 - **Python 3.12+**
+- **Node.js 18+** (for frontend)
 - **uv** — Fast Python package manager ([install](https://docs.astral.sh/uv/getting-started/installation/))
 - **Docker & Docker Compose** (optional, for containerized deployment)
 
@@ -53,6 +54,23 @@ The API is now available at:
 - **API**: http://localhost:8000/api/v1
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
+
+## Running the Frontend
+
+```bash
+# Install frontend dependencies
+make frontend-install
+
+# Start frontend dev server (http://localhost:5173)
+make frontend-dev
+```
+
+The frontend provides a web UI for:
+- Creating and managing tasks
+- Viewing real-time progress via WebSocket
+- Approving/rejecting commands (Human-in-the-Loop)
+- Managing templates and knowledge base
+- Monitoring costs
 
 ## Running with Docker
 
@@ -114,4 +132,5 @@ make help       # Show all available commands
 - [Architecture Overview](architecture/overview.md) — Understand the system design
 - [API Reference](api/reference.md) — Detailed API documentation
 - [Configuration](configuration.md) — All configuration options
+- [Human-in-the-Loop](guides/human-in-the-loop.md) — Command approval system
 - [Deployment](deployment.md) — Production deployment guide

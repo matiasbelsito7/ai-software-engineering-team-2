@@ -122,6 +122,8 @@ class TaskStore:
         self._tasks: dict[str, TaskRecord] = {}
         self._lock: asyncio.Lock = asyncio.Lock()
         self._subscribers: dict[str, list[asyncio.Queue[Any]]] = {}
+        self._pending_approvals: dict[str, dict[str, dict[str, Any]]] = {}
+        self._approval_events: dict[str, asyncio.Event] = {}
 
     async def create(
         self,
@@ -301,3 +303,114 @@ class TaskStore:
                     "Subscriber queue full for task %s, dropping message",
                     task_id,
                 )
+
+    # ------------------------------------------------------------------
+    # Approval (human-in-the-loop)
+    # ------------------------------------------------------------------
+
+    async def request_approval(
+        self,
+        task_id: str,
+        *,
+        approval_id: str,
+        command: str,
+        agent: str | None = None,
+        description: str | None = None,
+    ) -> None:
+        """Store a pending approval and notify subscribers."""
+
+        approval_record = {
+            "approval_id": approval_id,
+            "task_id": task_id,
+            "command": command,
+            "agent": agent,
+            "description": description,
+            "status": "pending",
+        }
+
+        async with self._lock:
+            if task_id not in self._pending_approvals:
+                self._pending_approvals[task_id] = {}
+
+            self._pending_approvals[task_id][approval_id] = approval_record
+
+            event = asyncio.Event()
+            self._approval_events[approval_id] = event
+
+        await self._notify(
+            task_id,
+            {
+                "type": "approval_request",
+                "task_id": task_id,
+                "approval_id": approval_id,
+                "command": command,
+                "agent": agent,
+                "description": description,
+            },
+        )
+
+    async def wait_approval(
+        self,
+        approval_id: str,
+        *,
+        timeout: float = 300.0,
+    ) -> bool:
+        """Block until the approval is resolved or timeout."""
+
+        event = self._approval_events.get(approval_id)
+
+        if event is None:
+            return False
+
+        try:
+            await asyncio.wait_for(event.wait(), timeout=timeout)
+        except TimeoutError:
+            return False
+
+        return True
+
+    async def resolve_approval(
+        self,
+        task_id: str,
+        *,
+        approval_id: str,
+        approved: bool,
+    ) -> dict[str, Any] | None:
+        """Resolve a pending approval and notify subscribers."""
+
+        async with self._lock:
+            task_approvals = self._pending_approvals.get(task_id, {})
+            record = task_approvals.pop(approval_id, None)
+
+            event = self._approval_events.pop(approval_id, None)
+
+        if record is None:
+            return None
+
+        record["status"] = "approved" if approved else "rejected"
+
+        if event is not None:
+            event.set()
+
+        await self._notify(
+            task_id,
+            {
+                "type": "approval_response",
+                "task_id": task_id,
+                "approval_id": approval_id,
+                "approved": approved,
+                "command": record["command"],
+            },
+        )
+
+        return record
+
+    async def get_pending_approvals(
+        self,
+        task_id: str,
+    ) -> list[dict[str, Any]]:
+        """Return all pending approvals for a task."""
+
+        async with self._lock:
+            task_approvals = self._pending_approvals.get(task_id, {})
+            return list(task_approvals.values())
