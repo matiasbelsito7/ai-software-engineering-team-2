@@ -123,8 +123,8 @@ class DatabaseSettings(BaseSettings):
     # URL
     ###########################################################################
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
-    @computed_field
     def url(self) -> str:
         """
         SQLAlchemy async connection URL.
