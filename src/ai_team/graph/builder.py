@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from ai_team.agents.planner.agent import PlannerAgent
     from ai_team.agents.qa.agent import QAAgent
     from ai_team.agents.reviewer.agent import ReviewerAgent
+    from ai_team.agents.spec.agent import SpecAgent
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +115,15 @@ def _make_agent_node(
             execution.result,
         )
 
+        # Store spec output in state for downstream agents
+        if (
+            agent.info.name == "spec"
+            and execution.result is not None
+            and execution.result.success
+            and execution.result.output is not None
+        ):
+            state.specification = execution.result.output
+
         state.execution.current_agent = agent.info.name
         state.execution.previous_agent = state.execution.current_agent
 
@@ -130,6 +140,7 @@ class GraphBuilder:
     def __init__(
         self,
         *,
+        spec: SpecAgent,
         planner: PlannerAgent,
         architect: ArchitectAgent,
         backend: BackendAgent,
@@ -141,6 +152,7 @@ class GraphBuilder:
         git: GitAgent,
     ) -> None:
 
+        self._spec = spec
         self._planner = planner
         self._architect = architect
         self._backend = backend
@@ -161,6 +173,11 @@ class GraphBuilder:
         # -----------------------------------------------------
         # Nodes
         # -----------------------------------------------------
+
+        graph.add_node(
+            WorkflowNode.SPEC,
+            _make_agent_node(self._spec),
+        )
 
         graph.add_node(
             WorkflowNode.PLANNER,
@@ -219,6 +236,11 @@ class GraphBuilder:
         # -----------------------------------------------------
         # Sequential edges
         # -----------------------------------------------------
+
+        graph.add_edge(
+            WorkflowNode.SPEC,
+            WorkflowNode.PLANNER,
+        )
 
         graph.add_edge(
             WorkflowNode.PLANNER,

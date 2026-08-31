@@ -13,6 +13,7 @@ from ai_team.agents.feedback_state import FeedbackState
 
 if TYPE_CHECKING:
     from ai_team.agents.result import AgentResult
+    from ai_team.agents.spec.models import AppSpecification
     from ai_team.memory.models import MemoryContext
     from ai_team.rag.models import RAGContext
 
@@ -147,3 +148,5 @@ class GraphState(BaseModel):
     budget: BudgetState = Field(
         default_factory=BudgetState,
     )
+
+    specification: AppSpecification | None = None

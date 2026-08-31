@@ -16,6 +16,8 @@ class WorkflowNode(StrEnum):
     Workflow node names.
     """
 
+    SPEC = "spec"
+
     PLANNER = "planner"
 
     ARCHITECT = "architect"
@@ -48,11 +50,18 @@ class Workflow:
         Entry point of the workflow.
         """
 
-        return WorkflowNode.PLANNER
+        return WorkflowNode.SPEC
 
     # ---------------------------------------------------------
     # Sequential transitions
     # ---------------------------------------------------------
+
+    @staticmethod
+    def spec(
+        state: GraphState,
+    ) -> str:
+
+        return WorkflowNode.PLANNER
 
     @staticmethod
     def planner(

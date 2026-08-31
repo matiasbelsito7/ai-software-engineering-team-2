@@ -19,6 +19,7 @@ from ai_team.agents.git.agent import GitAgent
 from ai_team.agents.planner.agent import PlannerAgent
 from ai_team.agents.qa.agent import QAAgent
 from ai_team.agents.reviewer.agent import ReviewerAgent
+from ai_team.agents.spec.agent import SpecAgent
 from ai_team.agents.tools import AgentTools
 
 # ------------------------------------------------------------------
@@ -265,6 +266,10 @@ class Container:
             memory=self.memory,
             rag=self.rag,
             observability=self.observation,
+        )
+
+        self.spec = SpecAgent(
+            dependencies=self.agent_deps,
         )
 
         self.planner = PlannerAgent(

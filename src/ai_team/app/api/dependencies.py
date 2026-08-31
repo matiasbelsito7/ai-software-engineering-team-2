@@ -39,6 +39,7 @@ def get_graph() -> Any:
     container = get_container()
 
     builder = GraphBuilder(
+        spec=container.spec,
         planner=container.planner,
         architect=container.architect,
         backend=container.backend,
