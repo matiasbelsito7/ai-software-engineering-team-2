@@ -278,4 +278,4 @@ async def delete_project(
     try:
         await project_service.delete(project_id, current_user.id)
     except ProjectError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
