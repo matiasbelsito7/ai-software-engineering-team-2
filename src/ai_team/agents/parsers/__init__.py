@@ -11,6 +11,7 @@ from ai_team.agents.parsers.frontend import FrontendParser
 from ai_team.agents.parsers.planner import PlannerParser
 from ai_team.agents.parsers.qa import QAParser
 from ai_team.agents.parsers.reviewer import ReviewerParser
+from ai_team.agents.parsers.spec import SpecParser
 
 __all__ = [
     "ArchitectParser",
@@ -22,4 +23,5 @@ __all__ = [
     "PlannerParser",
     "QAParser",
     "ReviewerParser",
+    "SpecParser",
 ]

@@ -12,6 +12,8 @@ class AgentCapability(StrEnum):
     Capabilities supported by the agent system.
     """
 
+    SPEC = "spec"
+
     PLANNER = "planner"
 
     ARCHITECT = "architect"
