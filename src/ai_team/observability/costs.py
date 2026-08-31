@@ -22,9 +22,7 @@ class BudgetExhaustedError(Exception):
     def __init__(self, tokens_used: int, budget: int) -> None:
         self.tokens_used = tokens_used
         self.budget = budget
-        super().__init__(
-            f"Budget exhausted: {tokens_used}/{budget} tokens used"
-        )
+        super().__init__(f"Budget exhausted: {tokens_used}/{budget} tokens used")
 
 
 class CostTracker:

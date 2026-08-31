@@ -120,11 +120,13 @@ class AuthService:
             "exp": expire,
             "iat": datetime.now(timezone.utc),  # noqa: UP017
         }
-        return str(jwt.encode(
-            payload,
-            security_settings.jwt_secret,
-            algorithm=security_settings.jwt_algorithm,
-        ))
+        return str(
+            jwt.encode(
+                payload,
+                security_settings.jwt_secret,
+                algorithm=security_settings.jwt_algorithm,
+            )
+        )
 
     @staticmethod
     def create_refresh_token(user_id: str) -> str:
@@ -139,11 +141,13 @@ class AuthService:
             "iat": datetime.now(timezone.utc),  # noqa: UP017
             "jti": str(uuid.uuid4()),
         }
-        return str(jwt.encode(
-            payload,
-            security_settings.jwt_secret,
-            algorithm=security_settings.jwt_algorithm,
-        ))
+        return str(
+            jwt.encode(
+                payload,
+                security_settings.jwt_secret,
+                algorithm=security_settings.jwt_algorithm,
+            )
+        )
 
     @staticmethod
     def decode_token(token: str) -> dict[str, Any]:

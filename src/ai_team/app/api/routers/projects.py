@@ -205,9 +205,7 @@ async def get_project_stats(
     tier_config = get_tier("free")  # default tier
     total_projects = stats["total_projects"]
     max_projects = tier_config.max_projects
-    projects_remaining = (
-        None if max_projects == -1 else max(0, max_projects - total_projects)
-    )
+    projects_remaining = None if max_projects == -1 else max(0, max_projects - total_projects)
 
     return ProjectStatsResponse(
         total_projects=total_projects,

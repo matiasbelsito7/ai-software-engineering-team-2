@@ -60,8 +60,7 @@ class BudgetExhaustedError(ProjectError):
 
     def __init__(self, tokens_used: int, budget: int) -> None:
         super().__init__(
-            f"Token budget exhausted ({tokens_used}/{budget}). "
-            "Upgrade your plan to continue.",
+            f"Token budget exhausted ({tokens_used}/{budget}). " "Upgrade your plan to continue.",
             "BUDGET_EXHAUSTED",
         )
 
