@@ -154,12 +154,16 @@ class ProjectService:
         user_id: uuid.UUID,
         *,
         name: str | None = None,
+        files_path: str | None = None,
     ) -> Project:
         """Update a project."""
         project = await self.get(project_id, user_id)
 
         if name is not None:
             project.name = name
+
+        if files_path is not None:
+            project.files_path = files_path
 
         await self.session.commit()
         await self.session.refresh(project)
