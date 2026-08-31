@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import CreateProject from './pages/CreateProject';
 import CreateTask from './pages/CreateTask';
 import TaskDetail from './pages/TaskDetail';
 import Templates from './pages/Templates';
@@ -21,6 +22,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/projects/new" element={<CreateProject />} />
               <Route path="/tasks/new" element={<CreateTask />} />
               <Route path="/tasks/:taskId" element={<TaskDetail />} />
               <Route path="/templates" element={<Templates />} />

@@ -12,7 +12,7 @@ import {
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/tasks/new', label: 'New Task', icon: PlusCircle },
+  { to: '/projects/new', label: 'New Project', icon: PlusCircle },
   { to: '/templates', label: 'Templates', icon: FileText },
   { to: '/knowledge', label: 'Knowledge', icon: BookOpen },
   { to: '/costs', label: 'Costs', icon: DollarSign },

@@ -120,3 +120,47 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+// Tier types
+export interface TierInfo {
+  name: string;
+  display_name: string;
+  price_monthly: number;
+  tokens_per_project: number;
+  max_iterations: number;
+  max_projects: number;
+  retention_days: number;
+  can_download_code: boolean;
+}
+
+// Project types
+export type ProjectStatus = 'pending' | 'generating' | 'completed' | 'failed' | 'cancelled';
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  tier: string;
+  tokens_used: number;
+  iterations_used: number;
+  status: ProjectStatus;
+  files_path: string | null;
+  created_at: string;
+  updated_at: string;
+  expires_at: string;
+}
+
+export interface ProjectListResponse {
+  projects: Project[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+export interface ProjectStats {
+  total_projects: number;
+  projects_by_status: Record<string, number>;
+  total_tokens_used: number;
+  current_tier: string;
+  projects_remaining: number | null;
+}

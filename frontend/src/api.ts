@@ -13,6 +13,10 @@ import type {
   ApprovalRequest,
   User,
   TokenResponse,
+  Project,
+  ProjectListResponse,
+  ProjectStats,
+  TierInfo,
 } from './types';
 
 const api = axios.create({
@@ -74,6 +78,26 @@ export const refreshToken = (refresh_token: string) =>
 
 export const getMe = () =>
   api.get<User>('/auth/me').then((r) => r.data);
+
+// Tiers
+export const getTiers = () =>
+  api.get<TierInfo[]>('/projects/tiers').then((r) => r.data);
+
+// Projects
+export const createProject = (data: { name: string; description: string; tier?: string }) =>
+  api.post<Project>('/projects', data).then((r) => r.data);
+
+export const getProjects = (offset = 0, limit = 50, status?: string) =>
+  api.get<ProjectListResponse>('/projects', { params: { offset, limit, status } }).then((r) => r.data);
+
+export const getProject = (projectId: string) =>
+  api.get<Project>(`/projects/${projectId}`).then((r) => r.data);
+
+export const deleteProject = (projectId: string) =>
+  api.delete(`/projects/${projectId}`);
+
+export const getProjectStats = () =>
+  api.get<ProjectStats>('/projects/stats').then((r) => r.data);
 
 // Health
 export const getHealth = () => api.get<HealthResponse>('/health').then((r) => r.data);
