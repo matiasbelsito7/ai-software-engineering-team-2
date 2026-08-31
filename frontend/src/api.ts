@@ -11,6 +11,8 @@ import type {
   HealthResponse,
   PaginatedResponse,
   ApprovalRequest,
+  User,
+  TokenResponse,
 } from './types';
 
 const api = axios.create({
@@ -18,13 +20,60 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Attach JWT token to every request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle 401 and try refresh
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err) => {
+    const originalRequest = err.config;
+
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken) {
+        try {
+          const { data } = await axios.post<TokenResponse>('/api/v1/auth/refresh', {
+            refresh_token: refreshToken,
+          });
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('refresh_token', data.refresh_token);
+          originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+          return api(originalRequest);
+        } catch {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/login';
+        }
+      } else {
+        window.location.href = '/login';
+      }
+    }
+
     const message = err.response?.data?.detail || err.message;
     return Promise.reject(new Error(message));
   }
 );
+
+// Auth
+export const register = (email: string, password: string) =>
+  api.post<User>('/auth/register', { email, password }).then((r) => r.data);
+
+export const login = (email: string, password: string) =>
+  api.post<TokenResponse>('/auth/login', { email, password }).then((r) => r.data);
+
+export const refreshToken = (refresh_token: string) =>
+  api.post<TokenResponse>('/auth/refresh', { refresh_token }).then((r) => r.data);
+
+export const getMe = () =>
+  api.get<User>('/auth/me').then((r) => r.data);
 
 // Health
 export const getHealth = () => api.get<HealthResponse>('/health').then((r) => r.data);
@@ -82,16 +131,38 @@ export const deleteBudget = (budgetId: string) =>
   api.delete(`/cost-tracking/budgets/${budgetId}`);
 
 // WebSocket helper
-export const createTaskWebSocket = (taskId: string, onMessage: (data: Record<string, unknown>) => void) => {
+export const createTaskWebSocket = (
+  taskId: string,
+  onMessage: (data: Record<string, unknown>) => void,
+  onError?: (error: Event) => void,
+  onClose?: (event: CloseEvent) => void,
+) => {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const ws = new WebSocket(`${protocol}//${window.location.host}/ws/tasks/${taskId}`);
-  ws.onmessage = (event) => onMessage(JSON.parse(event.data));
+  ws.onmessage = (event) => {
+    try {
+      onMessage(JSON.parse(event.data));
+    } catch {
+      console.error('Failed to parse WebSocket message');
+    }
+  };
+  ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+    onError?.(error);
+  };
+  ws.onclose = (event) => {
+    console.warn('WebSocket closed:', event.code, event.reason);
+    onClose?.(event);
+  };
   return ws;
 };
 
 // SSE helper
 export const streamTask = async function* (taskId: string) {
   const response = await fetch(`/api/v1/tasks/${taskId}/stream`);
+  if (!response.ok) {
+    throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
+  }
   const reader = response.body?.getReader();
   const decoder = new TextDecoder();
   if (!reader) return;
