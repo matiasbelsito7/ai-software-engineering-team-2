@@ -138,7 +138,7 @@ Create the Spec Agent that generates technical specifications from natural langu
 
 ## Task 5: Workflow Integration — Add Spec Agent
 
-**Status:** Pending
+**Status:** Completed
 **Priority:** High
 **Estimated time:** 1 hour
 **Dependencies:** Tasks 2, 4
@@ -379,7 +379,7 @@ Task 11 (Testing) ←── All tasks
 | 2. Tier System | Completed | - | - | 2026-08-31 |
 | 3. Cost Tracking | Completed | - | - | 2026-08-31 |
 | 4. Spec Agent | Completed | - | - | 2026-08-31 |
-| 5. Workflow Integration | Pending | - | - | - |
+| 5. Workflow Integration | Completed | - | - | 2026-08-31 |
 | 6. App Generator | Pending | - | - | - |
 | 7. Frontend Auth | Pending | - | - | - |
 | 8. Frontend Wizard | Pending | - | - | - |
