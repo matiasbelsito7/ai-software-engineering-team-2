@@ -116,6 +116,13 @@ export const downloadProject = async (projectId: string, projectName: string) =>
   window.URL.revokeObjectURL(url);
 };
 
+// Admin
+export const getAdminMetrics = () =>
+  api.get('/admin/metrics').then((r) => r.data);
+
+export const getAdminUsers = (offset = 0, limit = 50) =>
+  api.get('/admin/users', { params: { offset, limit } }).then((r) => r.data);
+
 // Health
 export const getHealth = () => api.get<HealthResponse>('/health').then((r) => r.data);
 

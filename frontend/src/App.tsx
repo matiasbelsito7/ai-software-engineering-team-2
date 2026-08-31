@@ -12,6 +12,7 @@ import TaskDetail from './pages/TaskDetail';
 import Templates from './pages/Templates';
 import Knowledge from './pages/Knowledge';
 import CostTracking from './pages/CostTracking';
+import Admin from './pages/Admin';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
               <Route path="/templates" element={<Templates />} />
               <Route path="/knowledge" element={<Knowledge />} />
               <Route path="/costs" element={<CostTracking />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
           </Route>
         </Routes>

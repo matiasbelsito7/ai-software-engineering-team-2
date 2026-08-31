@@ -39,6 +39,7 @@ from ai_team.app.api.routers import (
     testing_router,
     ws_router,
 )
+from ai_team.app.api.routers.admin import router as admin_router
 from ai_team.app.api.security.audit import SecurityAuditLogger
 from ai_team.app.api.task_store import TaskStore
 from ai_team.infrastructure.config.app import AppSettings
@@ -134,6 +135,7 @@ def create_app() -> FastAPI:
     application.include_router(knowledge_router, prefix=app_settings.api_prefix)
     application.include_router(orchestration_router, prefix=app_settings.api_prefix)
     application.include_router(cost_tracking_router, prefix=app_settings.api_prefix)
+    application.include_router(admin_router, prefix=app_settings.api_prefix)
     application.include_router(ws_router, prefix=app_settings.api_prefix)
 
     return application

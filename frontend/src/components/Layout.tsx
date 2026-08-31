@@ -8,6 +8,7 @@ import {
   DollarSign,
   Activity,
   LogOut,
+  Shield,
 } from 'lucide-react';
 
 const links = [
@@ -16,6 +17,10 @@ const links = [
   { to: '/templates', label: 'Templates', icon: FileText },
   { to: '/knowledge', label: 'Knowledge', icon: BookOpen },
   { to: '/costs', label: 'Costs', icon: DollarSign },
+];
+
+const adminLinks = [
+  { to: '/admin', label: 'Admin', icon: Shield },
 ];
 
 export default function Layout() {
@@ -49,6 +54,27 @@ export default function Layout() {
               {label}
             </NavLink>
           ))}
+          {user?.role === 'admin' && (
+            <>
+              <div className="border-t border-gray-200 my-2" />
+              {adminLinks.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-indigo-50 text-indigo-700'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </NavLink>
+              ))}
+            </>
+          )}
         </nav>
         <div className="p-4 border-t border-gray-200 space-y-3">
           {user && (
