@@ -305,6 +305,9 @@ ignore = [
     # Permitimos defaults con llamadas (FastAPI)
     "B008",
 
+    # SQLAlchemy ORM models need runtime imports (datetime, etc.)
+    "TC003",
+
 ]
 
 fixable = ["ALL"]
