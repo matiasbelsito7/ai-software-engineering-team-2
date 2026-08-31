@@ -279,3 +279,101 @@ async def delete_project(
         await project_service.delete(project_id, current_user.id)
     except ProjectError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+
+
+@router.get(
+    "/projects/{project_id}/preview",
+    summary="Get HTML preview of generated app",
+)
+async def get_project_preview(
+    project_id: str,
+    current_user: UserResponse = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+) -> JSONResponse:
+    """
+    Get the HTML preview of a generated application.
+    """
+    try:
+        project = await project_service.get(project_id, current_user.id)
+        if not project.files_path:
+            raise HTTPException(status_code=404, detail="Project has no generated files")
+
+        from ai_team.domain.services.app_preview import AppPreview
+
+        files = await _load_project_files(project.files_path)
+        preview_html = AppPreview.generate(files=files, app_name=project.name)
+        return JSONResponse(content={"html": preview_html})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.get(
+    "/projects/{project_id}/download",
+    summary="Download project as ZIP",
+)
+async def download_project(
+    project_id: str,
+    current_user: UserResponse = Depends(get_current_user),
+    project_service: ProjectService = Depends(get_project_service),
+) -> Response:
+    """
+    Download the generated project as a ZIP archive.
+
+    Only available for paid tiers (starter, pro, business).
+    """
+    try:
+        project = await project_service.get(project_id, current_user.id)
+
+        from ai_team.domain.models.tier import get_tier
+
+        tier_config = get_tier(project.tier)
+        if not tier_config.can_download_code:
+            raise HTTPException(
+                status_code=403,
+                detail="Code download is not available for the Free tier. Upgrade to download.",
+            )
+
+        if not project.files_path:
+            raise HTTPException(status_code=404, detail="Project has no generated files")
+
+        files = await _load_project_files(project.files_path)
+
+        from ai_team.domain.services.app_packager import AppPackager
+
+        readme = AppPackager.build_readme(
+            app_name=project.name,
+            description=project.description,
+        )
+        zip_bytes = AppPackager.create_zip(files=files, readme_content=readme)
+
+        return Response(
+            content=zip_bytes,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{project.name}.zip"',
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+async def _load_project_files(base_path: str) -> dict[str, str]:
+    """Load all files from a project directory."""
+    from pathlib import Path
+
+    root = Path(base_path)
+    files: dict[str, str] = {}
+
+    if not root.exists():
+        return files
+
+    for file_path in sorted(root.rglob("*")):
+        if file_path.is_file():
+            rel_path = str(file_path.relative_to(root))
+            files[rel_path] = file_path.read_text(encoding="utf-8")
+
+    return files

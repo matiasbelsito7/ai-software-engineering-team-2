@@ -99,6 +99,23 @@ export const deleteProject = (projectId: string) =>
 export const getProjectStats = () =>
   api.get<ProjectStats>('/projects/stats').then((r) => r.data);
 
+export const getProjectPreview = (projectId: string) =>
+  api.get<{ html: string }>(`/projects/${projectId}/preview`).then((r) => r.data);
+
+export const downloadProject = async (projectId: string, projectName: string) => {
+  const response = await api.get(`/projects/${projectId}/download`, {
+    responseType: 'blob',
+  });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${projectName}.zip`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 // Health
 export const getHealth = () => api.get<HealthResponse>('/health').then((r) => r.data);
 
