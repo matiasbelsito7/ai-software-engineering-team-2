@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
 
 from ai_team.app.api.schemas.tasks import ErrorResponse
@@ -265,17 +265,17 @@ async def update_project(
     "/projects/{project_id}",
     status_code=204,
     summary="Delete project",
+    response_class=None,
 )
 async def delete_project(
     project_id: str,
     current_user: UserResponse = Depends(get_current_user),
     project_service: ProjectService = Depends(get_project_service),
-) -> JSONResponse | None:
+) -> None:
     """
     Delete a project.
     """
     try:
         await project_service.delete(project_id, current_user.id)
-        return None
     except ProjectError as e:
-        return _project_error_response(e)
+        raise HTTPException(status_code=404, detail=str(e))
