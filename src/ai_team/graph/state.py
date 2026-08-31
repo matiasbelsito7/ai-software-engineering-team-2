@@ -80,6 +80,44 @@ class ArtifactState(BaseModel):
     )
 
 
+class BudgetState(BaseModel):
+    """
+    Budget and tier configuration for the workflow.
+    """
+
+    model_config = ConfigDict(
+        validate_assignment=True,
+        extra="forbid",
+    )
+
+    tier: str = "free"
+
+    tokens_budget: int = 50_000
+
+    tokens_used: int = 0
+
+    max_iterations: int = 2
+
+    iterations_used: int = 0
+
+    project_id: str | None = None
+
+    @property
+    def tokens_remaining(self) -> int:
+        """Remaining token budget."""
+        return max(0, self.tokens_budget - self.tokens_used)
+
+    @property
+    def budget_exhausted(self) -> bool:
+        """Check if budget is exhausted."""
+        return self.tokens_used >= self.tokens_budget
+
+    @property
+    def iterations_exhausted(self) -> bool:
+        """Check if iteration limit is reached."""
+        return self.iterations_used >= self.max_iterations
+
+
 class GraphState(BaseModel):
     """
     Global state shared by every LangGraph node.
@@ -104,4 +142,8 @@ class GraphState(BaseModel):
 
     feedback: FeedbackState = Field(
         default_factory=FeedbackState,
+    )
+
+    budget: BudgetState = Field(
+        default_factory=BudgetState,
     )

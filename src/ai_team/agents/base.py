@@ -231,6 +231,19 @@ class BaseAgent[T](ABC):
             response.content,
         )
 
+        # Record LLM call for observability and cost tracking
+        if self.observations is not None and response.usage is not None:
+            with contextlib.suppress(Exception):
+                await self.observations.record_llm_call(
+                    execution_id=str(execution.id),
+                    agent=self.info.name,
+                    provider=response.provider,
+                    model=response.model,
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    latency_ms=response.latency_ms or 0.0,
+                )
+
         return response
 
     async def generate_and_parse(

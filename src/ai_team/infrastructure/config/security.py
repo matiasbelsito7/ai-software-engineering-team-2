@@ -96,6 +96,32 @@ class SecuritySettings(BaseSettings):
     )
 
     ###########################################################################
+    # JWT Authentication
+    ###########################################################################
+
+    jwt_secret: str = Field(
+        default="CHANGE_ME_IN_PRODUCTION",
+        description="Secret key for JWT signing.",
+    )
+
+    jwt_algorithm: str = Field(
+        default="HS256",
+        description="JWT signing algorithm.",
+    )
+
+    jwt_access_token_expire_minutes: int = Field(
+        default=30,
+        ge=1,
+        description="Access token expiration in minutes.",
+    )
+
+    jwt_refresh_token_expire_days: int = Field(
+        default=7,
+        ge=1,
+        description="Refresh token expiration in days.",
+    )
+
+    ###########################################################################
     # Audit Logging
     ###########################################################################
 

@@ -4,6 +4,7 @@ LangGraph builder.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from langgraph.graph import END, START, StateGraph
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
     from ai_team.agents.qa.agent import QAAgent
     from ai_team.agents.reviewer.agent import ReviewerAgent
 
+logger = logging.getLogger(__name__)
+
 
 def _make_agent_node(
     agent: Any,
@@ -31,6 +34,8 @@ def _make_agent_node(
 
     LangGraph nodes receive and return GraphState.
     BaseAgent.execute() expects AgentExecution and returns AgentExecution.
+
+    Includes budget checking before execution.
     """
 
     async def _node(state: GraphState) -> GraphState:
@@ -38,6 +43,57 @@ def _make_agent_node(
             AgentExecution,
             AgentRequest,
         )
+
+        # Check budget before executing
+        if state.budget.budget_exhausted:
+            logger.warning(
+                "Budget exhausted for project %s. Skipping agent %s.",
+                state.budget.project_id,
+                agent.info.name,
+            )
+            # Create a skipped result
+            from ai_team.agents.result import AgentResult
+
+            skipped_result = AgentResult(
+                success=False,
+                output=None,
+                message=f"Budget exhausted. Used {state.budget.tokens_used}/{state.budget.tokens_budget} tokens.",
+                next_agent=None,
+                metadata={
+                    "agent": agent.info.name,
+                    "skipped": True,
+                    "reason": "budget_exhausted",
+                },
+            )
+            state.artifacts.results.append(skipped_result)
+            state.execution.current_agent = agent.info.name
+            state.execution.previous_agent = agent.info.name
+            return state
+
+        # Check iteration limit
+        if state.budget.iterations_exhausted:
+            logger.warning(
+                "Iteration limit reached for project %s. Skipping agent %s.",
+                state.budget.project_id,
+                agent.info.name,
+            )
+            from ai_team.agents.result import AgentResult
+
+            skipped_result = AgentResult(
+                success=False,
+                output=None,
+                message=f"Iteration limit reached. Used {state.budget.iterations_used}/{state.budget.max_iterations} iterations.",
+                next_agent=None,
+                metadata={
+                    "agent": agent.info.name,
+                    "skipped": True,
+                    "reason": "iterations_exhausted",
+                },
+            )
+            state.artifacts.results.append(skipped_result)
+            state.execution.current_agent = agent.info.name
+            state.execution.previous_agent = agent.info.name
+            return state
 
         execution = AgentExecution(
             capability=agent.capability,
@@ -48,6 +104,11 @@ def _make_agent_node(
         )
 
         execution = await agent.execute(execution)
+
+        # Update budget tracking from LLM response
+        if execution.llm_response is not None and execution.llm_response.usage is not None:
+            tokens = execution.llm_response.usage.total_tokens
+            state.budget.tokens_used += tokens
 
         state.artifacts.results.append(
             execution.result,

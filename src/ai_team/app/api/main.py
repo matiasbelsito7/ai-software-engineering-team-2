@@ -24,12 +24,14 @@ from ai_team.app.api.middleware import (
 )
 from ai_team.app.api.routers import (
     approvals_router,
+    auth_router,
     cost_tracking_router,
     deployment_router,
     feedback_router,
     health_router,
     knowledge_router,
     orchestration_router,
+    projects_router,
     review_router,
     streaming_router,
     tasks_router,
@@ -119,6 +121,8 @@ def create_app() -> FastAPI:
 
     # --- Routers ---
     application.include_router(health_router, prefix=app_settings.api_prefix)
+    application.include_router(auth_router, prefix=app_settings.api_prefix)
+    application.include_router(projects_router, prefix=app_settings.api_prefix)
     application.include_router(tasks_router, prefix=app_settings.api_prefix)
     application.include_router(approvals_router, prefix=app_settings.api_prefix)
     application.include_router(templates_router, prefix=app_settings.api_prefix)
