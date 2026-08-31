@@ -165,7 +165,7 @@ Integrate the Spec Agent into the LangGraph workflow as the first node, before t
 
 ## Task 6: App Generator Service
 
-**Status:** Pending
+**Status:** Completed
 **Priority:** High
 **Estimated time:** 2 hours
 **Dependencies:** Tasks 2, 3, 5
@@ -380,7 +380,7 @@ Task 11 (Testing) ←── All tasks
 | 3. Cost Tracking | Completed | - | - | 2026-08-31 |
 | 4. Spec Agent | Completed | - | - | 2026-08-31 |
 | 5. Workflow Integration | Completed | - | - | 2026-08-31 |
-| 6. App Generator | Pending | - | - | - |
+| 6. App Generator | Completed | - | - | 2026-08-31 |
 | 7. Frontend Auth | Pending | - | - | - |
 | 8. Frontend Wizard | Pending | - | - | - |
 | 9. Frontend Preview | Pending | - | - | - |
