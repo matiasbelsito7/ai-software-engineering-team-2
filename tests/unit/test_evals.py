@@ -5,7 +5,7 @@ Unit tests for the evals subsystem.
 from __future__ import annotations
 
 import json
-from pathlib import Path  # noqa: TC003
+from pathlib import Path
 
 import pytest
 
