@@ -5,16 +5,13 @@ User ORM model.
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from sqlalchemy import String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ai_team.infrastructure.database.base import Base
-
-if TYPE_CHECKING:
-    from datetime import datetime
 
 
 class User(Base):
