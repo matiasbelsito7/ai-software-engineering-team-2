@@ -401,6 +401,11 @@ module = [
     "docker",
     "docker.*",
     "playwright.*",
+    "jose.*",
+    "jose",
+    "passlib.*",
+    "passlib",
+    "passlib.context",
 ]
 
 ignore_missing_imports = true

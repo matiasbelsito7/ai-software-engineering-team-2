@@ -8,7 +8,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from ai_team.app.api.schemas.tasks import ErrorResponse
 from ai_team.domain.models.tier import TIERS, get_tier
@@ -265,7 +265,7 @@ async def update_project(
     "/projects/{project_id}",
     status_code=204,
     summary="Delete project",
-    response_class=None,
+    response_class=Response,
 )
 async def delete_project(
     project_id: str,
