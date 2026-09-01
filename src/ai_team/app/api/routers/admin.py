@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 from fastapi import APIRouter, Depends
 
 from ai_team.app.api.dependencies import get_current_admin
-from ai_team.domain.schemas.auth import UserResponse
+from ai_team.domain.schemas.auth import UserResponse  # noqa: TC001
 from ai_team.infrastructure.database.session import get_session
 
 if TYPE_CHECKING:
@@ -62,9 +62,7 @@ async def get_admin_metrics(
     projects_by_status = {row[0]: row[1] for row in status_result.all()}
 
     # Total tokens used
-    tokens_result = await session.execute(
-        select(func.coalesce(func.sum(Project.tokens_used), 0))
-    )
+    tokens_result = await session.execute(select(func.coalesce(func.sum(Project.tokens_used), 0)))
     total_tokens = tokens_result.scalar() or 0
 
     # Projects by tier
@@ -74,9 +72,7 @@ async def get_admin_metrics(
     projects_by_tier = {row[0]: row[1] for row in tier_result.all()}
 
     # Total iterations
-    iter_result = await session.execute(
-        select(func.coalesce(func.sum(Project.iterations_used), 0))
-    )
+    iter_result = await session.execute(select(func.coalesce(func.sum(Project.iterations_used), 0)))
     total_iterations = iter_result.scalar() or 0
 
     return {

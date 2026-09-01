@@ -4,9 +4,6 @@ Tests for the authentication system.
 
 from __future__ import annotations
 
-import time
-from unittest.mock import MagicMock
-
 import pytest
 
 from ai_team.domain.models.tier import TIERS, get_tier
@@ -14,9 +11,7 @@ from ai_team.domain.schemas.auth import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
-    UserResponse,
 )
-
 
 # ---------------------------------------------------------------------------
 # Tier config tests
@@ -71,11 +66,11 @@ class TestAuthSchemas:
         assert req.password == "StrongPass1"
 
     def test_register_request_invalid_email(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             RegisterRequest(email="not-an-email", password="StrongPass1")
 
     def test_register_request_short_password(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             RegisterRequest(email="test@example.com", password="short")
 
     def test_login_request(self):

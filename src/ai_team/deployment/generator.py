@@ -172,7 +172,8 @@ jobs:
         """Build GitHub Actions deploy workflow."""
         environments = config.environments or [DeploymentEnvironment.STAGING]
 
-        env_configs = [f"""  {env.value}:
+        env_configs = [
+            f"""  {env.value}:
     runs-on: ubuntu-latest
     needs: ci
     if: github.ref == 'refs/heads/main'
@@ -181,7 +182,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Deploy to {env.value}
         run: echo "Deploying to {env.value}..."
-""" for env in environments]
+"""
+            for env in environments
+        ]
 
         workflow = f"""name: Deploy
 

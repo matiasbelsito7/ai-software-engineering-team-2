@@ -4,11 +4,9 @@ Tests for the Spec Agent models.
 
 from __future__ import annotations
 
-import pytest
-
 from ai_team.agents.spec.models import (
-    AppSpecification,
     AppComponent,
+    AppSpecification,
     AuthRequirements,
     DatabaseSchema,
     DBField,

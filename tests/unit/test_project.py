@@ -4,20 +4,14 @@ Tests for the project system.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 import pytest
 
-from ai_team.domain.models.tier import TIERS, get_tier
 from ai_team.domain.schemas.project import (
     CreateProjectRequest,
-    ProjectListResponse,
-    ProjectResponse,
     ProjectStatsResponse,
     TierInfo,
     UpdateProjectRequest,
 )
-
 
 # ---------------------------------------------------------------------------
 # Project schema tests
@@ -44,7 +38,7 @@ class TestProjectSchemas:
         assert req.tier == "free"
 
     def test_create_project_request_empty_name_fails(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             CreateProjectRequest(name="", description="Desc")
 
     def test_update_project_request(self):
